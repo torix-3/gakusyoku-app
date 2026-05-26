@@ -7,6 +7,10 @@
 
   <title>限界大学生の学食ナビ</title>
 
+  <!-- Chart.js -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -19,16 +23,14 @@
       width: 100%;
       max-width: 400px;
       margin: 0 auto;
-      padding-top: 20px;
-
-      display: flex;
-      flex-direction: column;
-
       min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
-
-    /* 進行バー */
+    /* =========================
+       進行バー
+    ========================= */
 
     .progress-container {
       display: flex;
@@ -48,7 +50,9 @@
       background: #ff5722;
     }
 
-    /* カード */
+    /* =========================
+       質問カード
+    ========================= */
 
     .card {
       background: white;
@@ -56,16 +60,8 @@
       padding: 30px 25px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 
-      margin-top: 200px;
+      margin-top: 180px;
     }
-
-
-    h2 {
-      text-align: center;
-      margin-bottom: 35px;
-    }
-
-    /* 質問 */
 
     .question {
       display: none;
@@ -83,7 +79,9 @@
       text-align: center;
     }
 
-    /* 性別ボタン */
+    /* =========================
+       性別ボタン
+    ========================= */
 
     .gender-buttons {
       display: flex;
@@ -106,7 +104,9 @@
       color: white;
     }
 
-    /* select */
+    /* =========================
+       select
+    ========================= */
 
     select {
       width: 100%;
@@ -117,7 +117,9 @@
       background: white;
     }
 
-    /* ボタン */
+    /* =========================
+       次へボタン
+    ========================= */
 
     .button-area {
       margin-top: 35px;
@@ -140,11 +142,14 @@
       cursor: pointer;
     }
 
-    /* おすすめ画面 */
+    /* =========================
+       おすすめ画面
+    ========================= */
 
     .recommend-screen {
       display: none;
 
+      width: 100%;
       height: 100vh;
 
       justify-content: center;
@@ -153,16 +158,13 @@
       position: relative;
     }
 
-    .food-slider {
-      display: flex;
-      gap: 20px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      padding-bottom: 10px;
-    }
+    /* =========================
+       料理カード
+    ========================= */
 
     .food-card {
-      width: 85%;
+      width: 100%;
+      max-width: 350px;
 
       background: white;
 
@@ -170,18 +172,64 @@
 
       padding: 20px;
 
-      margin: auto;
+      box-sizing: border-box;
 
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
+      text-align: center;
     }
 
     .food-image {
       width: 100%;
-      height: 200px;
+      height: 220px;
       object-fit: cover;
       border-radius: 20px;
     }
+
+    h2 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 260px !important;
+    }
+
+    /* =========================
+       矢印ボタン
+    ========================= */
+
+    .arrow-btn {
+      position: absolute;
+
+      top: 50%;
+      transform: translateY(-50%);
+
+      width: 50px;
+      height: 50px;
+
+      border: none;
+      border-radius: 50%;
+
+      background: white;
+
+      font-size: 24px;
+
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+
+      cursor: pointer;
+    }
+
+    .left-btn {
+      left: 0;
+    }
+
+    .right-btn {
+      right: 0;
+    }
   </style>
+
 </head>
 
 <body>
@@ -197,11 +245,13 @@
       <div class="progress-step"></div>
     </div>
 
+    <!-- 質問カード -->
+
     <div class="card">
 
       <!-- 性別 -->
 
-      <div class="question active" id="question0">
+      <div class="question active">
 
         <label>性別を選択してください</label>
 
@@ -221,7 +271,7 @@
 
       <!-- 年齢 -->
 
-      <div class="question" id="question1">
+      <div class="question">
 
         <label>年齢を選択してください</label>
 
@@ -233,7 +283,7 @@
 
       <!-- 身長 -->
 
-      <div class="question" id="question2">
+      <div class="question">
 
         <label>身長を選択してください</label>
 
@@ -245,7 +295,7 @@
 
       <!-- 体重 -->
 
-      <div class="question" id="question3">
+      <div class="question">
 
         <label>体重を選択してください</label>
 
@@ -255,7 +305,7 @@
 
       </div>
 
-      <!-- ボタン -->
+      <!-- 次へ -->
 
       <div class="button-area">
 
@@ -265,59 +315,45 @@
 
       </div>
 
-    </div> <!-- card終了 -->
+    </div>
 
     <!-- おすすめ画面 -->
 
     <div class="recommend-screen" id="recommendScreen">
 
-      <div class="food-slider">
+      <!-- 左矢印 -->
 
-        <!-- カード1 -->
+      <button class="arrow-btn left-btn" id="prevBtn">
+        ←
+      </button>
 
-        <div class="food-card">
+      <!-- カード -->
 
-          <img src="https://picsum.photos/300/200" class="food-image">
+      <div class="food-card">
 
-          <h2>唐揚げ定食</h2>
+        <img id="foodImage" class="food-image">
 
-          <canvas id="radarChart"></canvas>
+        <h2 id="foodTitle"></h2>
 
-        </div>
-
-        <!-- カード2 -->
-
-        <div class="food-card">
-
-          <img src="https://picsum.photos/301/200" class="food-image">
-
-          <h2>カツカレー</h2>
-
-          <canvas id="radarChart2"></canvas>
-
-        </div>
-
-        <!-- カード3 -->
-
-        <div class="food-card">
-
-          <img src="https://picsum.photos/302/200" class="food-image">
-
-          <h2>鯖味噌定食</h2>
-
-          <canvas id="radarChart3"></canvas>
-
-        </div>
+        <canvas id="radarChart"></canvas>
 
       </div>
 
+      <!-- 右矢印 -->
+
+      <button class="arrow-btn right-btn" id="nextFoodBtn">
+        →
+      </button>
+
     </div>
 
-  </div> <!-- container終了 -->
+  </div>
 
   <script>
 
-    /* データ */
+    /* =========================
+       質問画面
+    ========================= */
 
     let currentStep = 0;
 
@@ -327,24 +363,65 @@
 
     let selectedGender = null;
 
-    /* select生成 */
+    /* 保存データ取得 */
+
+    const savedGender = localStorage.getItem("gender");
+
+    const savedAge = localStorage.getItem("age");
+
+    const savedHeight = localStorage.getItem("height");
+
+    const savedWeight = localStorage.getItem("weight");
+
+    /* =========================
+       select生成
+    ========================= */
 
     const ageSelect = document.getElementById("age");
+
     for (let i = 18; i <= 30; i++) {
       ageSelect.innerHTML += `<option value="${i}">${i}歳</option>`;
     }
 
     const heightSelect = document.getElementById("height");
+
     for (let i = 140; i <= 200; i++) {
       heightSelect.innerHTML += `<option value="${i}">${i}cm</option>`;
     }
 
     const weightSelect = document.getElementById("weight");
+
     for (let i = 40; i <= 120; i++) {
       weightSelect.innerHTML += `<option value="${i}">${i}kg</option>`;
     }
 
-    /* 性別 */
+    /* 保存データ反映 */
+
+    if (savedGender) {
+
+      selectedGender = savedGender;
+
+      document
+        .querySelector(`[data-value="${savedGender}"]`)
+        .classList.add("selected");
+
+    }
+
+    if (savedAge) {
+      ageSelect.value = savedAge;
+    }
+
+    if (savedHeight) {
+      heightSelect.value = savedHeight;
+    }
+
+    if (savedWeight) {
+      weightSelect.value = savedWeight;
+    }
+
+    /* =========================
+       性別選択
+    ========================= */
 
     const genderButtons = document.querySelectorAll(".gender-btn");
 
@@ -361,11 +438,14 @@
         selectedGender = btn.dataset.value;
 
         enableButton();
+
       });
 
     });
 
-    /* select変更 */
+    /* =========================
+       select変更
+    ========================= */
 
     document.querySelectorAll("select").forEach(select => {
 
@@ -379,43 +459,44 @@
 
     });
 
-    /* ボタン有効化 */
+    /* =========================
+       ボタン有効化
+    ========================= */
 
     function enableButton() {
       nextBtn.classList.add("enabled");
     }
 
-    /* 次へ */
+    /* =========================
+       次へ
+    ========================= */
 
     nextBtn.addEventListener("click", () => {
 
-      /* 入力チェック */
-
-      if (currentStep === 0 && !selectedGender) {
-        return;
-      }
-
-      if (currentStep === 1 && ageSelect.value === "") {
-        return;
-      }
-
-      if (currentStep === 2 && heightSelect.value === "") {
-        return;
-      }
-
-      if (currentStep === 3 && weightSelect.value === "") {
-        return;
-      }
+      if (currentStep === 0 && !selectedGender) return;
+      if (currentStep === 1 && ageSelect.value === "") return;
+      if (currentStep === 2 && heightSelect.value === "") return;
+      if (currentStep === 3 && weightSelect.value === "") return;
 
       /* 最後 */
 
       if (currentStep === 3) {
 
+        /* 保存 */
+
+        localStorage.setItem("gender", selectedGender);
+
+        localStorage.setItem("age", ageSelect.value);
+
+        localStorage.setItem("height", heightSelect.value);
+
+        localStorage.setItem("weight", weightSelect.value);
+
         /* 進行バーを消す */
 
         document.querySelector(".progress-container").style.display = "none";
 
-        /* 質問画面を消す */
+        /* 入力カードを消す */
 
         document.querySelector(".card").style.display = "none";
 
@@ -439,6 +520,189 @@
       nextBtn.classList.remove("enabled");
 
     });
+
+    /* =========================
+       食事データ
+    ========================= */
+
+    const foods = [
+
+      {
+        title: "唐揚げ定食",
+        image: "https://picsum.photos/300/200",
+        data: [8, 6, 7, 3, 10]
+      },
+
+      {
+        title: "カツカレー",
+        image: "https://picsum.photos/301/200",
+        data: [7, 9, 10, 2, 10]
+      },
+
+      {
+        title: "鯖味噌定食",
+        image: "https://picsum.photos/302/200",
+        data: [8, 5, 6, 9, 7]
+      }
+
+    ];
+
+    let currentFood = 0;
+
+    /* =========================
+       要素取得
+    ========================= */
+
+    const foodTitle = document.getElementById("foodTitle");
+    const foodImage = document.getElementById("foodImage");
+
+    /* =========================
+       レーダーチャート
+    ========================= */
+
+    const ctx = document.getElementById("radarChart");
+
+    const radarChart = new Chart(ctx, {
+
+      type: "radar",
+
+      data: {
+
+        labels: [
+          "タンパク質",
+          "脂質",
+          "炭水化物",
+          "ビタミン",
+          "満足度"
+        ],
+
+        datasets: [
+
+          /* 理想栄養 */
+
+          {
+            label: "理想",
+
+            data: [8, 8, 8, 8, 8],
+
+            borderColor: "#999",
+
+            backgroundColor: "transparent",
+
+            borderWidth: 2,
+
+            pointBackgroundColor: "#999"
+          },
+
+          /* 実際の栄養 */
+
+          {
+            label: "実際",
+
+            data: [],
+
+            borderColor: "#ff5722",
+
+            backgroundColor: "rgba(255,87,34,0.4)",
+
+            borderWidth: 2,
+
+            pointBackgroundColor: "#ff5722"
+          }
+
+        ]
+      },
+
+      options: {
+
+        responsive: true,
+
+        plugins: {
+
+          legend: {
+            display: true
+          }
+
+        },
+
+        scales: {
+
+          r: {
+
+            min: 0,
+            max: 10,
+
+            ticks: {
+              stepSize: 2
+            },
+
+            pointLabels: {
+              font: {
+                size: 14
+              }
+            }
+
+          }
+
+        }
+
+      }
+
+    });
+
+    /* =========================
+       表示更新
+    ========================= */
+
+    function updateFood() {
+
+      const food = foods[currentFood];
+
+      foodTitle.textContent = food.title;
+
+      foodImage.src = food.image;
+
+      radarChart.data.datasets[1].data = food.data;
+
+      radarChart.update();
+
+    }
+
+    updateFood();
+
+    /* =========================
+       右矢印
+    ========================= */
+
+    document.getElementById("nextFoodBtn")
+      .addEventListener("click", () => {
+
+        currentFood++;
+
+        if (currentFood >= foods.length) {
+          currentFood = 0;
+        }
+
+        updateFood();
+
+      });
+
+    /* =========================
+       左矢印
+    ========================= */
+
+    document.getElementById("prevBtn")
+      .addEventListener("click", () => {
+
+        currentFood--;
+
+        if (currentFood < 0) {
+          currentFood = foods.length - 1;
+        }
+
+        updateFood();
+
+      });
 
   </script>
 
