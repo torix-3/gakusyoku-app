@@ -2,13 +2,14 @@
 <html lang="ja">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>限界大学生の学食ナビ</title>
 
   <!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     body {
@@ -16,12 +17,11 @@
       background: #f5f5f5;
       font-family: sans-serif;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
     .container {
       width: 100%;
-      max-width: 430px;
+      max-width: 400px;
       margin: 0 auto;
       min-height: 100vh;
       padding: 20px;
@@ -60,7 +60,7 @@
       padding: 30px 25px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 
-      margin-top: 170px;
+      margin-top: 180px;
     }
 
     .question {
@@ -73,9 +73,9 @@
 
     label {
       display: block;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       text-align: center;
     }
 
@@ -150,16 +150,12 @@
       display: none;
 
       width: 100%;
-      min-height: 100vh;
+      height: 100vh;
 
       justify-content: center;
       align-items: center;
 
       position: relative;
-
-      padding: 20px 0;
-
-      box-sizing: border-box;
     }
 
     /* =========================
@@ -167,8 +163,8 @@
     ========================= */
 
     .food-card {
-      width: 85%;
-      max-width: 360px;
+      width: 100%;
+      max-width: 350px;
 
       background: white;
 
@@ -178,7 +174,7 @@
 
       box-sizing: border-box;
 
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 
       text-align: center;
     }
@@ -193,12 +189,11 @@
     h2 {
       margin-top: 20px;
       margin-bottom: 10px;
-      font-size: 28px;
     }
 
     canvas {
       width: 100% !important;
-      height: 250px !important;
+      height: 260px !important;
     }
 
     /* =========================
@@ -211,8 +206,8 @@
       top: 50%;
       transform: translateY(-50%);
 
-      width: 55px;
-      height: 55px;
+      width: 50px;
+      height: 50px;
 
       border: none;
       border-radius: 50%;
@@ -224,16 +219,14 @@
       box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 
       cursor: pointer;
-
-      z-index: 100;
     }
 
     .left-btn {
-      left: 10px;
+      left: 0;
     }
 
     .right-btn {
-      right: 10px;
+      right: 0;
     }
   </style>
 
@@ -246,15 +239,13 @@
     <!-- 進行バー -->
 
     <div class="progress-container">
-
       <div class="progress-step active"></div>
       <div class="progress-step"></div>
       <div class="progress-step"></div>
       <div class="progress-step"></div>
-
     </div>
 
-    <!-- 入力カード -->
+    <!-- 質問カード -->
 
     <div class="card">
 
@@ -314,7 +305,7 @@
 
       </div>
 
-      <!-- ボタン -->
+      <!-- 次へ -->
 
       <div class="button-area">
 
@@ -372,13 +363,14 @@
 
     let selectedGender = null;
 
-    /* =========================
-       保存データ取得
-    ========================= */
+    /* 保存データ取得 */
 
     const savedGender = localStorage.getItem("gender");
+
     const savedAge = localStorage.getItem("age");
+
     const savedHeight = localStorage.getItem("height");
+
     const savedWeight = localStorage.getItem("weight");
 
     /* =========================
@@ -403,9 +395,7 @@
       weightSelect.innerHTML += `<option value="${i}">${i}kg</option>`;
     }
 
-    /* =========================
-       保存データ反映
-    ========================= */
+    /* 保存データ反映 */
 
     if (savedGender) {
 
@@ -414,11 +404,20 @@
       document
         .querySelector(`[data-value="${savedGender}"]`)
         .classList.add("selected");
+
     }
 
-    if (savedAge) ageSelect.value = savedAge;
-    if (savedHeight) heightSelect.value = savedHeight;
-    if (savedWeight) weightSelect.value = savedWeight;
+    if (savedAge) {
+      ageSelect.value = savedAge;
+    }
+
+    if (savedHeight) {
+      heightSelect.value = savedHeight;
+    }
+
+    if (savedWeight) {
+      weightSelect.value = savedWeight;
+    }
 
     /* =========================
        性別選択
@@ -486,30 +485,29 @@
         /* 保存 */
 
         localStorage.setItem("gender", selectedGender);
+
         localStorage.setItem("age", ageSelect.value);
+
         localStorage.setItem("height", heightSelect.value);
+
         localStorage.setItem("weight", weightSelect.value);
 
-        /* 非表示 */
+        /* 進行バーを消す */
 
         document.querySelector(".progress-container").style.display = "none";
+
+        /* 入力カードを消す */
+
         document.querySelector(".card").style.display = "none";
 
-        /* 表示 */
+        /* おすすめ画面表示 */
 
         document.getElementById("recommendScreen").style.display = "flex";
-
-        /* スマホ用再描画 */
-
-        setTimeout(() => {
-          radarChart.resize();
-          radarChart.update();
-        }, 100);
 
         return;
       }
 
-      /* 次へ */
+      /* 次へ進む */
 
       questions[currentStep].classList.remove("active");
 
@@ -530,7 +528,7 @@
     const foods = [
 
       {
-        title: "揚げ定食",
+        title: "唐揚げ定食",
         image: "https://picsum.photos/300/200",
         data: [8, 6, 7, 3, 10]
       },
@@ -580,6 +578,8 @@
 
         datasets: [
 
+          /* 理想栄養 */
+
           {
             label: "理想",
 
@@ -593,6 +593,8 @@
 
             pointBackgroundColor: "#999"
           },
+
+          /* 実際の栄養 */
 
           {
             label: "実際",
@@ -609,14 +611,11 @@
           }
 
         ]
-
       },
 
       options: {
 
         responsive: true,
-
-        maintainAspectRatio: false,
 
         plugins: {
 
@@ -638,11 +637,9 @@
             },
 
             pointLabels: {
-
               font: {
                 size: 14
               }
-
             }
 
           }
