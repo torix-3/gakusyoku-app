@@ -733,10 +733,33 @@
         title: "鯖味噌定食",
         image: "https://picsum.photos/302/200",
         data: [8, 5, 6, 9, 7]
+      },
+      {
+        title: "親子丼",
+        image: "https://picsum.photos/303/200",
+        data: [7, 4, 8, 5, 8]
+      },
+
+      {
+        title: "味噌ラーメン",
+        image: "https://picsum.photos/304/200",
+        data: [5, 6, 9, 3, 9]
+      },
+
+      {
+        title: "ハンバーグ定食",
+        image: "https://picsum.photos/305/200",
+        data: [8, 7, 6, 4, 9]
       }
-
     ];
+    /* =========================
+       ランダムで3つ選択
+    ========================= */
 
+    const selectedFoods =
+      [...foods]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
     let currentFood = 0;
 
     /* =========================
@@ -780,13 +803,13 @@
 
               data: [8, 8, 8, 8, 8],
 
-              borderColor: "#999",
+              borderColor: "#87CEEB",
 
-              backgroundColor: "transparent",
+              backgroundColor: "rgba(135,206,235,0.2)",
 
               borderWidth: 3,
 
-              pointBackgroundColor: "#999"
+              pointBackgroundColor: "#87CEEB"
             },
 
             /* 実際 */
@@ -873,7 +896,7 @@
 
     function updateFood() {
 
-      const food = foods[currentFood];
+      const food = selectedFoods[currentFood];
 
       foodTitle.textContent =
         food.title;
@@ -901,7 +924,7 @@
         currentFood++;
 
         if (
-          currentFood >= foods.length
+          currentFood >= selectedFoods.length
         ) {
 
           currentFood = 0;
@@ -927,7 +950,7 @@
         ) {
 
           currentFood =
-            foods.length - 1;
+            selectedFoods.length - 1;
 
         }
 
