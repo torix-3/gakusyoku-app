@@ -64,7 +64,7 @@
 
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 
-      height: calc(100vh - 70px);
+      height: calc(100vh - 105px);
 
       display: flex;
       flex-direction: column;
@@ -177,10 +177,12 @@
       width: 100%;
       height: 100vh;
 
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
 
       position: relative;
+
+      padding-top: 0;
     }
 
     /* =========================
@@ -189,7 +191,7 @@
 
     .food-card {
       width: 100%;
-      height: calc(100vh - 32px);
+      height: calc(100vh - 70px);
 
       background: white;
 
@@ -204,6 +206,8 @@
       justify-content: space-between;
 
       position: relative;
+
+      transform: translateY(-45px);
     }
 
     .food-image {
@@ -243,6 +247,35 @@
     }
 
     /* =========================
+   選択ボタン
+========================= */
+
+    .select-area {
+      margin-top: 15px;
+    }
+
+    .select-btn {
+
+      width: 100%;
+
+      padding: 18px;
+
+      border: none;
+
+      border-radius: 20px;
+
+      background: #ff5722;
+
+      color: white;
+
+      font-size: 22px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    /* =========================
        矢印
     ========================= */
 
@@ -250,7 +283,7 @@
       position: absolute;
 
       top: 50%;
-      transform: translateY(-50%);
+      transform: translateY(-100%);
 
       width: 65px;
       height: 65px;
@@ -273,6 +306,83 @@
 
     .right-btn {
       right: -10px;
+    }
+
+    /* =========================
+   マイページ
+========================= */
+
+    .my-page {
+
+      display: none;
+
+      width: 100%;
+
+      height: calc(100vh - 32px);
+
+      background: white;
+
+      border-radius: 35px;
+
+      padding: 20px;
+
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .my-page h2 {
+
+      text-align: center;
+
+      font-size: 32px;
+    }
+
+    .my-page h3 {
+
+      margin-top: 30px;
+    }
+
+    #historyList {
+
+      padding-left: 20px;
+    }
+
+    .bottom-nav {
+
+      position: fixed;
+
+      bottom: 0;
+
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 100%;
+      max-width: 430px;
+
+      height: 70px;
+
+      background: white;
+
+      border-top: 1px solid #ddd;
+
+      display: none;
+    }
+
+    .bottom-nav button {
+
+      flex: 1;
+
+      border: none;
+
+      border-right: 1px solid #e5e5e5;
+
+      background: white;
+
+      font-size: 14px;
+
+      font-weight: bold;
+
+      color: #666;
     }
 
     /* =========================
@@ -412,6 +522,13 @@
           <canvas id="radarChart"></canvas>
 
         </div>
+        <div class="select-area">
+
+          <button id="selectBtn" class="select-btn">
+            選択
+          </button>
+
+        </div>
 
       </div>
 
@@ -422,7 +539,47 @@
       </button>
 
     </div>
+    <!-- マイページ -->
 
+    <div id="myPage" class="my-page">
+
+      <!-- 本日の食事 -->
+
+      <div id="todayPage">
+
+        <h2>本日の食事</h2>
+
+        <div id="todayContent">
+
+          メニューを選択してください
+
+        </div>
+
+      </div>
+
+      <!-- 下部ナビ -->
+
+      <div id="bottomNav" class="bottom-nav">
+
+        <button id="todayTab">
+          本日の食事
+        </button>
+
+        <button id="menuTab">
+          学食一覧
+        </button>
+
+        <button id="aiTab">
+          AIチャット
+        </button>
+
+        <button id="mypageTab">
+          マイページ
+        </button>
+
+      </div>
+
+    </div>
   </div>
 
   <script>
@@ -956,6 +1113,72 @@
 
         updateFood();
 
+      });
+    /* =========================
+ 選択
+========================= */
+
+    document
+      .getElementById("selectBtn")
+      .addEventListener("click", () => {
+
+        const selectedFood =
+          selectedFoods[currentFood];
+
+        if (
+          !confirm(
+            `${selectedFood.title} を選択しますか？`
+          )
+        ) {
+          return;
+        }
+        /* 保存済み履歴取得 */
+
+        let history =
+          JSON.parse(
+            localStorage.getItem("foodHistory")
+          ) || [];
+
+        /* 今回選んだ料理追加 */
+
+        history.push({
+          title: selectedFood.title,
+          date: new Date().toLocaleString()
+        });
+
+        /* 保存 */
+
+        localStorage.setItem(
+          "foodHistory",
+          JSON.stringify(history)
+        );
+
+        document.getElementById(
+          "todayContent"
+        ).innerHTML = `
+  <h3>${selectedFood.title}</h3>
+
+  <p>
+    鶏肉や魚などを含む栄養バランスの良いメニューです。
+  </p>
+
+  <p>
+    サラダや味噌汁を追加すると
+    より健康的になります。
+  </p>
+`;
+
+        document
+          .getElementById("recommendScreen")
+          .style.display = "none";
+
+        document
+          .getElementById("myPage")
+          .style.display = "block";
+
+        document
+          .getElementById("bottomNav")
+          .style.display = "flex";
       });
 
   </script>
