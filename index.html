@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <title>限界大学生の学食ナビ</title>
+  <title>限界大学生の学食ナビ - 基本情報入力</title>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -19,7 +19,7 @@
       margin: 0;
       background: #f5f5f5;
       font-family: sans-serif;
-      overflow: hidden;
+      overflow: auto;
     }
 
     .container {
@@ -34,7 +34,6 @@
     /* =========================
        進行バー
     ========================= */
-
     .progress-container {
       display: flex;
       gap: 8px;
@@ -56,16 +55,12 @@
     /* =========================
        入力カード
     ========================= */
-
     .card {
       background: white;
       border-radius: 28px;
       padding: 30px 24px;
-
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-
       height: calc(100vh - 105px);
-
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -90,7 +85,6 @@
     /* =========================
        性別ボタン
     ========================= */
-
     .gender-buttons {
       display: flex;
       gap: 16px;
@@ -98,19 +92,14 @@
 
     .gender-btn {
       flex: 1;
-
       border: none;
-
       border-radius: 20px;
-
       padding: 20px;
-
       font-size: 22px;
       font-weight: bold;
-
       background: #e5e5e5;
-
       transition: 0.2s;
+      cursor: pointer;
     }
 
     .gender-btn.selected {
@@ -121,46 +110,33 @@
     /* =========================
        select
     ========================= */
-
     select {
       width: 100%;
-
       padding: 20px;
-
       border-radius: 20px;
-
       border: 1px solid #ddd;
-
       font-size: 22px;
-
       background: white;
     }
 
     /* =========================
-       次へ
+       次へボタン
     ========================= */
-
     .button-area {
       margin-top: 40px;
     }
 
     .next-btn {
       width: 100%;
-
       padding: 20px;
-
       border: none;
-
       border-radius: 20px;
-
       background: #ccc;
-
       color: white;
-
       font-size: 22px;
       font-weight: bold;
-
       transition: 0.2s;
+      cursor: pointer;
     }
 
     .next-btn.enabled {
@@ -168,246 +144,62 @@
     }
 
     /* =========================
-       おすすめ画面
-    ========================= */
-
-    .recommend-screen {
-      display: none;
-
-      width: 100%;
-      height: 100vh;
-
-      justify-content: flex-start;
-      align-items: center;
-
-      position: relative;
-
-      padding-top: 0;
-    }
-
-    /* =========================
-       料理カード
-    ========================= */
-
-    .food-card {
-      width: 100%;
-      height: calc(100vh - 70px);
-
-      background: white;
-
-      border-radius: 35px;
-
-      padding: 20px;
-
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-
-      position: relative;
-
-      transform: translateY(-45px);
-    }
-
-    .food-image {
-      width: 100%;
-      height: 30vh;
-
-      object-fit: cover;
-
-      border-radius: 24px;
-    }
-
-    .food-title {
-      text-align: center;
-
-      font-size: 40px;
-      font-weight: bold;
-
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-
-    /* =========================
-       グラフ
-    ========================= */
-
-    .chart-area {
-      flex: 1;
-
-      position: relative;
-
-      min-height: 0;
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
-    /* =========================
-   選択ボタン
-========================= */
-
-    .select-area {
-      margin-top: 15px;
-    }
-
-    .select-btn {
-
-      width: 100%;
-
-      padding: 18px;
-
-      border: none;
-
-      border-radius: 20px;
-
-      background: #ff5722;
-
-      color: white;
-
-      font-size: 22px;
-
-      font-weight: bold;
-
-      cursor: pointer;
-    }
-
-    /* =========================
-       矢印
-    ========================= */
-
-    .arrow-btn {
-      position: absolute;
-
-      top: 50%;
-      transform: translateY(-100%);
-
-      width: 65px;
-      height: 65px;
-
-      border: none;
-      border-radius: 50%;
-
-      background: white;
-
-      font-size: 32px;
-
-      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
-
-      z-index: 10;
-    }
-
-    .left-btn {
-      left: -10px;
-    }
-
-    .right-btn {
-      right: -10px;
-    }
-
-    /* =========================
-   マイページ
-========================= */
-
-    .my-page {
-
-      display: none;
-
-      width: 100%;
-
-      height: calc(100vh - 32px);
-
-      background: white;
-
-      border-radius: 35px;
-
-      padding: 20px;
-
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .my-page h2 {
-
-      text-align: center;
-
-      font-size: 32px;
-    }
-
-    .my-page h3 {
-
-      margin-top: 30px;
-    }
-
-    #historyList {
-
-      padding-left: 20px;
-    }
-
-    .bottom-nav {
-
-      position: fixed;
-
-      bottom: 0;
-
-      left: 50%;
-
-      transform: translateX(-50%);
-
-      width: 100%;
-      max-width: 430px;
-
-      height: 70px;
-
-      background: white;
-
-      border-top: 1px solid #ddd;
-
-      display: none;
-    }
-
-    .bottom-nav button {
-
-      flex: 1;
-
-      border: none;
-
-      border-right: 1px solid #e5e5e5;
-
-      background: white;
-
-      font-size: 14px;
-
-      font-weight: bold;
-
-      color: #666;
-    }
-
-    /* =========================
        スマホ最適化
     ========================= */
-
     @media (max-height: 750px) {
-
       label {
         font-size: 24px;
         margin-bottom: 28px;
       }
+    }
 
-      .food-title {
-        font-size: 32px;
-      }
+    /* =========================
+   学食一覧
+========================= */
 
-      .food-image {
-        height: 24vh;
-      }
+    #menuList {
 
-      .arrow-btn {
-        width: 56px;
-        height: 56px;
-      }
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 15px;
+
+      margin-top: 20px;
+    }
+
+    .menu-item {
+
+      background: #f7f7f7;
+
+      border: 1px solid #ddd;
+
+      border-radius: 20px;
+
+      height: 120px;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      font-size: 20px;
+
+      font-weight: bold;
+
+    }
+
+    .food-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .chart-area {
+      height: 300px;
     }
   </style>
 </head>
@@ -416,468 +208,118 @@
 
   <div class="container">
 
+    <!-- 学食一覧画面 -->
+    <div id="menuPage" style="display:none;">
+
+      <div class="card">
+
+        <h2>学食メニュー一覧</h2>
+
+        <div id="menuList">
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- メニュー詳細画面 -->
+    <div id="detailPage" style="display:none;">
+
+      <div class="card">
+
+        <h2 id="detailTitle"></h2>
+
+        <img id="detailImage" class="food-image">
+
+        <div class="chart-area">
+          <canvas id="radarChart"></canvas>
+        </div>
+
+        <p id="detailComment"></p>
+
+        <button class="next-btn" id="registerBtn">
+          今日の食事として登録
+        </button>
+
+      </div>
+
+    </div>
+
     <!-- 進行バー -->
-
     <div class="progress-container">
-
       <div class="progress-step active"></div>
       <div class="progress-step"></div>
       <div class="progress-step"></div>
       <div class="progress-step"></div>
-
     </div>
 
     <!-- 入力画面 -->
+    <div class="card" id="inputCard">
 
-    <div class="card">
-
-      <!-- 性別 -->
-
+      <!-- 性別 (Step 0) -->
       <div class="question active">
-
         <label>性別を選択してください</label>
-
         <div class="gender-buttons">
-
-          <button class="gender-btn" data-value="male">
-            男性
-          </button>
-
-          <button class="gender-btn" data-value="female">
-            女性
-          </button>
-
+          <button class="gender-btn" data-value="male">男性</button>
+          <button class="gender-btn" data-value="female">女性</button>
         </div>
-
       </div>
 
-      <!-- 年齢 -->
-
+      <!-- 年齢 (Step 1) -->
       <div class="question">
-
         <label>年齢を選択してください</label>
-
         <select id="age">
           <option value="">選択してください</option>
         </select>
-
       </div>
 
-      <!-- 身長 -->
-
+      <!-- 身長 (Step 2) -->
       <div class="question">
-
         <label>身長を選択してください</label>
-
         <select id="height">
           <option value="">選択してください</option>
         </select>
-
       </div>
 
-      <!-- 体重 -->
-
+      <!-- 体重 (Step 3) -->
       <div class="question">
-
         <label>体重を選択してください</label>
-
         <select id="weight">
           <option value="">選択してください</option>
         </select>
-
       </div>
 
-      <!-- 次へ -->
-
+      <!-- 次へボタン -->
       <div class="button-area">
-
-        <button class="next-btn" id="nextBtn">
-          次へ
-        </button>
-
+        <button class="next-btn" id="nextBtn">次へ</button>
       </div>
+
 
     </div>
 
-    <!-- おすすめ画面 -->
-
-    <div class="recommend-screen" id="recommendScreen">
-
-      <!-- 左 -->
-
-      <button class="arrow-btn left-btn" id="prevBtn">
-        ←
-      </button>
-
-      <!-- カード -->
-
-      <div class="food-card">
-
-        <img id="foodImage" class="food-image">
-
-        <div class="food-title" id="foodTitle"></div>
-
-        <div class="chart-area">
-
-          <canvas id="radarChart"></canvas>
-
-        </div>
-        <div class="select-area">
-
-          <button id="selectBtn" class="select-btn">
-            選択
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- 右 -->
-
-      <button class="arrow-btn right-btn" id="nextFoodBtn">
-        →
-      </button>
-
-    </div>
-    <!-- マイページ -->
-
-    <div id="myPage" class="my-page">
-
-      <!-- 本日の食事 -->
-
-      <div id="todayPage">
-
-        <h2>本日の食事</h2>
-
-        <div id="todayContent">
-
-          メニューを選択してください
-
-        </div>
-
-      </div>
-
-      <!-- 下部ナビ -->
-
-      <div id="bottomNav" class="bottom-nav">
-
-        <button id="todayTab">
-          本日の食事
-        </button>
-
-        <button id="menuTab">
-          学食一覧
-        </button>
-
-        <button id="aiTab">
-          AIチャット
-        </button>
-
-        <button id="mypageTab">
-          マイページ
-        </button>
-
-      </div>
-
-    </div>
   </div>
 
   <script>
-
-    /* =========================
-       基本
-    ========================= */
-
-    let currentStep = 0;
-
-    const questions =
-      document.querySelectorAll(".question");
-
-    const progressSteps =
-      document.querySelectorAll(".progress-step");
-
-    const nextBtn =
-      document.getElementById("nextBtn");
-
-    let selectedGender = null;
-
-    /* =========================
-       保存データ取得
-    ========================= */
-
-    const savedGender =
-      localStorage.getItem("gender");
-
-    const savedAge =
-      localStorage.getItem("age");
-
-    const savedHeight =
-      localStorage.getItem("height");
-
-    const savedWeight =
-      localStorage.getItem("weight");
-
-    /* =========================
-       select生成
-    ========================= */
-
-    const ageSelect =
-      document.getElementById("age");
-
-    for (let i = 18; i <= 30; i++) {
-
-      ageSelect.innerHTML += `
-        <option value="${i}">
-          ${i}歳
-        </option>
-      `;
-    }
-
-    const heightSelect =
-      document.getElementById("height");
-
-    for (let i = 140; i <= 200; i++) {
-
-      heightSelect.innerHTML += `
-        <option value="${i}">
-          ${i}cm
-        </option>
-      `;
-    }
-
-    const weightSelect =
-      document.getElementById("weight");
-
-    for (let i = 40; i <= 120; i++) {
-
-      weightSelect.innerHTML += `
-        <option value="${i}">
-          ${i}kg
-        </option>
-      `;
-    }
-
-    /* =========================
-       保存データ反映
-    ========================= */
-
-    if (savedGender) {
-
-      selectedGender = savedGender;
-
-      document
-        .querySelector(`[data-value="${savedGender}"]`)
-        .classList.add("selected");
-    }
-
-    if (savedAge) {
-      ageSelect.value = savedAge;
-    }
-
-    if (savedHeight) {
-      heightSelect.value = savedHeight;
-    }
-
-    if (savedWeight) {
-      weightSelect.value = savedWeight;
-    }
-
-    /* =========================
-       保存データあるなら
-       最初からボタン有効
-    ========================= */
-
-    if (
-      savedGender ||
-      savedAge ||
-      savedHeight ||
-      savedWeight
-    ) {
-
-      nextBtn.classList.add("enabled");
-
-    }
-
-    /* =========================
-       性別
-    ========================= */
-
-    const genderButtons =
-      document.querySelectorAll(".gender-btn");
-
-    genderButtons.forEach(btn => {
-
-      btn.addEventListener("click", () => {
-
-        genderButtons.forEach(b => {
-          b.classList.remove("selected");
-        });
-
-        btn.classList.add("selected");
-
-        selectedGender =
-          btn.dataset.value;
-
-        enableButton();
-
-      });
-
-    });
-
-    /* =========================
-       select
-    ========================= */
-
-    document
-      .querySelectorAll("select")
-      .forEach(select => {
-
-        select.addEventListener("change", () => {
-
-          if (select.value !== "") {
-
-            enableButton();
-
-          }
-
-        });
-
-      });
-
-    /* =========================
-       ボタン有効化
-    ========================= */
-
-    function enableButton() {
-
-      nextBtn.classList.add("enabled");
-
-    }
-
-    /* =========================
-       次へ
-    ========================= */
-
-    nextBtn.addEventListener("click", () => {
-
-      if (
-        currentStep === 0 &&
-        !selectedGender
-      ) return;
-
-      if (
-        currentStep === 1 &&
-        ageSelect.value === ""
-      ) return;
-
-      if (
-        currentStep === 2 &&
-        heightSelect.value === ""
-      ) return;
-
-      if (
-        currentStep === 3 &&
-        weightSelect.value === ""
-      ) return;
-
-      /* 最後 */
-
-      if (currentStep === 3) {
-
-        /* 保存 */
-
-        localStorage.setItem(
-          "gender",
-          selectedGender
-        );
-
-        localStorage.setItem(
-          "age",
-          ageSelect.value
-        );
-
-        localStorage.setItem(
-          "height",
-          heightSelect.value
-        );
-
-        localStorage.setItem(
-          "weight",
-          weightSelect.value
-        );
-
-        /* 非表示 */
-
-        document
-          .querySelector(".progress-container")
-          .style.display = "none";
-
-        document
-          .querySelector(".card")
-          .style.display = "none";
-
-        /* 表示 */
-
-        document
-          .getElementById("recommendScreen")
-          .style.display = "flex";
-
-        radarChart.resize();
-
-        return;
-      }
-
-      /* 次 */
-
-      questions[currentStep]
-        .classList.remove("active");
-
-      currentStep++;
-
-      questions[currentStep]
-        .classList.add("active");
-
-      progressSteps[currentStep]
-        .classList.add("active");
-
-      nextBtn.classList.remove("enabled");
-
-      /* 保存データあるなら
-         次も押せるようにする */
-
-      if (
-        currentStep === 1 &&
-        ageSelect.value !== ""
-      ) {
-        nextBtn.classList.add("enabled");
-      }
-
-      if (
-        currentStep === 2 &&
-        heightSelect.value !== ""
-      ) {
-        nextBtn.classList.add("enabled");
-      }
-
-      if (
-        currentStep === 3 &&
-        weightSelect.value !== ""
-      ) {
-        nextBtn.classList.add("enabled");
-      }
-
-    });
-
-    /* =========================
-       食事データ
-    ========================= */
 
     const foods = [
 
       {
         title: "唐揚げ定食",
-        image: "https://picsum.photos/300/200",
+        image: "images/karaage.jpg",
         data: [8, 6, 7, 3, 10]
+      },
+
+      {
+        title: "親子丼",
+        image: "images/oyako.jpg",
+        data: [7, 4, 8, 5, 8]
+      },
+
+      {
+        title: "鯖味噌定食",
+        image: "images/saba.jpg",
+        data: [8, 5, 6, 9, 7]
       },
 
       {
@@ -885,59 +327,175 @@
         image: "https://picsum.photos/301/200",
         data: [7, 9, 10, 2, 10]
       },
-
-      {
-        title: "鯖味噌定食",
-        image: "https://picsum.photos/302/200",
-        data: [8, 5, 6, 9, 7]
-      },
-      {
-        title: "親子丼",
-        image: "https://picsum.photos/303/200",
-        data: [7, 4, 8, 5, 8]
-      },
-
       {
         title: "味噌ラーメン",
-        image: "https://picsum.photos/304/200",
+        image: "https://picsum.photos/302/200",
         data: [5, 6, 9, 3, 9]
       },
-
       {
         title: "ハンバーグ定食",
-        image: "https://picsum.photos/305/200",
+        image: "https://picsum.photos/303/200",
         data: [8, 7, 6, 4, 9]
       }
     ];
     /* =========================
-       ランダムで3つ選択
+       基本設定と要素の取得
     ========================= */
-
-    const selectedFoods =
-      [...foods]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
-    let currentFood = 0;
+    let currentStep = 0;
+    let selectedFood = null;
+    let radarChart = null;
+    const questions = document.querySelectorAll(".question");
+    const progressSteps = document.querySelectorAll(".progress-step");
+    const nextBtn = document.getElementById("nextBtn");
+    let selectedGender = null;
 
     /* =========================
-       要素
+       セレクトボックスの選択肢自動生成
     ========================= */
+    const ageSelect = document.getElementById("age");
+    for (let i = 18; i <= 30; i++) {
+      ageSelect.innerHTML += `<option value="${i}">${i}歳</option>`;
+    }
 
-    const foodTitle =
-      document.getElementById("foodTitle");
+    const heightSelect = document.getElementById("height");
+    for (let i = 140; i <= 200; i++) {
+      heightSelect.innerHTML += `<option value="${i}">${i}cm</option>`;
+    }
 
-    const foodImage =
-      document.getElementById("foodImage");
+    const weightSelect = document.getElementById("weight");
+    for (let i = 40; i <= 120; i++) {
+      weightSelect.innerHTML += `<option value="${i}">${i}kg</option>`;
+    }
 
     /* =========================
-       グラフ
+       LocalStorageから既存データの読み込み・反映
     ========================= */
+    const savedGender = localStorage.getItem("gender");
+    const savedAge = localStorage.getItem("age");
+    const savedHeight = localStorage.getItem("height");
+    const savedWeight = localStorage.getItem("weight");
 
-    const ctx =
-      document.getElementById("radarChart");
+    if (savedGender) {
+      selectedGender = savedGender;
+      document.querySelector(`[data-value="${savedGender}"]`).classList.add("selected");
+    }
+    if (savedAge) { ageSelect.value = savedAge; }
+    if (savedHeight) { heightSelect.value = savedHeight; }
+    if (savedWeight) { weightSelect.value = savedWeight; }
 
-    const radarChart =
-      new Chart(ctx, {
+    // すでにどれかのデータが保存されている場合は最初からボタンを押せるようにする
+    if (savedGender || savedAge || savedHeight || savedWeight) {
+      enableButton();
+    }
+
+    /* =========================
+       イベントリスナー（入力検知）
+    ========================= */
+    // 性別ボタンのクリックイベント
+    const genderButtons = document.querySelectorAll(".gender-btn");
+    genderButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        genderButtons.forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedGender = btn.dataset.value;
+        enableButton();
+      });
+    });
+
+    // 各セレクトボックスの変更イベント
+    document.querySelectorAll("select").forEach(select => {
+      select.addEventListener("change", () => {
+        if (select.value !== "") {
+          enableButton();
+        }
+      });
+    });
+
+    // ボタンの活性化
+    function enableButton() {
+      nextBtn.classList.add("enabled");
+    }
+
+    /* =========================
+       ステップ遷移・保存ロジック
+    ========================= */
+    nextBtn.addEventListener("click", () => {
+      // 各ステップでの未入力チェック
+      if (currentStep === 0 && !selectedGender) return;
+      if (currentStep === 1 && ageSelect.value === "") return;
+      if (currentStep === 2 && heightSelect.value === "") return;
+      if (currentStep === 3 && weightSelect.value === "") return;
+
+      /* 最後（ステップ3）の入力が終わった時の処理 */
+      if (currentStep === 3) {
+        // LocalStorageに保存
+        localStorage.setItem("gender", selectedGender);
+        localStorage.setItem("age", ageSelect.value);
+        localStorage.setItem("height", heightSelect.value);
+        localStorage.setItem("weight", weightSelect.value);
+
+        document.querySelector(".progress-container").style.display = "none";
+        document.getElementById("inputCard").style.display = "none";
+        document.getElementById("menuPage").style.display = "block";
+
+        console.log({
+          gender: selectedGender,
+          age: ageSelect.value,
+          height: heightSelect.value,
+          weight: weightSelect.value
+        });
+
+        // TODO: ここに次の画面（学食一覧や管理画面など）への遷移処理を記述する
+        return;
+      }
+
+      /* 次のステップへ進む処理 */
+      questions[currentStep].classList.remove("active");
+      currentStep++;
+      questions[currentStep].classList.add("active");
+      progressSteps[currentStep].classList.add("active");
+
+      // ボタンを一旦非活性化（次の項目がすでに入力済みの場合は活性化）
+      nextBtn.classList.remove("enabled");
+
+      if (currentStep === 1 && ageSelect.value !== "") { nextBtn.classList.add("enabled"); }
+      if (currentStep === 2 && heightSelect.value !== "") { nextBtn.classList.add("enabled"); }
+      if (currentStep === 3 && weightSelect.value !== "") { nextBtn.classList.add("enabled"); }
+    });
+    const menuList = document.getElementById("menuList");
+
+    foods.forEach((food, index) => {
+
+      menuList.innerHTML += `
+    <div class="menu-item" onclick="showDetail(${index})">
+      ${food.title}
+    </div>
+  `;
+
+    });
+    function showDetail(index) {
+
+      selectedFood = foods[index];
+
+      document.getElementById("menuPage").style.display = "none";
+      document.getElementById("detailPage").style.display = "block";
+
+      document.getElementById("detailTitle").textContent =
+        selectedFood.title;
+
+      document.getElementById("detailImage").src =
+        selectedFood.image;
+
+      document.getElementById("detailComment").textContent =
+        "サラダや味噌汁を追加するとさらに栄養バランスが良くなります。";
+
+      if (radarChart) {
+        radarChart.destroy();
+      }
+
+      const ctx = document.getElementById("radarChart");
+
+      radarChart = new Chart(ctx, {
 
         type: "radar",
 
@@ -951,68 +509,19 @@
             "満足度"
           ],
 
-          datasets: [
-
-            /* 理想 */
-
-            {
-              label: "理想",
-
-              data: [8, 8, 8, 8, 8],
-
-              borderColor: "#87CEEB",
-
-              backgroundColor: "rgba(135,206,235,0.2)",
-
-              borderWidth: 3,
-
-              pointBackgroundColor: "#87CEEB"
-            },
-
-            /* 実際 */
-
-            {
-              label: "実際",
-
-              data: [],
-
-              borderColor: "#ff5722",
-
-              backgroundColor:
-                "rgba(255,87,34,0.35)",
-
-              borderWidth: 3,
-
-              pointBackgroundColor: "#ff5722"
-            }
-
-          ]
+          datasets: [{
+            label: selectedFood.title,
+            data: selectedFood.data,
+            borderColor: "#ff5722",
+            backgroundColor: "rgba(255,87,34,0.3)",
+            borderWidth: 3
+          }]
 
         },
 
         options: {
 
           responsive: true,
-
-          maintainAspectRatio: false,
-
-          animation: false,
-
-          plugins: {
-
-            legend: {
-
-              labels: {
-
-                font: {
-                  size: 20
-                }
-
-              }
-
-            }
-
-          },
 
           scales: {
 
@@ -1022,21 +531,7 @@
               max: 10,
 
               ticks: {
-
-                stepSize: 2,
-
-                font: {
-                  size: 16
-                }
-
-              },
-
-              pointLabels: {
-
-                font: {
-                  size: 24
-                }
-
+                stepSize: 2
               }
 
             }
@@ -1047,140 +542,13 @@
 
       });
 
-    /* =========================
-       表示更新
-    ========================= */
-
-    function updateFood() {
-
-      const food = selectedFoods[currentFood];
-
-      foodTitle.textContent =
-        food.title;
-
-      foodImage.src =
-        food.image;
-
-      radarChart.data.datasets[1].data =
-        food.data;
-
-      radarChart.update();
-
     }
-
-    updateFood();
-
-    /* =========================
-       右
-    ========================= */
-
-    document
-      .getElementById("nextFoodBtn")
+    document.getElementById("registerBtn")
       .addEventListener("click", () => {
 
-        currentFood++;
-
-        if (
-          currentFood >= selectedFoods.length
-        ) {
-
-          currentFood = 0;
-
-        }
-
-        updateFood();
+        alert(selectedFood.title + " を登録しました");
 
       });
-
-    /* =========================
-       左
-    ========================= */
-
-    document
-      .getElementById("prevBtn")
-      .addEventListener("click", () => {
-
-        currentFood--;
-
-        if (
-          currentFood < 0
-        ) {
-
-          currentFood =
-            selectedFoods.length - 1;
-
-        }
-
-        updateFood();
-
-      });
-    /* =========================
- 選択
-========================= */
-
-    document
-      .getElementById("selectBtn")
-      .addEventListener("click", () => {
-
-        const selectedFood =
-          selectedFoods[currentFood];
-
-        if (
-          !confirm(
-            `${selectedFood.title} を選択しますか？`
-          )
-        ) {
-          return;
-        }
-        /* 保存済み履歴取得 */
-
-        let history =
-          JSON.parse(
-            localStorage.getItem("foodHistory")
-          ) || [];
-
-        /* 今回選んだ料理追加 */
-
-        history.push({
-          title: selectedFood.title,
-          date: new Date().toLocaleString()
-        });
-
-        /* 保存 */
-
-        localStorage.setItem(
-          "foodHistory",
-          JSON.stringify(history)
-        );
-
-        document.getElementById(
-          "todayContent"
-        ).innerHTML = `
-  <h3>${selectedFood.title}</h3>
-
-  <p>
-    鶏肉や魚などを含む栄養バランスの良いメニューです。
-  </p>
-
-  <p>
-    サラダや味噌汁を追加すると
-    より健康的になります。
-  </p>
-`;
-
-        document
-          .getElementById("recommendScreen")
-          .style.display = "none";
-
-        document
-          .getElementById("myPage")
-          .style.display = "block";
-
-        document
-          .getElementById("bottomNav")
-          .style.display = "flex";
-      });
-
   </script>
 
 </body>
