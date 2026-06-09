@@ -66,6 +66,12 @@
       justify-content: center;
     }
 
+    #detailPage .card {
+      height: auto;
+      min-height: calc(100vh - 40px);
+      justify-content: flex-start;
+    }
+
     .question {
       display: none;
     }
@@ -128,15 +134,10 @@
 
     .next-btn {
       width: 100%;
-      padding: 20px;
+      padding: 18px;
+      font-size: 18px;
       border: none;
       border-radius: 20px;
-      background: #ccc;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
-      transition: 0.2s;
-      cursor: pointer;
     }
 
     .next-btn.enabled {
@@ -201,6 +202,12 @@
     .chart-area {
       height: 300px;
     }
+
+    #detailTitle {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 
@@ -236,10 +243,8 @@
           <canvas id="radarChart"></canvas>
         </div>
 
-        <p id="detailComment"></p>
-
         <button class="next-btn" id="registerBtn">
-          今日の食事として登録
+          登録する
         </button>
 
       </div>
@@ -486,9 +491,6 @@
       document.getElementById("detailImage").src =
         selectedFood.image;
 
-      document.getElementById("detailComment").textContent =
-        "サラダや味噌汁を追加するとさらに栄養バランスが良くなります。";
-
       if (radarChart) {
         radarChart.destroy();
       }
@@ -517,7 +519,7 @@
             borderWidth: 3
           }]
 
-        },
+        },   // ← この } が必要
 
         options: {
 
