@@ -208,6 +208,58 @@
       text-align: center;
       margin-bottom: 15px;
     }
+
+    #registerBtn {
+      background: #ff5722;
+      color: white;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .bottom-nav {
+
+      position: fixed;
+
+      bottom: 0;
+
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      width: 100%;
+      max-width: 430px;
+
+      height: 70px;
+
+      background: white;
+
+      border-top: 1px solid #ddd;
+
+      display: none;
+
+      z-index: 1000;
+    }
+
+    .bottom-nav button {
+
+      flex: 1;
+
+      border: none;
+
+      background: white;
+
+      font-size: 13px;
+
+      font-weight: bold;
+
+      border-right: 1px solid #eee;
+    }
+
+    .bottom-nav button:last-child {
+
+      border-right: none;
+
+    }
   </style>
 </head>
 
@@ -248,6 +300,52 @@
         </button>
 
       </div>
+
+    </div>
+    <!-- マイページ -->
+    <div id="todayPage" style="display:none;">
+
+      <div class="card">
+
+        <h2>本日の食事</h2>
+
+        <div id="todayFood">
+          まだ登録されていません
+        </div>
+
+      </div>
+
+      <!-- AIページ -->
+      <div id="aiPage" style="display:none;">
+        AIチャット画面
+      </div>
+
+      <!-- マイページ -->
+      <div id="mypagePage" style="display:none;">
+        マイページ
+      </div>
+
+    </div>
+    <!-- 下部ナビ -->
+    <div id="bottomNav" class="bottom-nav">
+
+      <button id="todayTab">
+        本日の食事
+      </button>
+
+      <button id="aiTab">
+        AIチャット
+      </button>
+
+      <button id="menuTab">
+        学食一覧
+      </button>
+
+      <button id="mypageTab">
+        マイページ
+      </button>
+
+
 
     </div>
 
@@ -300,258 +398,308 @@
         <button class="next-btn" id="nextBtn">次へ</button>
       </div>
 
-
     </div>
 
-  </div>
+    <script>
 
-  <script>
+      const foods = [
 
-    const foods = [
+        {
+          title: "唐揚げ定食",
+          image: "images/karaage.jpg",
+          data: [8, 6, 7, 3, 10]
+        },
 
-      {
-        title: "唐揚げ定食",
-        image: "images/karaage.jpg",
-        data: [8, 6, 7, 3, 10]
-      },
+        {
+          title: "親子丼",
+          image: "images/oyako.jpg",
+          data: [7, 4, 8, 5, 8]
+        },
 
-      {
-        title: "親子丼",
-        image: "images/oyako.jpg",
-        data: [7, 4, 8, 5, 8]
-      },
+        {
+          title: "鯖味噌定食",
+          image: "images/saba.jpg",
+          data: [8, 5, 6, 9, 7]
+        },
 
-      {
-        title: "鯖味噌定食",
-        image: "images/saba.jpg",
-        data: [8, 5, 6, 9, 7]
-      },
-
-      {
-        title: "カツカレー",
-        image: "https://picsum.photos/301/200",
-        data: [7, 9, 10, 2, 10]
-      },
-      {
-        title: "味噌ラーメン",
-        image: "https://picsum.photos/302/200",
-        data: [5, 6, 9, 3, 9]
-      },
-      {
-        title: "ハンバーグ定食",
-        image: "https://picsum.photos/303/200",
-        data: [8, 7, 6, 4, 9]
-      }
-    ];
-    /* =========================
-       基本設定と要素の取得
-    ========================= */
-    let currentStep = 0;
-    let selectedFood = null;
-    let radarChart = null;
-    const questions = document.querySelectorAll(".question");
-    const progressSteps = document.querySelectorAll(".progress-step");
-    const nextBtn = document.getElementById("nextBtn");
-    let selectedGender = null;
-
-    /* =========================
-       セレクトボックスの選択肢自動生成
-    ========================= */
-    const ageSelect = document.getElementById("age");
-    for (let i = 18; i <= 30; i++) {
-      ageSelect.innerHTML += `<option value="${i}">${i}歳</option>`;
-    }
-
-    const heightSelect = document.getElementById("height");
-    for (let i = 140; i <= 200; i++) {
-      heightSelect.innerHTML += `<option value="${i}">${i}cm</option>`;
-    }
-
-    const weightSelect = document.getElementById("weight");
-    for (let i = 40; i <= 120; i++) {
-      weightSelect.innerHTML += `<option value="${i}">${i}kg</option>`;
-    }
-
-    /* =========================
-       LocalStorageから既存データの読み込み・反映
-    ========================= */
-    const savedGender = localStorage.getItem("gender");
-    const savedAge = localStorage.getItem("age");
-    const savedHeight = localStorage.getItem("height");
-    const savedWeight = localStorage.getItem("weight");
-
-    if (savedGender) {
-      selectedGender = savedGender;
-      document.querySelector(`[data-value="${savedGender}"]`).classList.add("selected");
-    }
-    if (savedAge) { ageSelect.value = savedAge; }
-    if (savedHeight) { heightSelect.value = savedHeight; }
-    if (savedWeight) { weightSelect.value = savedWeight; }
-
-    // すでにどれかのデータが保存されている場合は最初からボタンを押せるようにする
-    if (savedGender || savedAge || savedHeight || savedWeight) {
-      enableButton();
-    }
-
-    /* =========================
-       イベントリスナー（入力検知）
-    ========================= */
-    // 性別ボタンのクリックイベント
-    const genderButtons = document.querySelectorAll(".gender-btn");
-    genderButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        genderButtons.forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
-        selectedGender = btn.dataset.value;
-        enableButton();
-      });
-    });
-
-    // 各セレクトボックスの変更イベント
-    document.querySelectorAll("select").forEach(select => {
-      select.addEventListener("change", () => {
-        if (select.value !== "") {
-          enableButton();
+        {
+          title: "カツカレー",
+          image: "https://picsum.photos/301/200",
+          data: [7, 9, 10, 2, 10]
+        },
+        {
+          title: "味噌ラーメン",
+          image: "https://picsum.photos/302/200",
+          data: [5, 6, 9, 3, 9]
+        },
+        {
+          title: "ハンバーグ定食",
+          image: "https://picsum.photos/303/200",
+          data: [8, 7, 6, 4, 9]
         }
-      });
-    });
+      ];
+      /* =========================
+         基本設定と要素の取得
+      ========================= */
+      let currentStep = 0;
+      let selectedFood = null;
+      let radarChart = null;
+      const questions = document.querySelectorAll(".question");
+      const progressSteps = document.querySelectorAll(".progress-step");
+      const nextBtn = document.getElementById("nextBtn");
+      let selectedGender = null;
 
-    // ボタンの活性化
-    function enableButton() {
-      nextBtn.classList.add("enabled");
-    }
-
-    /* =========================
-       ステップ遷移・保存ロジック
-    ========================= */
-    nextBtn.addEventListener("click", () => {
-      // 各ステップでの未入力チェック
-      if (currentStep === 0 && !selectedGender) return;
-      if (currentStep === 1 && ageSelect.value === "") return;
-      if (currentStep === 2 && heightSelect.value === "") return;
-      if (currentStep === 3 && weightSelect.value === "") return;
-
-      /* 最後（ステップ3）の入力が終わった時の処理 */
-      if (currentStep === 3) {
-        // LocalStorageに保存
-        localStorage.setItem("gender", selectedGender);
-        localStorage.setItem("age", ageSelect.value);
-        localStorage.setItem("height", heightSelect.value);
-        localStorage.setItem("weight", weightSelect.value);
-
-        document.querySelector(".progress-container").style.display = "none";
-        document.getElementById("inputCard").style.display = "none";
-        document.getElementById("menuPage").style.display = "block";
-
-        console.log({
-          gender: selectedGender,
-          age: ageSelect.value,
-          height: heightSelect.value,
-          weight: weightSelect.value
-        });
-
-        // TODO: ここに次の画面（学食一覧や管理画面など）への遷移処理を記述する
-        return;
+      /* =========================
+         セレクトボックスの選択肢自動生成
+      ========================= */
+      const ageSelect = document.getElementById("age");
+      for (let i = 18; i <= 30; i++) {
+        ageSelect.innerHTML += `<option value="${i}">${i}歳</option>`;
       }
 
-      /* 次のステップへ進む処理 */
-      questions[currentStep].classList.remove("active");
-      currentStep++;
-      questions[currentStep].classList.add("active");
-      progressSteps[currentStep].classList.add("active");
+      const heightSelect = document.getElementById("height");
+      for (let i = 140; i <= 200; i++) {
+        heightSelect.innerHTML += `<option value="${i}">${i}cm</option>`;
+      }
 
-      // ボタンを一旦非活性化（次の項目がすでに入力済みの場合は活性化）
-      nextBtn.classList.remove("enabled");
+      const weightSelect = document.getElementById("weight");
+      for (let i = 40; i <= 120; i++) {
+        weightSelect.innerHTML += `<option value="${i}">${i}kg</option>`;
+      }
 
-      if (currentStep === 1 && ageSelect.value !== "") { nextBtn.classList.add("enabled"); }
-      if (currentStep === 2 && heightSelect.value !== "") { nextBtn.classList.add("enabled"); }
-      if (currentStep === 3 && weightSelect.value !== "") { nextBtn.classList.add("enabled"); }
-    });
-    const menuList = document.getElementById("menuList");
+      /* =========================
+         LocalStorageから既存データの読み込み・反映
+      ========================= */
+      const savedGender = localStorage.getItem("gender");
+      const savedAge = localStorage.getItem("age");
+      const savedHeight = localStorage.getItem("height");
+      const savedWeight = localStorage.getItem("weight");
 
-    foods.forEach((food, index) => {
+      if (savedGender) {
+        selectedGender = savedGender;
+        document.querySelector(`[data-value="${savedGender}"]`).classList.add("selected");
+      }
+      if (savedAge) { ageSelect.value = savedAge; }
+      if (savedHeight) { heightSelect.value = savedHeight; }
+      if (savedWeight) { weightSelect.value = savedWeight; }
 
-      menuList.innerHTML += `
+      // すでにどれかのデータが保存されている場合は最初からボタンを押せるようにする
+      if (savedGender || savedAge || savedHeight || savedWeight) {
+        enableButton();
+      }
+
+      /* =========================
+         イベントリスナー（入力検知）
+      ========================= */
+      // 性別ボタンのクリックイベント
+      const genderButtons = document.querySelectorAll(".gender-btn");
+      genderButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          genderButtons.forEach(b => b.classList.remove("selected"));
+          btn.classList.add("selected");
+          selectedGender = btn.dataset.value;
+          enableButton();
+        });
+      });
+
+      // 各セレクトボックスの変更イベント
+      document.querySelectorAll("select").forEach(select => {
+        select.addEventListener("change", () => {
+          if (select.value !== "") {
+            enableButton();
+          }
+        });
+      });
+
+      // ボタンの活性化
+      function enableButton() {
+        nextBtn.classList.add("enabled");
+      }
+
+      /* =========================
+         ステップ遷移・保存ロジック
+      ========================= */
+      nextBtn.addEventListener("click", () => {
+        // 各ステップでの未入力チェック
+        if (currentStep === 0 && !selectedGender) return;
+        if (currentStep === 1 && ageSelect.value === "") return;
+        if (currentStep === 2 && heightSelect.value === "") return;
+        if (currentStep === 3 && weightSelect.value === "") return;
+
+        /* 最後（ステップ3）の入力が終わった時の処理 */
+        if (currentStep === 3) {
+          // LocalStorageに保存
+          localStorage.setItem("gender", selectedGender);
+          localStorage.setItem("age", ageSelect.value);
+          localStorage.setItem("height", heightSelect.value);
+          localStorage.setItem("weight", weightSelect.value);
+
+          document.querySelector(".progress-container").style.display = "none";
+          document.getElementById("inputCard").style.display = "none";
+          document.getElementById("menuPage").style.display = "block";
+
+          console.log({
+            gender: selectedGender,
+            age: ageSelect.value,
+            height: heightSelect.value,
+            weight: weightSelect.value
+          });
+
+          // TODO: ここに次の画面（学食一覧や管理画面など）への遷移処理を記述する
+          return;
+        }
+
+        /* 次のステップへ進む処理 */
+        questions[currentStep].classList.remove("active");
+        currentStep++;
+        questions[currentStep].classList.add("active");
+        progressSteps[currentStep].classList.add("active");
+
+        // ボタンを一旦非活性化（次の項目がすでに入力済みの場合は活性化）
+        nextBtn.classList.remove("enabled");
+
+        if (currentStep === 1 && ageSelect.value !== "") { nextBtn.classList.add("enabled"); }
+        if (currentStep === 2 && heightSelect.value !== "") { nextBtn.classList.add("enabled"); }
+        if (currentStep === 3 && weightSelect.value !== "") { nextBtn.classList.add("enabled"); }
+      });
+      const menuList = document.getElementById("menuList");
+
+      foods.forEach((food, index) => {
+
+        menuList.innerHTML += `
     <div class="menu-item" onclick="showDetail(${index})">
       ${food.title}
     </div>
   `;
 
-    });
-    function showDetail(index) {
+      });
+      function showDetail(index) {
 
-      selectedFood = foods[index];
+        selectedFood = foods[index];
 
-      document.getElementById("menuPage").style.display = "none";
-      document.getElementById("detailPage").style.display = "block";
+        document.getElementById("menuPage").style.display = "none";
+        document.getElementById("detailPage").style.display = "block";
 
-      document.getElementById("detailTitle").textContent =
-        selectedFood.title;
+        document.getElementById("detailTitle").textContent =
+          selectedFood.title;
 
-      document.getElementById("detailImage").src =
-        selectedFood.image;
+        document.getElementById("detailImage").src =
+          selectedFood.image;
 
-      if (radarChart) {
-        radarChart.destroy();
-      }
+        if (radarChart) {
+          radarChart.destroy();
+        }
 
-      const ctx = document.getElementById("radarChart");
+        const ctx = document.getElementById("radarChart");
 
-      radarChart = new Chart(ctx, {
+        radarChart = new Chart(ctx, {
 
-        type: "radar",
+          type: "radar",
 
-        data: {
+          data: {
 
-          labels: [
-            "タンパク質",
-            "脂質",
-            "炭水化物",
-            "ビタミン",
-            "満足度"
-          ],
+            labels: [
+              "タンパク質",
+              "脂質",
+              "炭水化物",
+              "ビタミン",
+              "満足度"
+            ],
 
-          datasets: [{
-            label: selectedFood.title,
-            data: selectedFood.data,
-            borderColor: "#ff5722",
-            backgroundColor: "rgba(255,87,34,0.3)",
-            borderWidth: 3
-          }]
+            datasets: [{
+              label: selectedFood.title,
+              data: selectedFood.data,
+              borderColor: "#ff5722",
+              backgroundColor: "rgba(255,87,34,0.3)",
+              borderWidth: 3
+            }]
 
-        },   // ← この } が必要
+          },   // ← この } が必要
 
-        options: {
+          options: {
 
-          responsive: true,
+            responsive: true,
 
-          scales: {
+            scales: {
 
-            r: {
+              r: {
 
-              min: 0,
-              max: 10,
+                min: 0,
+                max: 10,
 
-              ticks: {
-                stepSize: 2
+                ticks: {
+                  stepSize: 2
+                }
+
               }
 
             }
 
           }
 
-        }
+        });
 
-      });
+      }
+      document.getElementById("registerBtn")
+        .addEventListener("click", () => {
 
-    }
-    document.getElementById("registerBtn")
-      .addEventListener("click", () => {
+          document.getElementById("detailPage").style.display = "none";
 
-        alert(selectedFood.title + " を登録しました");
+          document.getElementById("todayPage").style.display = "block";
 
-      });
-  </script>
+          document.getElementById("bottomNav").style.display = "flex";
+
+          document.getElementById("todayFood").innerHTML =
+            `<h3>${selectedFood.title}</h3>`;
+
+        });
+
+      const todayTab = document.getElementById("todayTab");
+      const aiTab = document.getElementById("aiTab");
+      const menuTab = document.getElementById("menuTab");
+      const mypageTab = document.getElementById("mypageTab");
+
+      const todayPage = document.getElementById("todayPage");
+      const aiPage = document.getElementById("aiPage");
+      const menuPage = document.getElementById("menuPage");
+      const mypagePage = document.getElementById("mypagePage");
+
+      todayTab.onclick = () => {
+
+        todayPage.style.display = "block";
+        aiPage.style.display = "none";
+        menuPage.style.display = "none";
+        mypagePage.style.display = "none";
+
+      }
+
+      aiTab.onclick = () => {
+
+        todayPage.style.display = "none";
+        aiPage.style.display = "block";
+        menuPage.style.display = "none";
+        mypagePage.style.display = "none";
+
+      };
+
+      menuTab.onclick = () => {
+
+        todayPage.style.display = "none";
+        aiPage.style.display = "none";
+        menuPage.style.display = "block";
+        mypagePage.style.display = "none";
+
+      };
+
+      mypageTab.onclick = () => {
+
+        todayPage.style.display = "none";
+        aiPage.style.display = "none";
+        menuPage.style.display = "none";
+        mypagePage.style.display = "block";
+
+      };
+    </script>
 
 </body>
 
