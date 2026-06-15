@@ -7,15 +7,6 @@
 
   <title>限界大学生の学食ナビ - 基本情報入力</title>
 
-  <!-- Chart.js --><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-  <title>限界大学生の学食ナビ - 基本情報入力</title>
-
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
@@ -38,6 +29,11 @@
       height: 100vh;
       padding: 16px;
       position: relative;
+      transition: padding-bottom 0.2s;
+    }
+
+    .container.has-bottom-nav {
+      padding-bottom: calc(86px + env(safe-area-inset-bottom));
     }
 
     /* =========================
@@ -62,7 +58,7 @@
     }
 
     /* =========================
-       入力カード
+       カード共通
     ========================= */
     .card {
       background: white;
@@ -75,7 +71,12 @@
       justify-content: center;
     }
 
-    #detailPage .card {
+    /* 一覧・詳細・タブ系ページは中央寄せせず上から表示 */
+    #selectMenuPage .card,
+    #detailPage .card,
+    #todayPage .card,
+    #aiPage .card,
+    #mypagePage .card {
       height: auto;
       min-height: calc(100vh - 40px);
       justify-content: flex-start;
@@ -139,7 +140,7 @@
     }
 
     /* =========================
-       次へボタン
+       次へボタン / 共通ボタン
     ========================= */
     .button-area {
       margin-top: 40px;
@@ -174,141 +175,281 @@
     }
 
     /* =========================
-   学食一覧
-========================= */
+       学食一覧ページ見出し
+    ========================= */
+    #selectMenuPage h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+    }
 
+    /* =========================
+       SmartNews風 横スクロールタブ
+    ========================= */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+
+      width: calc(100% + 48px);
+      max-width: none;
+
+      margin: 0 -24px 16px;
+      padding: 0 24px;
+
+      border-bottom: 1px solid #eee;
+      scrollbar-width: none;
+    }
+
+    .tab-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-item {
+      flex: 0 0 auto;
+      appearance: none;
+      border: none;
+      background: none;
+      padding: 10px 14px 12px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #aaa;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .tab-item:hover {
+      color: #ff5722;
+    }
+
+    .tab-item.active {
+      color: #ff5722;
+      border-bottom-color: #ff5722;
+    }
+
+    /* =========================
+       学食一覧（メニューカード）
+    ========================= */
     #menuList {
-
       display: grid;
-
       grid-template-columns: 1fr 1fr;
-
-      gap: 15px;
-
-      margin-top: 20px;
+      gap: 12px;
+      align-content: start;
     }
 
     .menu-item {
-
       background: #f7f7f7;
-
       border: 1px solid #ddd;
-
-      border-radius: 20px;
-
-      height: 120px;
-
+      border-radius: 18px;
+      min-height: 112px;
+      padding: 14px;
       display: flex;
-
-      justify-content: center;
-
-      align-items: center;
-
-      font-size: 20px;
-
-      font-weight: bold;
-
-      text-align: center;
-
-      padding: 10px;
-
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: left;
       cursor: pointer;
-
       transition: 0.2s;
-
     }
 
     .menu-item:hover {
-      background: #eee;
+      background: #fff5f2;
       border-color: #ff5722;
     }
 
-    .food-image {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      border-radius: 20px;
-      margin-bottom: 20px;
-      background: #eee;
-    }
-
-    .chart-area {
-      height: 300px;
-      position: relative;
-    }
-
-    #detailTitle {
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    #registerBtn {
-      background: #ff5722;
-      color: white;
-      margin-top: 20px;
+    .menu-item .menu-name {
+      font-size: 15px;
       font-weight: bold;
-      cursor: pointer;
+      line-height: 1.35;
     }
 
+    .menu-item .menu-tags {
+      margin-top: 6px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .tag-badge {
+      font-size: 10px;
+      font-weight: bold;
+      color: #ff5722;
+      background: #ffe3da;
+      border-radius: 6px;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    .menu-item .menu-meta {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .menu-item .menu-price {
+      font-size: 17px;
+      font-weight: bold;
+      color: #ff5722;
+    }
+
+    .menu-item .menu-kcal {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .empty-msg {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #999;
+      font-size: 14px;
+      padding: 30px 0;
+    }
+
+    /* =========================
+       メニュー詳細ページ
+    ========================= */
     .back-link {
       background: none;
       border: none;
       color: #ff5722;
       font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 10px;
+      font-size: 15px;
+      margin-bottom: 12px;
       cursor: pointer;
-      padding: 8px 0;
+      padding: 6px 0;
     }
 
+    .detail-hero {
+      width: 100%;
+      height: 160px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      background: linear-gradient(135deg, #ffe3da, #ffb199);
+    }
+
+    #detailTitle {
+      font-size: 24px;
+      margin: 0 0 4px;
+    }
+
+    .detail-category {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 12px;
+    }
+
+    .detail-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .detail-price {
+      font-size: 26px;
+      font-weight: bold;
+      color: #ff5722;
+    }
+
+    .detail-tags {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .nutrition-item {
+      background: #f7f7f7;
+      border-radius: 14px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
+    .nutrition-item .n-label {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .nutrition-item .n-value {
+      font-size: 17px;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    .nutrition-item .n-unit {
+      font-size: 11px;
+      font-weight: normal;
+      color: #999;
+    }
+
+    .chart-area {
+      height: 280px;
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    #registerBtn {
+      margin-top: 10px;
+    }
+
+    /* =========================
+       本日の食事ページ
+    ========================= */
+    .today-card {
+      background: #f7f7f7;
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 10px;
+    }
+
+    .today-card h3 {
+      margin: 0 0 10px;
+    }
+
+    /* =========================
+       下部ナビ
+    ========================= */
     .bottom-nav {
-
       position: fixed;
-
       bottom: 0;
-
       left: 50%;
-
       transform: translateX(-50%);
-
       width: 100%;
       max-width: 430px;
-
       height: 70px;
-
       padding-bottom: env(safe-area-inset-bottom);
-
       background: white;
-
       border-top: 1px solid #ddd;
-
       display: none;
-
       z-index: 1000;
     }
 
     .bottom-nav button {
-
       flex: 1;
-
       border: none;
-
       background: white;
-
       font-size: 13px;
-
       font-weight: bold;
-
+      color: #999;
       border-right: 1px solid #eee;
-
       cursor: pointer;
     }
 
     .bottom-nav button:last-child {
-
       border-right: none;
-
     }
 
     .bottom-nav button.active-tab {
@@ -316,24 +457,16 @@
     }
 
     .app-header {
-
       display: flex;
-
       align-items: center;
-
       padding: 10px 0;
-
       margin-bottom: 10px;
     }
 
     .app-header h1 {
-
       margin: 0;
-
       font-size: 22px;
-
       font-weight: bold;
-
       color: #ff5722;
     }
   </style>
@@ -342,7 +475,7 @@
 <body>
 
 
-  <div class="container">
+  <div class="container" id="appContainer">
 
     <div class="app-header">
 
@@ -355,9 +488,9 @@
 
         <h2>学食メニュー一覧</h2>
 
-        <div id="menuList">
+        <div class="tab-bar" id="tabBar"></div>
 
-        </div>
+        <div id="menuList"></div>
 
       </div>
 
@@ -370,9 +503,17 @@
 
         <button type="button" class="back-link" id="backToMenuBtn">← 一覧へ戻る</button>
 
-        <h2 id="detailTitle"></h2>
+        <div class="detail-hero" id="detailHero"></div>
 
-        <img id="detailImage" class="food-image" alt="">
+        <h2 id="detailTitle"></h2>
+        <div class="detail-category" id="detailCategory"></div>
+
+        <div class="detail-meta">
+          <span class="detail-price" id="detailPrice"></span>
+          <span class="detail-tags" id="detailTags"></span>
+        </div>
+
+        <div class="nutrition-grid" id="nutritionGrid"></div>
 
         <div class="chart-area">
           <canvas id="radarChart"></canvas>
@@ -495,49 +636,116 @@
 
     <script>
 
-      const foods = [
+      /* =========================================================
+         学食メニューデータ
+         （栄養価一覧表.xlsx を categorize_menu.py で分類したもの）
+      ========================================================= */
+      const MENU_DATA = {
+        "categories": [
+          { "id": "udon", "label": "うどん・そば", "emoji": "🍜" },
+          { "id": "ramen", "label": "ラーメン", "emoji": "🍥" },
+          { "id": "teishoku", "label": "定食", "emoji": "🍗" },
+          { "id": "don", "label": "丼", "emoji": "🍚" },
+          { "id": "curry", "label": "カレー", "emoji": "🍛" },
+          { "id": "side", "label": "サイドメニュー", "emoji": "🥗" },
+          { "id": "seasonal", "label": "季節限定", "emoji": "🧊" }
+        ],
+        "items": [
+          { "id": "udon-01", "name": "はいから", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 210, "energy_kcal": 256, "protein_g": 7, "fat_g": 2.6, "carb_g": 53.6, "salt_g": 5.3 },
+          { "id": "udon-02", "name": "わかめ", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 212, "protein_g": 6.5, "fat_g": 0.8, "carb_g": 47.7, "salt_g": 5.5 },
+          { "id": "udon-03", "name": "きつね", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 304, "protein_g": 12.2, "fat_g": 9.4, "carb_g": 47.4, "salt_g": 5.3 },
+          { "id": "udon-04", "name": "月見", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 281, "protein_g": 12.4, "fat_g": 5.9, "carb_g": 47.5, "salt_g": 5.5 },
+          { "id": "udon-05", "name": "ちく天", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 347, "protein_g": 10.9, "fat_g": 7, "carb_g": 58, "salt_g": 6.4 },
+          { "id": "udon-06", "name": "カレー", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 360, "energy_kcal": 423, "protein_g": 10.6, "fat_g": 14.5, "carb_g": 64.8, "salt_g": 7.7 },
+          { "id": "udon-07", "name": "+大盛り", "category": "udon", "category_label": "うどん・そば", "tags": ["option"], "price": 110, "energy_kcal": 190, "protein_g": 5.2, "fat_g": 0.8, "carb_g": 43.2, "salt_g": 0.6 },
+          { "id": "udon-08", "name": "定食 カツ", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 550, "energy_kcal": 750, "protein_g": 21.5, "fat_g": 14, "carb_g": 137.3, "salt_g": 5.7 },
+          { "id": "udon-09", "name": "鶏そぼろ丼", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 260, "energy_kcal": 441, "protein_g": 14.6, "fat_g": 9.8, "carb_g": 73.8, "salt_g": 1.5 },
+          { "id": "udon-10", "name": "鶏そぼろ丼セット", "category": "udon", "category_label": "うどん・そば", "tags": ["set"], "price": 430, "energy_kcal": 697, "protein_g": 21.6, "fat_g": 12.4, "carb_g": 127.4, "salt_g": 6.8 },
 
-        {
-          title: "唐揚げ定食",
-          image: "https://picsum.photos/seed/karaage/400/300",
-          data: [8, 6, 7, 3, 10]
-        },
+          { "id": "ramen-01", "name": "醤油", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 382, "protein_g": 14.6, "fat_g": 3.5, "carb_g": 69.9, "salt_g": 7.6 },
+          { "id": "ramen-02", "name": "味噌", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 453, "protein_g": 19.9, "fat_g": 5.1, "carb_g": 79.7, "salt_g": 6 },
+          { "id": "ramen-03", "name": "とんこつ", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 468, "protein_g": 15.4, "fat_g": 11.2, "carb_g": 73.1, "salt_g": 6.7 },
+          { "id": "ramen-04", "name": "塩", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 436, "protein_g": 15.7, "fat_g": 8.4, "carb_g": 70.7, "salt_g": 7.8 },
+          { "id": "ramen-05", "name": "担々麺", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 420, "energy_kcal": 653, "protein_g": 27.9, "fat_g": 18.7, "carb_g": 82.1, "salt_g": 6.8 },
+          { "id": "ramen-06", "name": "カレー", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 420, "energy_kcal": 597, "protein_g": 15.8, "fat_g": 18.7, "carb_g": 87.3, "salt_g": 5.7 },
+          { "id": "ramen-07", "name": "唐揚げカレー", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 480, "energy_kcal": 775, "protein_g": 23.1, "fat_g": 29.8, "carb_g": 99.6, "salt_g": 6.7 },
+          { "id": "ramen-08", "name": "+大盛り", "category": "ramen", "category_label": "ラーメン", "tags": ["option"], "price": 120, "energy_kcal": 337, "protein_g": 9.5, "fat_g": 1.3, "carb_g": 61.3, "salt_g": 1.2 },
+          { "id": "ramen-09", "name": "醤油ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 886, "protein_g": 27.9, "fat_g": 16.5, "carb_g": 154.3, "salt_g": 8.6 },
+          { "id": "ramen-10", "name": "味噌ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 957, "protein_g": 33.2, "fat_g": 18.1, "carb_g": 164.1, "salt_g": 7 },
+          { "id": "ramen-11", "name": "とんこつラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 972, "protein_g": 28.7, "fat_g": 24.2, "carb_g": 157.5, "salt_g": 7.7 },
+          { "id": "ramen-12", "name": "塩ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 940, "protein_g": 29, "fat_g": 21.4, "carb_g": 155.1, "salt_g": 8.8 },
+          { "id": "ramen-13", "name": "担々麺唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 690, "energy_kcal": 1157, "protein_g": 41.2, "fat_g": 31.7, "carb_g": 166.5, "salt_g": 7.8 },
+          { "id": "ramen-14", "name": "カレーラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 690, "energy_kcal": 1101, "protein_g": 29.1, "fat_g": 31.7, "carb_g": 171.7, "salt_g": 6.7 },
 
-        {
-          title: "親子丼",
-          image: "https://picsum.photos/seed/oyako/400/300",
-          data: [7, 4, 8, 5, 8]
-        },
+          { "id": "teishoku-01", "name": "とりマヨ丼", "category": "teishoku", "category_label": "定食", "tags": [], "price": 510, "energy_kcal": 779, "protein_g": 16.3, "fat_g": 34.6, "carb_g": 102, "salt_g": 5 },
+          { "id": "teishoku-02", "name": "とりポン定食", "category": "teishoku", "category_label": "定食", "tags": [], "price": 530, "energy_kcal": 738, "protein_g": 29.8, "fat_g": 30.6, "carb_g": 91.3, "salt_g": 4.9 },
+          { "id": "teishoku-03", "name": "とりマヨスペシャル", "category": "teishoku", "category_label": "定食", "tags": [], "price": 610, "energy_kcal": 1056, "protein_g": 27.3, "fat_g": 51.9, "carb_g": 120.4, "salt_g": 6.6 },
 
-        {
-          title: "鯖味噌定食",
-          image: "https://picsum.photos/seed/saba/400/300",
-          data: [8, 5, 6, 9, 7]
-        },
+          { "id": "don-01", "name": "かつ丼", "category": "don", "category_label": "丼", "tags": [], "price": 480, "energy_kcal": 587, "protein_g": 21.2, "fat_g": 16.4, "carb_g": 88.1, "salt_g": 3.6 },
+          { "id": "don-02", "name": "唐揚げ丼", "category": "don", "category_label": "丼", "tags": [], "price": 480, "energy_kcal": 698, "protein_g": 23.6, "fat_g": 25.1, "carb_g": 94.5, "salt_g": 4.2 },
+          { "id": "don-03", "name": "かつ丼セット", "category": "don", "category_label": "丼", "tags": ["set"], "price": 590, "energy_kcal": 843, "protein_g": 28.2, "fat_g": 19, "carb_g": 141.7, "salt_g": 8.9 },
+          { "id": "don-04", "name": "唐揚げ丼セット", "category": "don", "category_label": "丼", "tags": ["set"], "price": 590, "energy_kcal": 883, "protein_g": 24.5, "fat_g": 22.6, "carb_g": 147.9, "salt_g": 9.3 },
+          { "id": "don-05", "name": "ふわとろオムハヤシ", "category": "don", "category_label": "丼", "tags": [], "price": 450, "energy_kcal": 575, "protein_g": 18.1, "fat_g": 20.3, "carb_g": 80.5, "salt_g": 2.1 },
+          { "id": "don-06", "name": "親子丼", "category": "don", "category_label": "丼", "tags": [], "price": 420, "energy_kcal": 680, "protein_g": 27.7, "fat_g": 17.3, "carb_g": 100.3, "salt_g": 6.9 },
+          { "id": "don-07", "name": "親子丼セット", "category": "don", "category_label": "丼", "tags": ["set"], "price": 530, "energy_kcal": 936, "protein_g": 34.7, "fat_g": 19.9, "carb_g": 153.9, "salt_g": 12.2 },
 
-        {
-          title: "カツカレー",
-          image: "https://picsum.photos/301/200",
-          data: [7, 9, 10, 2, 10]
-        },
-        {
-          title: "味噌ラーメン",
-          image: "https://picsum.photos/302/200",
-          data: [5, 6, 9, 3, 9]
-        },
-        {
-          title: "ハンバーグ定食",
-          image: "https://picsum.photos/303/200",
-          data: [8, 7, 6, 4, 9]
-        }
-      ];
+          { "id": "curry-01", "name": "常翔特製カレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 380, "energy_kcal": 573, "protein_g": 10.9, "fat_g": 14.6, "carb_g": 99.5, "salt_g": 3 },
+          { "id": "curry-02", "name": "ハヤシライス", "category": "curry", "category_label": "カレー", "tags": [], "price": 380, "energy_kcal": 539, "protein_g": 11.4, "fat_g": 13.9, "carb_g": 93.2, "salt_g": 3.3 },
+          { "id": "curry-03", "name": "カレー大盛券", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 485, "protein_g": 9, "fat_g": 7.8, "carb_g": 94.7, "salt_g": 1.2 },
+          { "id": "curry-04", "name": "ハヤシ大盛券", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 476, "protein_g": 9.3, "fat_g": 7.5, "carb_g": 93.2, "salt_g": 1.6 },
+          { "id": "curry-05", "name": "常翔特製カツカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 750, "protein_g": 19.4, "fat_g": 25.1, "carb_g": 111.1, "salt_g": 3.4 },
+          { "id": "curry-06", "name": "常翔特製唐揚げカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 769, "protein_g": 18.2, "fat_g": 27.7, "carb_g": 111.8, "salt_g": 4 },
 
-      /* =========================
+          { "id": "side-01", "name": "味噌汁", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 50, "energy_kcal": 19, "protein_g": 1.3, "fat_g": 0.4, "carb_g": 4.3, "salt_g": 0.9 },
+          { "id": "side-02", "name": "温泉卵", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 70, "energy_kcal": 107, "protein_g": 7.3, "fat_g": 5.1, "carb_g": 0.2, "salt_g": 2.2 },
+          { "id": "side-03", "name": "チーズ", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 80, "energy_kcal": 61, "protein_g": 3.8, "fat_g": 5, "carb_g": 0.7, "salt_g": 0.6 },
+          { "id": "side-04", "name": "ごはん (M200g)", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 180, "energy_kcal": 308, "protein_g": 5.5, "fat_g": 0.8, "carb_g": 69.8, "salt_g": 0 },
+          { "id": "side-05", "name": "ミニサラダ", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 150, "energy_kcal": 20, "protein_g": 1.4, "fat_g": 0.3, "carb_g": 4.2, "salt_g": 0 },
+          { "id": "side-06", "name": "唐揚げ", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 230, "energy_kcal": 290, "protein_g": 11, "fat_g": 19.2, "carb_g": 18.4, "salt_g": 1.6 },
+          { "id": "side-07", "name": "ちょい足しライス(S 60g)", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 60, "energy_kcal": 92, "protein_g": 1.6, "fat_g": 0.2, "carb_g": 21, "salt_g": 0 },
+
+          { "id": "seasonal-01", "name": "冷やし担々麺", "category": "seasonal", "category_label": "季節限定", "tags": ["cold"], "price": 440, "energy_kcal": 555, "protein_g": 26.4, "fat_g": 22.7, "carb_g": 56.8, "salt_g": 6.7 },
+          { "id": "seasonal-02", "name": "冷やしとり天", "category": "seasonal", "category_label": "季節限定", "tags": ["cold"], "price": 350, "energy_kcal": 505, "protein_g": 21.9, "fat_g": 22.7, "carb_g": 57.4, "salt_g": 2.9 },
+          { "id": "seasonal-03", "name": "冷やしちく天", "category": "seasonal", "category_label": "季節限定", "tags": ["cold"], "price": 350, "energy_kcal": 419, "protein_g": 16.4, "fat_g": 11.8, "carb_g": 64.8, "salt_g": 3.9 },
+          { "id": "seasonal-04", "name": "冷やしタルタルうどん", "category": "seasonal", "category_label": "季節限定", "tags": ["cold"], "price": 490, "energy_kcal": 658, "protein_g": 20.8, "fat_g": 39.2, "carb_g": 60.1, "salt_g": 2.8 },
+          { "id": "seasonal-05", "name": "ごまだれ味噌うどん(冷やし)", "category": "seasonal", "category_label": "季節限定", "tags": ["cold"], "price": 490, "energy_kcal": 529, "protein_g": 22.6, "fat_g": 22.4, "carb_g": 62.3, "salt_g": 3.6 },
+          { "id": "seasonal-06", "name": "サラダ麺", "category": "seasonal", "category_label": "季節限定", "tags": ["cold"], "price": 450, "energy_kcal": 606, "protein_g": 19.6, "fat_g": 18.9, "carb_g": 86.9, "salt_g": 4.3 },
+          { "id": "seasonal-07", "name": "冷やし担々麺からあげセット", "category": "seasonal", "category_label": "季節限定", "tags": ["set", "cold"], "price": 710, "energy_kcal": 1059, "protein_g": 39.7, "fat_g": 35.7, "carb_g": 141.2, "salt_g": 7.7 }
+        ]
+      };
+
+      const TAG_LABELS = {
+        set: "セット",
+        option: "オプション",
+        ticket: "チケット",
+        cold: "冷やし"
+      };
+
+      // レーダーチャート用の正規化（各項目を 0〜10 の範囲に変換）
+      const RADAR_MAX = {
+        energy_kcal: 1200,
+        protein_g: 45,
+        fat_g: 55,
+        carb_g: 180,
+        salt_g: 13
+      };
+      const RADAR_LABELS = ["エネルギー", "たんぱく質", "脂質", "炭水化物", "塩分"];
+
+      function toRadarData(item) {
+        return [
+          item.energy_kcal / RADAR_MAX.energy_kcal * 10,
+          item.protein_g / RADAR_MAX.protein_g * 10,
+          item.fat_g / RADAR_MAX.fat_g * 10,
+          item.carb_g / RADAR_MAX.carb_g * 10,
+          item.salt_g / RADAR_MAX.salt_g * 10
+        ].map(v => Math.round(Math.min(v, 10) * 10) / 10);
+      }
+
+      /* =========================================================
          保存データの読み書き
-         （localStorage が使えない環境
-           でもエラーにならないように
+         （localStorage が使えない環境でもエラーにならないように
            簡易ストレージでラップ）
-      ========================= */
+      ========================================================= */
       const storage = {
         memory: {},
         getItem(key) {
@@ -561,6 +769,7 @@
       ========================= */
       let currentStep = 0;
       let selectedFood = null;
+      let activeCategory = MENU_DATA.categories[0].id;
       let radarChart = null;
       const questions = document.querySelectorAll(".question");
       const progressSteps = document.querySelectorAll(".progress-step");
@@ -616,7 +825,6 @@
       if (savedHeight) { heightSelect.value = savedHeight; }
       if (savedWeight) { weightSelect.value = savedWeight; }
 
-      // すでにどれかのデータが保存されている場合は最初からボタンを押せるようにする
       if (savedGender || savedAge || savedHeight || savedWeight) {
         enableButton();
       }
@@ -624,7 +832,6 @@
       /* =========================
          イベントリスナー（入力検知）
       ========================= */
-      // 性別ボタンのクリックイベント
       const genderButtons = document.querySelectorAll(".gender-btn");
       genderButtons.forEach(btn => {
         btn.addEventListener("click", () => {
@@ -635,7 +842,6 @@
         });
       });
 
-      // 各セレクトボックスの変更イベント
       document.querySelectorAll("select").forEach(select => {
         select.addEventListener("change", () => {
           if (select.value !== "") {
@@ -646,7 +852,6 @@
         });
       });
 
-      // ボタンの活性化・非活性化
       function enableButton() {
         nextBtn.classList.add("enabled");
         nextBtn.disabled = false;
@@ -661,15 +866,12 @@
          ステップ遷移・保存ロジック
       ========================= */
       nextBtn.addEventListener("click", () => {
-        // 各ステップでの未入力チェック
         if (currentStep === 0 && !selectedGender) return;
         if (currentStep === 1 && ageSelect.value === "") return;
         if (currentStep === 2 && heightSelect.value === "") return;
         if (currentStep === 3 && weightSelect.value === "") return;
 
-        /* 最後（ステップ3）の入力が終わった時の処理 */
         if (currentStep === 3) {
-          // 保存
           storage.setItem("gender", selectedGender);
           storage.setItem("age", ageSelect.value);
           storage.setItem("height", heightSelect.value);
@@ -678,18 +880,14 @@
           document.querySelector(".progress-container").style.display = "none";
           document.getElementById("inputCard").style.display = "none";
           document.getElementById("selectMenuPage").style.display = "block";
-
-          // TODO: ここに次の画面（学食一覧や管理画面など）への遷移処理を記述する
           return;
         }
 
-        /* 次のステップへ進む処理 */
         questions[currentStep].classList.remove("active");
         currentStep++;
         questions[currentStep].classList.add("active");
         progressSteps[currentStep].classList.add("active");
 
-        // ボタンを一旦非活性化（次の項目がすでに入力済みの場合は活性化）
         disableButton();
 
         if (currentStep === 1 && ageSelect.value !== "") { enableButton(); }
@@ -697,38 +895,94 @@
         if (currentStep === 3 && weightSelect.value !== "") { enableButton(); }
       });
 
-      /* =========================
-         学食一覧の表示
-      ========================= */
+      /* =========================================================
+         SmartNews風タブ + 学食一覧
+      ========================================================= */
+      const tabBar = document.getElementById("tabBar");
       const menuList = document.getElementById("menuList");
-      {
-        let itemsHtml = "";
-        foods.forEach((food, index) => {
-          itemsHtml += `<div class="menu-item" data-index="${index}">${food.title}</div>`;
-        });
-        menuList.innerHTML = itemsHtml;
 
-        menuList.querySelectorAll(".menu-item").forEach(item => {
-          item.addEventListener("click", () => {
-            showDetail(Number(item.dataset.index));
+      function renderTabs() {
+        tabBar.innerHTML = MENU_DATA.categories.map(cat => `
+          <button type="button" class="tab-item${cat.id === activeCategory ? " active" : ""}" data-category="${cat.id}">
+            ${cat.emoji} ${cat.label}
+          </button>
+        `).join("");
+
+        tabBar.querySelectorAll(".tab-item").forEach(tab => {
+          tab.addEventListener("click", () => {
+            activeCategory = tab.dataset.category;
+            renderTabs();
+            renderMenuList();
+            tab.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
           });
         });
       }
 
-      function showDetail(index) {
+      function renderMenuList() {
+        const items = MENU_DATA.items.filter(item => item.category === activeCategory);
 
-        selectedFood = foods[index];
+        if (items.length === 0) {
+          menuList.innerHTML = `<div class="empty-msg">このカテゴリのメニューはまだありません</div>`;
+          return;
+        }
+
+        menuList.innerHTML = items.map(item => `
+          <div class="menu-item" data-id="${item.id}">
+            <div>
+              <div class="menu-name">${item.name}</div>
+              <div class="menu-tags">
+                ${item.tags.map(t => `<span class="tag-badge">${TAG_LABELS[t] || t}</span>`).join("")}
+              </div>
+            </div>
+            <div class="menu-meta">
+              <span class="menu-price">¥${item.price}</span>
+              <span class="menu-kcal">${item.energy_kcal}kcal</span>
+            </div>
+          </div>
+        `).join("");
+
+        menuList.querySelectorAll(".menu-item").forEach(card => {
+          card.addEventListener("click", () => showDetail(card.dataset.id));
+        });
+      }
+
+      renderTabs();
+      renderMenuList();
+
+      /* =========================================================
+         メニュー詳細画面
+      ========================================================= */
+      const NUTRITION_FIELDS = [
+        { key: "energy_kcal", label: "エネルギー", unit: "kcal" },
+        { key: "protein_g", label: "たんぱく質", unit: "g" },
+        { key: "fat_g", label: "脂質", unit: "g" },
+        { key: "carb_g", label: "炭水化物", unit: "g" },
+        { key: "salt_g", label: "食塩相当量", unit: "g" }
+      ];
+
+      function showDetail(itemId) {
+        selectedFood = MENU_DATA.items.find(i => i.id === itemId);
+        if (!selectedFood) return;
+
+        const category = MENU_DATA.categories.find(c => c.id === selectedFood.category);
 
         document.getElementById("selectMenuPage").style.display = "none";
         document.getElementById("detailPage").style.display = "block";
 
-        document.getElementById("detailTitle").textContent =
-          selectedFood.title;
+        document.getElementById("detailHero").textContent = category ? category.emoji : "🍽️";
+        document.getElementById("detailTitle").textContent = selectedFood.name;
+        document.getElementById("detailCategory").textContent = selectedFood.category_label;
+        document.getElementById("detailPrice").textContent = `¥${selectedFood.price}`;
 
-        document.getElementById("detailImage").src =
-          selectedFood.image;
-        document.getElementById("detailImage").alt =
-          selectedFood.title;
+        document.getElementById("detailTags").innerHTML =
+          selectedFood.tags.map(t => `<span class="tag-badge">${TAG_LABELS[t] || t}</span>`).join("");
+
+        document.getElementById("nutritionGrid").innerHTML = NUTRITION_FIELDS.map(f => `
+          <div class="nutrition-item">
+            <div class="n-label">${f.label}</div>
+            <div class="n-value">${selectedFood[f.key]}<span class="n-unit">${f.unit}</span></div>
+          </div>
+        `).join("");
 
         if (radarChart) {
           radarChart.destroy();
@@ -737,56 +991,33 @@
         const ctx = document.getElementById("radarChart");
 
         radarChart = new Chart(ctx, {
-
           type: "radar",
-
           data: {
-
-            labels: [
-              "タンパク質",
-              "脂質",
-              "炭水化物",
-              "ビタミン",
-              "満足度"
-            ],
-
+            labels: RADAR_LABELS,
             datasets: [{
-              label: selectedFood.title,
-              data: selectedFood.data,
+              label: selectedFood.name,
+              data: toRadarData(selectedFood),
               borderColor: "#ff5722",
               backgroundColor: "rgba(255,87,34,0.3)",
               borderWidth: 3
             }]
-
           },
-
           options: {
-
             responsive: true,
             maintainAspectRatio: false,
-
             scales: {
-
               r: {
-
                 min: 0,
                 max: 10,
-
                 ticks: {
                   stepSize: 2
                 }
-
               }
-
             }
-
           }
-
         });
-
       }
 
-      // 一覧画面に戻る
       document.getElementById("backToMenuBtn").addEventListener("click", () => {
         document.getElementById("detailPage").style.display = "none";
         document.getElementById("selectMenuPage").style.display = "block";
@@ -799,13 +1030,24 @@
 
           document.getElementById("todayPage").style.display = "block";
 
+          document.getElementById("appContainer").classList.add("has-bottom-nav");
           document.getElementById("bottomNav").style.display = "flex";
 
-          document.getElementById("todayFood").innerHTML =
-            `<h3>${selectedFood.title}</h3>`;
+          document.getElementById("todayFood").innerHTML = `
+            <div class="today-card">
+              <h3>${selectedFood.name}</h3>
+              <div class="nutrition-grid">
+                ${NUTRITION_FIELDS.map(f => `
+                  <div class="nutrition-item">
+                    <div class="n-label">${f.label}</div>
+                    <div class="n-value">${selectedFood[f.key]}<span class="n-unit">${f.unit}</span></div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `;
 
           setActiveTab(todayTab);
-
         });
 
       /* =========================
@@ -818,8 +1060,7 @@
 
       const todayPage = document.getElementById("todayPage");
       const aiPage = document.getElementById("aiPage");
-      const menuPage =
-        document.getElementById("selectMenuPage");
+      const menuPage = document.getElementById("selectMenuPage");
       const mypagePage = document.getElementById("mypagePage");
 
       const allTabs = [todayTab, aiTab, menuTab, mypageTab];
@@ -844,1444 +1085,6 @@
       aiTab.onclick = () => showPage(aiPage, aiTab);
       menuTab.onclick = () => showPage(menuPage, menuTab);
       mypageTab.onclick = () => showPage(mypagePage, mypageTab);
-    </script>
-
-</body>
-
-</html>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #f5f5f5;
-      font-family: sans-serif;
-      overflow: auto;
-    }
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-  <title>限界大学生の学食ナビ - 基本情報入力</title>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #f5f5f5;
-      font-family: sans-serif;
-      overflow: auto;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 430px;
-      margin: 0 auto;
-      height: 100vh;
-      padding: 16px;
-      position: relative;
-    }
-
-    /* =========================
-       進行バー
-    ========================= */
-    .progress-container {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .progress-step {
-      flex: 1;
-      height: 8px;
-      border-radius: 999px;
-      background: #ddd;
-      transition: 0.3s;
-    }
-
-    .progress-step.active {
-      background: #ff5722;
-    }
-
-    /* =========================
-       入力カード
-    ========================= */
-    .card {
-      background: white;
-      border-radius: 28px;
-      padding: 30px 24px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-      height: calc(100vh - 105px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    #detailPage .card {
-      height: auto;
-      min-height: calc(100vh - 40px);
-      justify-content: flex-start;
-    }
-
-    .question {
-      display: none;
-    }
-
-    .question.active {
-      display: block;
-    }
-
-    label {
-      display: block;
-      text-align: center;
-      font-size: 30px;
-      font-weight: bold;
-      margin-bottom: 40px;
-    }
-
-    /* =========================
-       性別ボタン
-    ========================= */
-    .gender-buttons {
-      display: flex;
-      gap: 16px;
-    }
-
-    .gender-btn {
-      flex: 1;
-      border: none;
-      border-radius: 20px;
-      padding: 20px;
-      font-size: 22px;
-      font-weight: bold;
-      background: #e5e5e5;
-      transition: 0.2s;
-      cursor: pointer;
-    }
-
-    .gender-btn.selected {
-      background: #ff5722;
-      color: white;
-    }
-
-    /* =========================
-       select
-    ========================= */
-    select {
-      width: 100%;
-      padding: 20px;
-      border-radius: 20px;
-      border: 1px solid #ddd;
-      font-size: 22px;
-      background: white;
-    }
-
-    /* =========================
-       次へボタン
-    ========================= */
-    .button-area {
-      margin-top: 40px;
-    }
-
-    .next-btn {
-      width: 100%;
-      padding: 18px;
-      font-size: 18px;
-      border: none;
-      border-radius: 20px;
-    }
-
-    .next-btn.enabled {
-      background: #ff5722;
-    }
-
-    /* =========================
-       スマホ最適化
-    ========================= */
-    @media (max-height: 750px) {
-      label {
-        font-size: 24px;
-        margin-bottom: 28px;
-      }
-    }
-
-    /* =========================
-   学食一覧
-========================= */
-
-    #menuList {
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 15px;
-
-      margin-top: 20px;
-    }
-
-    .menu-item {
-
-      background: #f7f7f7;
-
-      border: 1px solid #ddd;
-
-      border-radius: 20px;
-
-      height: 120px;
-
-      display: flex;
-
-      justify-content: center;
-
-      align-items: center;
-
-      font-size: 20px;
-
-      font-weight: bold;
-
-    }
-
-    .food-image {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      border-radius: 20px;
-      margin-bottom: 20px;
-    }
-
-    .chart-area {
-      height: 300px;
-    }
-
-    #detailTitle {
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    #registerBtn {
-      background: #ff5722;
-      color: white;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-
-    .bottom-nav {
-
-      position: fixed;
-
-      bottom: 0;
-
-      left: 50%;
-
-      transform: translateX(-50%);
-
-      width: 100%;
-      max-width: 430px;
-
-      height: 70px;
-
-      background: white;
-
-      border-top: 1px solid #ddd;
-
-      display: none;
-
-      z-index: 1000;
-    }
-
-    .bottom-nav button {
-
-      flex: 1;
-
-      border: none;
-
-      background: white;
-
-      font-size: 13px;
-
-      font-weight: bold;
-
-      border-right: 1px solid #eee;
-    }
-
-    .bottom-nav button:last-child {
-
-      border-right: none;
-
-    }
-
-    .app-header {
-
-      display: flex;
-
-      align-items: center;
-
-      padding: 10px 0;
-
-      margin-bottom: 10px;
-    }
-
-    .app-header h1 {
-
-      margin: 0;
-
-      font-size: 22px;
-
-      font-weight: bold;
-
-      color: #ff5722;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="app-header">
-
-    <h1>常翔ウェルフェア</h1>
-
-  </div>
-  <div class="container">
-
-    <!-- 学食一覧画面 -->
-    <div id="selectMenuPage" style="display:none;">
-      <div class="card">
-
-        <h2>学食メニュー一覧</h2>
-
-        <div id="menuList">
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- メニュー詳細画面 -->
-    <div id="detailPage" style="display:none;">
-
-      <div class="card">
-
-        <h2 id="detailTitle"></h2>
-
-        <img id="detailImage" class="food-image">
-
-        <div class="chart-area">
-          <canvas id="radarChart"></canvas>
-        </div>
-
-        <button class="next-btn" id="registerBtn">
-          登録する
-        </button>
-
-      </div>
-
-    </div>
-    <!-- 本日の食事ページ -->
-    <div id="todayPage" style="display:none;">
-
-      <div class="card">
-
-        <h2>本日の食事</h2>
-
-        <div id="todayFood">
-          まだ登録されていません
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- AIページ -->
-    <div id="aiPage" style="display:none;">
-
-      <div class="card">
-        <h2>AIチャット</h2>
-        <p>AIチャット画面</p>
-      </div>
-
-    </div>
-
-    <!-- マイページ -->
-    <div id="mypagePage" style="display:none;">
-
-      <div class="card">
-        <h2>マイページ</h2>
-        <p>マイページ</p>
-      </div>
-
-    </div>
-    <!-- 下部ナビ -->
-    <div id="bottomNav" class="bottom-nav">
-
-      <button id="todayTab">
-        本日の食事
-      </button>
-
-      <button id="aiTab">
-        AIチャット
-      </button>
-
-      <button id="menuTab">
-        学食一覧
-      </button>
-
-      <button id="mypageTab">
-        マイページ
-      </button>
-
-
-
-    </div>
-
-    <!-- 進行バー -->
-    <div class="progress-container">
-      <div class="progress-step active"></div>
-      <div class="progress-step"></div>
-      <div class="progress-step"></div>
-      <div class="progress-step"></div>
-    </div>
-
-    <!-- 入力画面 -->
-    <div class="card" id="inputCard">
-
-      <!-- 性別 (Step 0) -->
-      <div class="question active">
-        <label>性別を選択してください</label>
-        <div class="gender-buttons">
-          <button class="gender-btn" data-value="male">男性</button>
-          <button class="gender-btn" data-value="female">女性</button>
-        </div>
-      </div>
-
-      <!-- 年齢 (Step 1) -->
-      <div class="question">
-        <label>年齢を選択してください</label>
-        <select id="age">
-          <option value="">選択してください</option>
-        </select>
-      </div>
-
-      <!-- 身長 (Step 2) -->
-      <div class="question">
-        <label>身長を選択してください</label>
-        <select id="height">
-          <option value="">選択してください</option>
-        </select>
-      </div>
-
-      <!-- 体重 (Step 3) -->
-      <div class="question">
-        <label>体重を選択してください</label>
-        <select id="weight">
-          <option value="">選択してください</option>
-        </select>
-      </div>
-
-      <!-- 次へボタン -->
-      <div class="button-area">
-        <button class="next-btn" id="nextBtn">次へ</button>
-      </div>
-
-    </div>
-
-    <script>
-
-      const foods = [
-
-        {
-          title: "唐揚げ定食",
-          image: "images/karaage.jpg",
-          data: [8, 6, 7, 3, 10]
-        },
-
-        {
-          title: "親子丼",
-          image: "images/oyako.jpg",
-          data: [7, 4, 8, 5, 8]
-        },
-
-        {
-          title: "鯖味噌定食",
-          image: "images/saba.jpg",
-          data: [8, 5, 6, 9, 7]
-        },
-
-        {
-          title: "カツカレー",
-          image: "https://picsum.photos/301/200",
-          data: [7, 9, 10, 2, 10]
-        },
-        {
-          title: "味噌ラーメン",
-          image: "https://picsum.photos/302/200",
-          data: [5, 6, 9, 3, 9]
-        },
-        {
-          title: "ハンバーグ定食",
-          image: "https://picsum.photos/303/200",
-          data: [8, 7, 6, 4, 9]
-        }
-      ];
-      /* =========================
-         基本設定と要素の取得
-      ========================= */
-      let currentStep = 0;
-      let selectedFood = null;
-      let radarChart = null;
-      const questions = document.querySelectorAll(".question");
-      const progressSteps = document.querySelectorAll(".progress-step");
-      const nextBtn = document.getElementById("nextBtn");
-      let selectedGender = null;
-
-      /* =========================
-         セレクトボックスの選択肢自動生成
-      ========================= */
-      const ageSelect = document.getElementById("age");
-      for (let i = 18; i <= 30; i++) {
-        ageSelect.innerHTML += `<option value="${i}">${i}歳</option>`;
-      }
-
-      const heightSelect = document.getElementById("height");
-      for (let i = 140; i <= 200; i++) {
-        heightSelect.innerHTML += `<option value="${i}">${i}cm</option>`;
-      }
-
-      const weightSelect = document.getElementById("weight");
-      for (let i = 40; i <= 120; i++) {
-        weightSelect.innerHTML += `<option value="${i}">${i}kg</option>`;
-      }
-
-      /* =========================
-         LocalStorageから既存データの読み込み・反映
-      ========================= */
-      const savedGender = localStorage.getItem("gender");
-      const savedAge = localStorage.getItem("age");
-      const savedHeight = localStorage.getItem("height");
-      const savedWeight = localStorage.getItem("weight");
-
-      if (savedGender) {
-        selectedGender = savedGender;
-        document.querySelector(`[data-value="${savedGender}"]`).classList.add("selected");
-      }
-      if (savedAge) { ageSelect.value = savedAge; }
-      if (savedHeight) { heightSelect.value = savedHeight; }
-      if (savedWeight) { weightSelect.value = savedWeight; }
-
-      // すでにどれかのデータが保存されている場合は最初からボタンを押せるようにする
-      if (savedGender || savedAge || savedHeight || savedWeight) {
-        enableButton();
-      }
-
-      /* =========================
-         イベントリスナー（入力検知）
-      ========================= */
-      // 性別ボタンのクリックイベント
-      const genderButtons = document.querySelectorAll(".gender-btn");
-      genderButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          genderButtons.forEach(b => b.classList.remove("selected"));
-          btn.classList.add("selected");
-          selectedGender = btn.dataset.value;
-          enableButton();
-        });
-      });
-
-      // 各セレクトボックスの変更イベント
-      document.querySelectorAll("select").forEach(select => {
-        select.addEventListener("change", () => {
-          if (select.value !== "") {
-            enableButton();
-          }
-        });
-      });
-
-      // ボタンの活性化
-      function enableButton() {
-        nextBtn.classList.add("enabled");
-      }
-
-      /* =========================
-         ステップ遷移・保存ロジック
-      ========================= */
-      nextBtn.addEventListener("click", () => {
-        // 各ステップでの未入力チェック
-        if (currentStep === 0 && !selectedGender) return;
-        if (currentStep === 1 && ageSelect.value === "") return;
-        if (currentStep === 2 && heightSelect.value === "") return;
-        if (currentStep === 3 && weightSelect.value === "") return;
-
-        /* 最後（ステップ3）の入力が終わった時の処理 */
-        if (currentStep === 3) {
-          // LocalStorageに保存
-          localStorage.setItem("gender", selectedGender);
-          localStorage.setItem("age", ageSelect.value);
-          localStorage.setItem("height", heightSelect.value);
-          localStorage.setItem("weight", weightSelect.value);
-
-          document.querySelector(".progress-container").style.display = "none";
-          document.getElementById("inputCard").style.display = "none";
-          document.getElementById("selectMenuPage").style.display = "block";
-
-          console.log({
-            gender: selectedGender,
-            age: ageSelect.value,
-            height: heightSelect.value,
-            weight: weightSelect.value
-          });
-
-          // TODO: ここに次の画面（学食一覧や管理画面など）への遷移処理を記述する
-          return;
-        }
-
-        /* 次のステップへ進む処理 */
-        questions[currentStep].classList.remove("active");
-        currentStep++;
-        questions[currentStep].classList.add("active");
-        progressSteps[currentStep].classList.add("active");
-
-        // ボタンを一旦非活性化（次の項目がすでに入力済みの場合は活性化）
-        nextBtn.classList.remove("enabled");
-
-        if (currentStep === 1 && ageSelect.value !== "") { nextBtn.classList.add("enabled"); }
-        if (currentStep === 2 && heightSelect.value !== "") { nextBtn.classList.add("enabled"); }
-        if (currentStep === 3 && weightSelect.value !== "") { nextBtn.classList.add("enabled"); }
-      });
-      const menuList = document.getElementById("menuList");
-
-      foods.forEach((food, index) => {
-
-        menuList.innerHTML += `
-    <div class="menu-item" onclick="showDetail(${index})">
-      ${food.title}
-    </div>
-  `;
-
-      });
-      function showDetail(index) {
-
-        selectedFood = foods[index];
-
-        document.getElementById("selectMenuPage").style.display = "none";
-        document.getElementById("detailPage").style.display = "block";
-
-        document.getElementById("detailTitle").textContent =
-          selectedFood.title;
-
-        document.getElementById("detailImage").src =
-          selectedFood.image;
-
-        if (radarChart) {
-          radarChart.destroy();
-        }
-
-        const ctx = document.getElementById("radarChart");
-
-        radarChart = new Chart(ctx, {
-
-          type: "radar",
-
-          data: {
-
-            labels: [
-              "タンパク質",
-              "脂質",
-              "炭水化物",
-              "ビタミン",
-              "満足度"
-            ],
-
-            datasets: [{
-              label: selectedFood.title,
-              data: selectedFood.data,
-              borderColor: "#ff5722",
-              backgroundColor: "rgba(255,87,34,0.3)",
-              borderWidth: 3
-            }]
-
-          },   // ← この } が必要
-
-          options: {
-
-            responsive: true,
-
-            scales: {
-
-              r: {
-
-                min: 0,
-                max: 10,
-
-                ticks: {
-                  stepSize: 2
-                }
-
-              }
-
-            }
-
-          }
-
-        });
-
-      }
-      document.getElementById("registerBtn")
-        .addEventListener("click", () => {
-
-          document.getElementById("detailPage").style.display = "none";
-
-          document.getElementById("todayPage").style.display = "block";
-
-          document.getElementById("bottomNav").style.display = "flex";
-
-          document.getElementById("todayFood").innerHTML =
-            `<h3>${selectedFood.title}</h3>`;
-
-        });
-
-      const todayTab = document.getElementById("todayTab");
-      const aiTab = document.getElementById("aiTab");
-      const menuTab = document.getElementById("menuTab");
-      const mypageTab = document.getElementById("mypageTab");
-
-      const todayPage = document.getElementById("todayPage");
-      const aiPage = document.getElementById("aiPage");
-      const menuPage =
-        document.getElementById("selectMenuPage");
-      const mypagePage = document.getElementById("mypagePage");
-
-      todayTab.onclick = () => {
-
-        todayPage.style.display = "block";
-        aiPage.style.display = "none";
-        menuPage.style.display = "none";
-        mypagePage.style.display = "none";
-
-      }
-
-      aiTab.onclick = () => {
-
-        todayPage.style.display = "none";
-        aiPage.style.display = "block";
-        menuPage.style.display = "none";
-        mypagePage.style.display = "none";
-
-      };
-
-      menuTab.onclick = () => {
-
-        todayPage.style.display = "none";
-        aiPage.style.display = "none";
-        menuPage.style.display = "block";
-        mypagePage.style.display = "none";
-
-      };
-
-      mypageTab.onclick = () => {
-
-        todayPage.style.display = "none";
-        aiPage.style.display = "none";
-        menuPage.style.display = "none";
-        mypagePage.style.display = "block";
-
-      };
-    </script>
-
-</body>
-
-</html>
-    .container {
-      width: 100%;
-      max-width: 430px;
-      margin: 0 auto;
-      height: 100vh;
-      padding: 16px;
-      position: relative;
-    }
-
-    /* =========================
-       進行バー
-    ========================= */
-    .progress-container {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .progress-step {
-      flex: 1;
-      height: 8px;
-      border-radius: 999px;
-      background: #ddd;
-      transition: 0.3s;
-    }
-
-    .progress-step.active {
-      background: #ff5722;
-    }
-
-    /* =========================
-       入力カード
-    ========================= */
-    .card {
-      background: white;
-      border-radius: 28px;
-      padding: 30px 24px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-      height: calc(100vh - 105px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    #detailPage .card {
-      height: auto;
-      min-height: calc(100vh - 40px);
-      justify-content: flex-start;
-    }
-
-    .question {
-      display: none;
-    }
-
-    .question.active {
-      display: block;
-    }
-
-    label {
-      display: block;
-      text-align: center;
-      font-size: 30px;
-      font-weight: bold;
-      margin-bottom: 40px;
-    }
-
-    /* =========================
-       性別ボタン
-    ========================= */
-    .gender-buttons {
-      display: flex;
-      gap: 16px;
-    }
-
-    .gender-btn {
-      flex: 1;
-      border: none;
-      border-radius: 20px;
-      padding: 20px;
-      font-size: 22px;
-      font-weight: bold;
-      background: #e5e5e5;
-      transition: 0.2s;
-      cursor: pointer;
-    }
-
-    .gender-btn.selected {
-      background: #ff5722;
-      color: white;
-    }
-
-    /* =========================
-       select
-    ========================= */
-    select {
-      width: 100%;
-      padding: 20px;
-      border-radius: 20px;
-      border: 1px solid #ddd;
-      font-size: 22px;
-      background: white;
-    }
-
-    /* =========================
-       次へボタン
-    ========================= */
-    .button-area {
-      margin-top: 40px;
-    }
-
-    .next-btn {
-      width: 100%;
-      padding: 18px;
-      font-size: 18px;
-      border: none;
-      border-radius: 20px;
-    }
-
-    .next-btn.enabled {
-      background: #ff5722;
-    }
-
-    /* =========================
-       スマホ最適化
-    ========================= */
-    @media (max-height: 750px) {
-      label {
-        font-size: 24px;
-        margin-bottom: 28px;
-      }
-    }
-
-    /* =========================
-   学食一覧
-========================= */
-
-    #menuList {
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 15px;
-
-      margin-top: 20px;
-    }
-
-    .menu-item {
-
-      background: #f7f7f7;
-
-      border: 1px solid #ddd;
-
-      border-radius: 20px;
-
-      height: 120px;
-
-      display: flex;
-
-      justify-content: center;
-
-      align-items: center;
-
-      font-size: 20px;
-
-      font-weight: bold;
-
-    }
-
-    .food-image {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      border-radius: 20px;
-      margin-bottom: 20px;
-    }
-
-    .chart-area {
-      height: 300px;
-    }
-
-    #detailTitle {
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    #registerBtn {
-      background: #ff5722;
-      color: white;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-
-    .bottom-nav {
-
-      position: fixed;
-
-      bottom: 0;
-
-      left: 50%;
-
-      transform: translateX(-50%);
-
-      width: 100%;
-      max-width: 430px;
-
-      height: 70px;
-
-      background: white;
-
-      border-top: 1px solid #ddd;
-
-      display: none;
-
-      z-index: 1000;
-    }
-
-    .bottom-nav button {
-
-      flex: 1;
-
-      border: none;
-
-      background: white;
-
-      font-size: 13px;
-
-      font-weight: bold;
-
-      border-right: 1px solid #eee;
-    }
-
-    .bottom-nav button:last-child {
-
-      border-right: none;
-
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="container">
-
-    <!-- 学食一覧画面 -->
-    <div id="menuPage" style="display:none;">
-
-      <div class="card">
-
-        <h2>学食メニュー一覧</h2>
-
-        <div id="menuList">
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- メニュー詳細画面 -->
-    <div id="detailPage" style="display:none;">
-
-      <div class="card">
-
-        <h2 id="detailTitle"></h2>
-
-        <img id="detailImage" class="food-image">
-
-        <div class="chart-area">
-          <canvas id="radarChart"></canvas>
-        </div>
-
-        <button class="next-btn" id="registerBtn">
-          登録する
-        </button>
-
-      </div>
-
-    </div>
-    <!-- マイページ -->
-    <div id="todayPage" style="display:none;">
-
-      <div class="card">
-
-        <h2>本日の食事</h2>
-
-        <div id="todayFood">
-          まだ登録されていません
-        </div>
-
-      </div>
-
-      <!-- AIページ -->
-      <div id="aiPage" style="display:none;">
-        AIチャット画面
-      </div>
-
-      <!-- マイページ -->
-      <div id="mypagePage" style="display:none;">
-        マイページ
-      </div>
-
-    </div>
-    <!-- 下部ナビ -->
-    <div id="bottomNav" class="bottom-nav">
-
-      <button id="todayTab">
-        本日の食事
-      </button>
-
-      <button id="aiTab">
-        AIチャット
-      </button>
-
-      <button id="menuTab">
-        学食一覧
-      </button>
-
-      <button id="mypageTab">
-        マイページ
-      </button>
-
-
-
-    </div>
-
-    <!-- 進行バー -->
-    <div class="progress-container">
-      <div class="progress-step active"></div>
-      <div class="progress-step"></div>
-      <div class="progress-step"></div>
-      <div class="progress-step"></div>
-    </div>
-
-    <!-- 入力画面 -->
-    <div class="card" id="inputCard">
-
-      <!-- 性別 (Step 0) -->
-      <div class="question active">
-        <label>性別を選択してください</label>
-        <div class="gender-buttons">
-          <button class="gender-btn" data-value="male">男性</button>
-          <button class="gender-btn" data-value="female">女性</button>
-        </div>
-      </div>
-
-      <!-- 年齢 (Step 1) -->
-      <div class="question">
-        <label>年齢を選択してください</label>
-        <select id="age">
-          <option value="">選択してください</option>
-        </select>
-      </div>
-
-      <!-- 身長 (Step 2) -->
-      <div class="question">
-        <label>身長を選択してください</label>
-        <select id="height">
-          <option value="">選択してください</option>
-        </select>
-      </div>
-
-      <!-- 体重 (Step 3) -->
-      <div class="question">
-        <label>体重を選択してください</label>
-        <select id="weight">
-          <option value="">選択してください</option>
-        </select>
-      </div>
-
-      <!-- 次へボタン -->
-      <div class="button-area">
-        <button class="next-btn" id="nextBtn">次へ</button>
-      </div>
-
-    </div>
-
-    <script>
-
-      const foods = [
-
-        {
-          title: "唐揚げ定食",
-          image: "images/karaage.jpg",
-          data: [8, 6, 7, 3, 10]
-        },
-
-        {
-          title: "親子丼",
-          image: "images/oyako.jpg",
-          data: [7, 4, 8, 5, 8]
-        },
-
-        {
-          title: "鯖味噌定食",
-          image: "images/saba.jpg",
-          data: [8, 5, 6, 9, 7]
-        },
-
-        {
-          title: "カツカレー",
-          image: "https://picsum.photos/301/200",
-          data: [7, 9, 10, 2, 10]
-        },
-        {
-          title: "味噌ラーメン",
-          image: "https://picsum.photos/302/200",
-          data: [5, 6, 9, 3, 9]
-        },
-        {
-          title: "ハンバーグ定食",
-          image: "https://picsum.photos/303/200",
-          data: [8, 7, 6, 4, 9]
-        }
-      ];
-      /* =========================
-         基本設定と要素の取得
-      ========================= */
-      let currentStep = 0;
-      let selectedFood = null;
-      let radarChart = null;
-      const questions = document.querySelectorAll(".question");
-      const progressSteps = document.querySelectorAll(".progress-step");
-      const nextBtn = document.getElementById("nextBtn");
-      let selectedGender = null;
-
-      /* =========================
-         セレクトボックスの選択肢自動生成
-      ========================= */
-      const ageSelect = document.getElementById("age");
-      for (let i = 18; i <= 30; i++) {
-        ageSelect.innerHTML += `<option value="${i}">${i}歳</option>`;
-      }
-
-      const heightSelect = document.getElementById("height");
-      for (let i = 140; i <= 200; i++) {
-        heightSelect.innerHTML += `<option value="${i}">${i}cm</option>`;
-      }
-
-      const weightSelect = document.getElementById("weight");
-      for (let i = 40; i <= 120; i++) {
-        weightSelect.innerHTML += `<option value="${i}">${i}kg</option>`;
-      }
-
-      /* =========================
-         LocalStorageから既存データの読み込み・反映
-      ========================= */
-      const savedGender = localStorage.getItem("gender");
-      const savedAge = localStorage.getItem("age");
-      const savedHeight = localStorage.getItem("height");
-      const savedWeight = localStorage.getItem("weight");
-
-      if (savedGender) {
-        selectedGender = savedGender;
-        document.querySelector(`[data-value="${savedGender}"]`).classList.add("selected");
-      }
-      if (savedAge) { ageSelect.value = savedAge; }
-      if (savedHeight) { heightSelect.value = savedHeight; }
-      if (savedWeight) { weightSelect.value = savedWeight; }
-
-      // すでにどれかのデータが保存されている場合は最初からボタンを押せるようにする
-      if (savedGender || savedAge || savedHeight || savedWeight) {
-        enableButton();
-      }
-
-      /* =========================
-         イベントリスナー（入力検知）
-      ========================= */
-      // 性別ボタンのクリックイベント
-      const genderButtons = document.querySelectorAll(".gender-btn");
-      genderButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          genderButtons.forEach(b => b.classList.remove("selected"));
-          btn.classList.add("selected");
-          selectedGender = btn.dataset.value;
-          enableButton();
-        });
-      });
-
-      // 各セレクトボックスの変更イベント
-      document.querySelectorAll("select").forEach(select => {
-        select.addEventListener("change", () => {
-          if (select.value !== "") {
-            enableButton();
-          }
-        });
-      });
-
-      // ボタンの活性化
-      function enableButton() {
-        nextBtn.classList.add("enabled");
-      }
-
-      /* =========================
-         ステップ遷移・保存ロジック
-      ========================= */
-      nextBtn.addEventListener("click", () => {
-        // 各ステップでの未入力チェック
-        if (currentStep === 0 && !selectedGender) return;
-        if (currentStep === 1 && ageSelect.value === "") return;
-        if (currentStep === 2 && heightSelect.value === "") return;
-        if (currentStep === 3 && weightSelect.value === "") return;
-
-        /* 最後（ステップ3）の入力が終わった時の処理 */
-        if (currentStep === 3) {
-          // LocalStorageに保存
-          localStorage.setItem("gender", selectedGender);
-          localStorage.setItem("age", ageSelect.value);
-          localStorage.setItem("height", heightSelect.value);
-          localStorage.setItem("weight", weightSelect.value);
-
-          document.querySelector(".progress-container").style.display = "none";
-          document.getElementById("inputCard").style.display = "none";
-          document.getElementById("menuPage").style.display = "block";
-
-          console.log({
-            gender: selectedGender,
-            age: ageSelect.value,
-            height: heightSelect.value,
-            weight: weightSelect.value
-          });
-
-          // TODO: ここに次の画面（学食一覧や管理画面など）への遷移処理を記述する
-          return;
-        }
-
-        /* 次のステップへ進む処理 */
-        questions[currentStep].classList.remove("active");
-        currentStep++;
-        questions[currentStep].classList.add("active");
-        progressSteps[currentStep].classList.add("active");
-
-        // ボタンを一旦非活性化（次の項目がすでに入力済みの場合は活性化）
-        nextBtn.classList.remove("enabled");
-
-        if (currentStep === 1 && ageSelect.value !== "") { nextBtn.classList.add("enabled"); }
-        if (currentStep === 2 && heightSelect.value !== "") { nextBtn.classList.add("enabled"); }
-        if (currentStep === 3 && weightSelect.value !== "") { nextBtn.classList.add("enabled"); }
-      });
-      const menuList = document.getElementById("menuList");
-
-      foods.forEach((food, index) => {
-
-        menuList.innerHTML += `
-    <div class="menu-item" onclick="showDetail(${index})">
-      ${food.title}
-    </div>
-  `;
-
-      });
-      function showDetail(index) {
-
-        selectedFood = foods[index];
-
-        document.getElementById("menuPage").style.display = "none";
-        document.getElementById("detailPage").style.display = "block";
-
-        document.getElementById("detailTitle").textContent =
-          selectedFood.title;
-
-        document.getElementById("detailImage").src =
-          selectedFood.image;
-
-        if (radarChart) {
-          radarChart.destroy();
-        }
-
-        const ctx = document.getElementById("radarChart");
-
-        radarChart = new Chart(ctx, {
-
-          type: "radar",
-
-          data: {
-
-            labels: [
-              "タンパク質",
-              "脂質",
-              "炭水化物",
-              "ビタミン",
-              "満足度"
-            ],
-
-            datasets: [{
-              label: selectedFood.title,
-              data: selectedFood.data,
-              borderColor: "#ff5722",
-              backgroundColor: "rgba(255,87,34,0.3)",
-              borderWidth: 3
-            }]
-
-          },   // ← この } が必要
-
-          options: {
-
-            responsive: true,
-
-            scales: {
-
-              r: {
-
-                min: 0,
-                max: 10,
-
-                ticks: {
-                  stepSize: 2
-                }
-
-              }
-
-            }
-
-          }
-
-        });
-
-      }
-      document.getElementById("registerBtn")
-        .addEventListener("click", () => {
-
-          document.getElementById("detailPage").style.display = "none";
-
-          document.getElementById("todayPage").style.display = "block";
-
-          document.getElementById("bottomNav").style.display = "flex";
-
-          document.getElementById("todayFood").innerHTML =
-            `<h3>${selectedFood.title}</h3>`;
-
-        });
-
-      const todayTab = document.getElementById("todayTab");
-      const aiTab = document.getElementById("aiTab");
-      const menuTab = document.getElementById("menuTab");
-      const mypageTab = document.getElementById("mypageTab");
-
-      const todayPage = document.getElementById("todayPage");
-      const aiPage = document.getElementById("aiPage");
-      const menuPage = document.getElementById("menuPage");
-      const mypagePage = document.getElementById("mypagePage");
-
-      todayTab.onclick = () => {
-
-        todayPage.style.display = "block";
-        aiPage.style.display = "none";
-        menuPage.style.display = "none";
-        mypagePage.style.display = "none";
-
-      }
-
-      aiTab.onclick = () => {
-
-        todayPage.style.display = "none";
-        aiPage.style.display = "block";
-        menuPage.style.display = "none";
-        mypagePage.style.display = "none";
-
-      };
-
-      menuTab.onclick = () => {
-
-        todayPage.style.display = "none";
-        aiPage.style.display = "none";
-        menuPage.style.display = "block";
-        mypagePage.style.display = "none";
-
-      };
-
-      mypageTab.onclick = () => {
-
-        todayPage.style.display = "none";
-        aiPage.style.display = "none";
-        menuPage.style.display = "none";
-        mypagePage.style.display = "block";
-
-      };
     </script>
 
 </body>
