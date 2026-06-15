@@ -60,7 +60,7 @@
     /* =========================
        カード共通
     ========================= */
-    .card {
+    /* .card {
       background: white;
       border-radius: 28px;
       padding: 30px 24px;
@@ -69,6 +69,16 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+    } */
+
+
+    .page {
+      min-height: calc(100vh - 32px);
+      padding: 0;
+    }
+
+    #selectMenuPage {
+      padding-bottom: 90px;
     }
 
     /* 一覧・詳細・タブ系ページは中央寄せせず上から表示 */
@@ -483,16 +493,13 @@
 
     </div>
     <!-- 学食一覧画面 -->
-    <div id="selectMenuPage" style="display:none;">
-      <div class="card">
+    <div id="selectMenuPage" class="page" style="display:none;">
 
-        <h2>学食メニュー一覧</h2>
+      <h2>学食メニュー一覧</h2>
 
-        <div class="tab-bar" id="tabBar"></div>
+      <div class="tab-bar" id="tabBar"></div>
 
-        <div id="menuList"></div>
-
-      </div>
+      <div id="menuList"></div>
 
     </div>
 
