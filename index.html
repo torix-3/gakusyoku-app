@@ -466,7 +466,7 @@
       color: #ff5722;
     }
 
-      .app-header {
+    .app-header {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -785,6 +785,7 @@
       let currentStep = 0;
       let selectedFood = null;
       let activeCategory = MENU_DATA.categories[0].id;
+      let menuMode = "select"; // select=登録用 / browse=見るだけ用
       let radarChart = null;
       const questions = document.querySelectorAll(".question");
       const progressSteps = document.querySelectorAll(".progress-step");
@@ -979,6 +980,12 @@
         selectedFood = MENU_DATA.items.find(i => i.id === itemId);
         if (!selectedFood) return;
 
+        if (menuMode === "select") {
+          document.getElementById("registerBtn").style.display = "block";
+        } else {
+          document.getElementById("registerBtn").style.display = "none";
+        }
+
         const category = MENU_DATA.categories.find(c => c.id === selectedFood.category);
 
         document.getElementById("selectMenuPage").style.display = "none";
@@ -1035,6 +1042,7 @@
 
       document.getElementById("backToMenuBtn").addEventListener("click", () => {
         document.getElementById("detailPage").style.display = "none";
+        menuMode = "select";
         document.getElementById("selectMenuPage").style.display = "block";
       });
 
@@ -1098,7 +1106,10 @@
 
       todayTab.onclick = () => showPage(todayPage, todayTab);
       aiTab.onclick = () => showPage(aiPage, aiTab);
-      menuTab.onclick = () => showPage(menuPage, menuTab);
+      menuTab.onclick = () => {
+        menuMode = "browse";
+        showPage(menuPage, menuTab);
+      };
       mypageTab.onclick = () => showPage(mypagePage, mypageTab);
     </script>
 
