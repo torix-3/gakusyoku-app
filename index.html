@@ -19,21 +19,25 @@
       margin: 0;
       background: #f5f5f5;
       font-family: sans-serif;
-      overflow: auto;
+      overflow-y: auto;
     }
 
     .container {
       width: 100%;
       max-width: 430px;
       margin: 0 auto;
-      height: 100vh;
+      min-height: 100vh;
       padding: 16px;
       position: relative;
       transition: padding-bottom 0.2s;
     }
 
     .container.has-bottom-nav {
-      padding-bottom: calc(86px + env(safe-area-inset-bottom));
+      padding-bottom: calc(120px + env(safe-area-inset-bottom));
+    }
+
+    #detailPage {
+      padding-bottom: 110px;
     }
 
     /* =========================
@@ -58,9 +62,11 @@
     }
 
     /* =========================
-       カード共通
+       入力画面カード
+       ※メニュー一覧・本日の食事などは全画面表示にするため、
+         白いカードUIは基本情報入力だけに使う
     ========================= */
-    /* .card {
+    #inputCard {
       background: white;
       border-radius: 28px;
       padding: 30px 24px;
@@ -69,7 +75,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-    } */
+    }
 
 
     .page {
@@ -269,6 +275,29 @@
       border-color: #ff5722;
     }
 
+    .menu-item.selected-menu {
+      background: #e9e9e9;
+      border-color: #d0d0d0;
+      opacity: 0.85;
+      cursor: default;
+    }
+
+    .selected-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #9e9e9e;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .menu-item.selected-menu:hover {
+      background: #e9e9e9;
+      border-color: #d0d0d0;
+    }
+
     .menu-item .menu-name {
       font-size: 15px;
       font-weight: bold;
@@ -376,9 +405,12 @@
 
     .nutrition-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 16px;
+    }
+
+    .nutrition-item:last-child {
+      grid-column: 1 / -1;
     }
 
     .nutrition-item {
@@ -407,8 +439,9 @@
 
     .nutrition-top {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      gap: 6px;
     }
 
     .diff-plus {
@@ -429,14 +462,6 @@
       font-size: 10px;
       color: #9bbfd4;
       font-weight: normal;
-    }
-
-    .diff-plus {
-      color: #e53935;
-    }
-
-    .diff-minus {
-      color: #1e88e5;
     }
 
     .chart-area {
@@ -463,6 +488,13 @@
       margin: 0 0 10px;
     }
 
+    .today-menu-list {
+      margin: 0 0 14px;
+      padding-left: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
     /* =========================
        下部ナビ
     ========================= */
@@ -479,6 +511,32 @@
       border-top: 1px solid #ddd;
       display: none;
       z-index: 1000;
+    }
+
+    .selected-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 398px;
+      background: white;
+      border-radius: 18px;
+      padding: 12px 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 900;
+    }
+
+    .selected-bar button {
+      border: none;
+      background: #ff5722;
+      color: white;
+      font-weight: bold;
+      border-radius: 14px;
+      padding: 10px 14px;
     }
 
     .bottom-nav button {
@@ -543,6 +601,11 @@
 
       <div id="menuList"></div>
 
+      <div id="selectedBar" class="selected-bar" style="display:none;">
+        <span id="selectedCount">選択中 0品</span>
+        <button type="button" id="finishSelectBtn">まとめて登録</button>
+      </div>
+
     </div>
 
     <!-- メニュー詳細画面 -->
@@ -569,7 +632,7 @@
         </div>
 
         <button type="button" class="next-btn enabled" id="registerBtn">
-          登録する
+          選択リストに追加
         </button>
 
       </div>
@@ -701,22 +764,21 @@
         ],
         "items": [
           { "id": "udon-01", "name": "はいから", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 210, "energy_kcal": 256, "protein_g": 7, "fat_g": 2.6, "carb_g": 53.6, "salt_g": 5.3 },
-          { "id": "udon-02", "name": "わかめ", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 212, "protein_g": 6.5, "fat_g": 0.8, "carb_g": 47.7, "salt_g": 5.5 },
-          { "id": "udon-03", "name": "きつね", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 304, "protein_g": 12.2, "fat_g": 9.4, "carb_g": 47.4, "salt_g": 5.3 },
-          { "id": "udon-04", "name": "月見", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 281, "protein_g": 12.4, "fat_g": 5.9, "carb_g": 47.5, "salt_g": 5.5 },
-          { "id": "udon-05", "name": "ちく天", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 347, "protein_g": 10.9, "fat_g": 7, "carb_g": 58, "salt_g": 6.4 },
-          { "id": "udon-06", "name": "カレー", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 360, "energy_kcal": 423, "protein_g": 10.6, "fat_g": 14.5, "carb_g": 64.8, "salt_g": 7.7 },
-          { "id": "udon-07", "name": "+大盛り", "category": "udon", "category_label": "うどん・そば", "tags": ["option"], "price": 110, "energy_kcal": 190, "protein_g": 5.2, "fat_g": 0.8, "carb_g": 43.2, "salt_g": 0.6 },
-          { "id": "udon-08", "name": "定食 カツ", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 550, "energy_kcal": 750, "protein_g": 21.5, "fat_g": 14, "carb_g": 137.3, "salt_g": 5.7 },
-          { "id": "udon-09", "name": "鶏そぼろ丼", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 260, "energy_kcal": 441, "protein_g": 14.6, "fat_g": 9.8, "carb_g": 73.8, "salt_g": 1.5 },
-          { "id": "udon-10", "name": "鶏そぼろ丼セット", "category": "udon", "category_label": "うどん・そば", "tags": ["set"], "price": 430, "energy_kcal": 697, "protein_g": 21.6, "fat_g": 12.4, "carb_g": 127.4, "salt_g": 6.8 },
+          { "id": "udon-02", "name": "わかめうどん", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 212, "protein_g": 6.5, "fat_g": 0.8, "carb_g": 47.7, "salt_g": 5.5 },
+          { "id": "udon-03", "name": "きつねうどん", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 304, "protein_g": 12.2, "fat_g": 9.4, "carb_g": 47.4, "salt_g": 5.3 },
+          { "id": "udon-04", "name": "月見うどん", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 281, "protein_g": 12.4, "fat_g": 5.9, "carb_g": 47.5, "salt_g": 5.5 },
+          { "id": "udon-05", "name": "ちく天うどん", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 270, "energy_kcal": 347, "protein_g": 10.9, "fat_g": 7, "carb_g": 58, "salt_g": 6.4 },
+          { "id": "udon-06", "name": "カレーうどん", "category": "udon", "category_label": "うどん・そば", "tags": [], "price": 360, "energy_kcal": 423, "protein_g": 10.6, "fat_g": 14.5, "carb_g": 64.8, "salt_g": 7.7 },
+          { "id": "udon-07", "name": "+鶏そぼろ丼", "category": "udon", "category_label": "うどん・そば", "tags": ["set"], "price": 430, "energy_kcal": 697, "protein_g": 21.6, "fat_g": 12.4, "carb_g": 127.4, "salt_g": 6.8 },
+          { "id": "udon-08", "name": "+大盛り", "category": "udon", "category_label": "うどん・そば", "tags": ["option"], "price": 110, "energy_kcal": 190, "protein_g": 5.2, "fat_g": 0.8, "carb_g": 43.2, "salt_g": 0.6 },
 
-          { "id": "ramen-01", "name": "醤油", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 382, "protein_g": 14.6, "fat_g": 3.5, "carb_g": 69.9, "salt_g": 7.6 },
-          { "id": "ramen-02", "name": "味噌", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 453, "protein_g": 19.9, "fat_g": 5.1, "carb_g": 79.7, "salt_g": 6 },
-          { "id": "ramen-03", "name": "とんこつ", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 468, "protein_g": 15.4, "fat_g": 11.2, "carb_g": 73.1, "salt_g": 6.7 },
-          { "id": "ramen-04", "name": "塩", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 436, "protein_g": 15.7, "fat_g": 8.4, "carb_g": 70.7, "salt_g": 7.8 },
+
+          { "id": "ramen-01", "name": "醤油ラーメン", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 382, "protein_g": 14.6, "fat_g": 3.5, "carb_g": 69.9, "salt_g": 7.6 },
+          { "id": "ramen-02", "name": "味噌ラーメン", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 453, "protein_g": 19.9, "fat_g": 5.1, "carb_g": 79.7, "salt_g": 6 },
+          { "id": "ramen-03", "name": "とんこつラーメン", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 468, "protein_g": 15.4, "fat_g": 11.2, "carb_g": 73.1, "salt_g": 6.7 },
+          { "id": "ramen-04", "name": "塩ラーメン", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 380, "energy_kcal": 436, "protein_g": 15.7, "fat_g": 8.4, "carb_g": 70.7, "salt_g": 7.8 },
           { "id": "ramen-05", "name": "担々麺", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 420, "energy_kcal": 653, "protein_g": 27.9, "fat_g": 18.7, "carb_g": 82.1, "salt_g": 6.8 },
-          { "id": "ramen-06", "name": "カレー", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 420, "energy_kcal": 597, "protein_g": 15.8, "fat_g": 18.7, "carb_g": 87.3, "salt_g": 5.7 },
+          { "id": "ramen-06", "name": "カレーラーメン", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 420, "energy_kcal": 597, "protein_g": 15.8, "fat_g": 18.7, "carb_g": 87.3, "salt_g": 5.7 },
           { "id": "ramen-07", "name": "唐揚げカレー", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 480, "energy_kcal": 775, "protein_g": 23.1, "fat_g": 29.8, "carb_g": 99.6, "salt_g": 6.7 },
           { "id": "ramen-08", "name": "+大盛り", "category": "ramen", "category_label": "ラーメン", "tags": ["option"], "price": 120, "energy_kcal": 337, "protein_g": 9.5, "fat_g": 1.3, "carb_g": 61.3, "salt_g": 1.2 },
           { "id": "ramen-09", "name": "醤油ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 886, "protein_g": 27.9, "fat_g": 16.5, "carb_g": 154.3, "salt_g": 8.6 },
@@ -729,6 +791,7 @@
           { "id": "teishoku-01", "name": "とりマヨ丼", "category": "teishoku", "category_label": "定食", "tags": [], "price": 510, "energy_kcal": 779, "protein_g": 16.3, "fat_g": 34.6, "carb_g": 102, "salt_g": 5 },
           { "id": "teishoku-02", "name": "とりポン定食", "category": "teishoku", "category_label": "定食", "tags": [], "price": 530, "energy_kcal": 738, "protein_g": 29.8, "fat_g": 30.6, "carb_g": 91.3, "salt_g": 4.9 },
           { "id": "teishoku-03", "name": "とりマヨスペシャル", "category": "teishoku", "category_label": "定食", "tags": [], "price": 610, "energy_kcal": 1056, "protein_g": 27.3, "fat_g": 51.9, "carb_g": 120.4, "salt_g": 6.6 },
+          { "id": "teishoku-04", "name": "うどん定食(＋とんかつ)", "category": "teishoku", "category_label": "定食", "tags": [], "price": 550, "energy_kcal": 750, "protein_g": 21.5, "fat_g": 14, "carb_g": 137.3, "salt_g": 5.7 },
 
           { "id": "don-01", "name": "かつ丼", "category": "don", "category_label": "丼", "tags": [], "price": 480, "energy_kcal": 587, "protein_g": 21.2, "fat_g": 16.4, "carb_g": 88.1, "salt_g": 3.6 },
           { "id": "don-02", "name": "唐揚げ丼", "category": "don", "category_label": "丼", "tags": [], "price": 480, "energy_kcal": 698, "protein_g": 23.6, "fat_g": 25.1, "carb_g": 94.5, "salt_g": 4.2 },
@@ -737,11 +800,12 @@
           { "id": "don-05", "name": "ふわとろオムハヤシ", "category": "don", "category_label": "丼", "tags": [], "price": 450, "energy_kcal": 575, "protein_g": 18.1, "fat_g": 20.3, "carb_g": 80.5, "salt_g": 2.1 },
           { "id": "don-06", "name": "親子丼", "category": "don", "category_label": "丼", "tags": [], "price": 420, "energy_kcal": 680, "protein_g": 27.7, "fat_g": 17.3, "carb_g": 100.3, "salt_g": 6.9 },
           { "id": "don-07", "name": "親子丼セット", "category": "don", "category_label": "丼", "tags": ["set"], "price": 530, "energy_kcal": 936, "protein_g": 34.7, "fat_g": 19.9, "carb_g": 153.9, "salt_g": 12.2 },
+          { "id": "don-08", "name": "鶏そぼろ丼", "category": "don", "category_label": "丼", "tags": [], "price": 260, "energy_kcal": 441, "protein_g": 14.6, "fat_g": 9.8, "carb_g": 73.8, "salt_g": 1.5 },
 
           { "id": "curry-01", "name": "常翔特製カレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 380, "energy_kcal": 573, "protein_g": 10.9, "fat_g": 14.6, "carb_g": 99.5, "salt_g": 3 },
           { "id": "curry-02", "name": "ハヤシライス", "category": "curry", "category_label": "カレー", "tags": [], "price": 380, "energy_kcal": 539, "protein_g": 11.4, "fat_g": 13.9, "carb_g": 93.2, "salt_g": 3.3 },
-          { "id": "curry-03", "name": "カレー大盛券", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 485, "protein_g": 9, "fat_g": 7.8, "carb_g": 94.7, "salt_g": 1.2 },
-          { "id": "curry-04", "name": "ハヤシ大盛券", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 476, "protein_g": 9.3, "fat_g": 7.5, "carb_g": 93.2, "salt_g": 1.6 },
+          { "id": "curry-03", "name": "カレー大盛", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 485, "protein_g": 9, "fat_g": 7.8, "carb_g": 94.7, "salt_g": 1.2 },
+          { "id": "curry-04", "name": "ハヤシ大盛", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 476, "protein_g": 9.3, "fat_g": 7.5, "carb_g": 93.2, "salt_g": 1.6 },
           { "id": "curry-05", "name": "常翔特製カツカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 750, "protein_g": 19.4, "fat_g": 25.1, "carb_g": 111.1, "salt_g": 3.4 },
           { "id": "curry-06", "name": "常翔特製唐揚げカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 769, "protein_g": 18.2, "fat_g": 27.7, "carb_g": 111.8, "salt_g": 4 },
 
@@ -875,6 +939,7 @@
       let selectedFood = null;
       let activeCategory = MENU_DATA.categories[0].id;
       let menuMode = "select"; // select=登録用 / browse=見るだけ用
+      let selectedFoods = [];
       let radarChart = null;
       const questions = document.querySelectorAll(".question");
       const progressSteps = document.querySelectorAll(".progress-step");
@@ -982,9 +1047,15 @@
           storage.setItem("height", heightSelect.value);
           storage.setItem("weight", weightSelect.value);
 
+          menuMode = "select";
+          selectedFoods = [];
+          renderMenuList();
+          updateSelectedBar();
+
           document.querySelector(".progress-container").style.display = "none";
           document.getElementById("inputCard").style.display = "none";
           document.getElementById("selectMenuPage").style.display = "block";
+          window.scrollTo({ top: 0, behavior: "auto" });
           return;
         }
 
@@ -1031,23 +1102,41 @@
           return;
         }
 
-        menuList.innerHTML = items.map(item => `
-          <div class="menu-item" data-id="${item.id}">
-            <div>
-              <div class="menu-name">${item.name}</div>
-              <div class="menu-tags">
-                ${item.tags.map(t => `<span class="tag-badge">${TAG_LABELS[t] || t}</span>`).join("")}
+        menuList.innerHTML = items.map(item => {
+          const isSelected = selectedFoods.some(f => f.id === item.id);
+          const selectedClass = isSelected && menuMode === "select" ? " selected-menu" : "";
+
+          return `
+            <div class="menu-item${selectedClass}" data-id="${item.id}" data-selected="${isSelected}">
+              <div>
+                <div class="menu-name">${item.name}</div>
+
+                ${isSelected && menuMode === "select" ? `<span class="selected-badge">✓ 選択済み</span>` : ""}
+
+                <div class="menu-tags">
+                  ${item.tags.map(t => `<span class="tag-badge">${TAG_LABELS[t] || t}</span>`).join("")}
+                </div>
+              </div>
+
+              <div class="menu-meta">
+                <span class="menu-price">¥${item.price}</span>
+                <span class="menu-kcal">${item.energy_kcal}kcal</span>
               </div>
             </div>
-            <div class="menu-meta">
-              <span class="menu-price">¥${item.price}</span>
-              <span class="menu-kcal">${item.energy_kcal}kcal</span>
-            </div>
-          </div>
-        `).join("");
+          `;
+        }).join("");
 
         menuList.querySelectorAll(".menu-item").forEach(card => {
-          card.addEventListener("click", () => showDetail(card.dataset.id));
+          card.addEventListener("click", () => {
+            const isSelected = card.dataset.selected === "true";
+
+            // 登録用の一覧では、選択済みメニューは押せないようにする
+            if (menuMode === "select" && isSelected) {
+              return;
+            }
+
+            showDetail(card.dataset.id);
+          });
         });
       }
 
@@ -1058,18 +1147,21 @@
          メニュー詳細画面
       ========================================================= */
       const NUTRITION_FIELDS = [
-        { key: "energy_kcal", label: "エネルギー", unit: "kcal" },
-        { key: "protein_g", label: "たんぱく質", unit: "g" },
-        { key: "fat_g", label: "脂質", unit: "g" },
         { key: "carb_g", label: "炭水化物", unit: "g" },
-        { key: "salt_g", label: "食塩相当量", unit: "g" }
-      ];
+        { key: "protein_g", label: "たんぱく質", unit: "g" },
 
+        { key: "fat_g", label: "脂質", unit: "g" },
+        { key: "salt_g", label: "食塩相当量", unit: "g" },
+
+        { key: "energy_kcal", label: "エネルギー", unit: "kcal" }
+      ];
       function showDetail(itemId) {
         selectedFood = MENU_DATA.items.find(i => i.id === itemId);
         if (!selectedFood) return;
 
-        if (menuMode === "select") {
+        const alreadySelected = selectedFoods.some(f => f.id === selectedFood.id);
+
+        if (menuMode === "select" && !alreadySelected) {
           document.getElementById("registerBtn").style.display = "block";
         } else {
           document.getElementById("registerBtn").style.display = "none";
@@ -1171,39 +1263,106 @@
             }
           }
         });
+        window.scrollTo({
+          top: 0,
+          behavior: "auto"
+        });
       }
 
-      document.getElementById("backToMenuBtn").addEventListener("click", () => {
-        document.getElementById("detailPage").style.display = "none";
-        menuMode = "select";
-        document.getElementById("selectMenuPage").style.display = "block";
-      });
+      function updateSelectedBar() {
+        const selectedBar = document.getElementById("selectedBar");
+        const selectedCount = document.getElementById("selectedCount");
+
+        if (selectedFoods.length === 0 || menuMode !== "select") {
+          selectedBar.style.display = "none";
+          return;
+        }
+
+        selectedBar.style.display = "flex";
+        selectedCount.textContent = `選択中 ${selectedFoods.length}品`;
+      }
 
       document.getElementById("registerBtn")
         .addEventListener("click", () => {
 
-          document.getElementById("detailPage").style.display = "none";
+          if (!selectedFood) return;
 
+          const alreadySelected = selectedFoods.some(f => f.id === selectedFood.id);
+
+          if (alreadySelected) {
+            return;
+          }
+
+          selectedFoods.push(selectedFood);
+
+          document.getElementById("detailPage").style.display = "none";
+          document.getElementById("selectMenuPage").style.display = "block";
+
+          renderMenuList();
+          updateSelectedBar();
+
+          window.scrollTo({
+            top: 0,
+            behavior: "auto"
+          });
+
+        });
+
+      document.getElementById("finishSelectBtn")
+        .addEventListener("click", () => {
+
+          if (selectedFoods.length === 0) return;
+
+          const totalFood = {
+            name: selectedFoods.map(f => f.name).join(" + "),
+            energy_kcal: selectedFoods.reduce((sum, f) => sum + f.energy_kcal, 0),
+            protein_g: selectedFoods.reduce((sum, f) => sum + f.protein_g, 0),
+            fat_g: selectedFoods.reduce((sum, f) => sum + f.fat_g, 0),
+            carb_g: selectedFoods.reduce((sum, f) => sum + f.carb_g, 0),
+            salt_g: selectedFoods.reduce((sum, f) => sum + f.salt_g, 0)
+          };
+
+          selectedFood = totalFood;
+
+          document.getElementById("selectMenuPage").style.display = "none";
           document.getElementById("todayPage").style.display = "block";
 
           document.getElementById("appContainer").classList.add("has-bottom-nav");
           document.getElementById("bottomNav").style.display = "flex";
 
+          document.getElementById("selectedBar").style.display = "none";
+
           document.getElementById("todayFood").innerHTML = `
-            <div class="today-card">
-              <h3>${selectedFood.name}</h3>
-              <div class="nutrition-grid">
-                ${NUTRITION_FIELDS.map(f => `
-                  <div class="nutrition-item">
-                    <div class="n-label">${f.label}</div>
-                    <div class="n-value">${selectedFood[f.key]}<span class="n-unit">${f.unit}</span></div>
-                  </div>
-                `).join("")}
+      <div class="today-card">
+        <h3>選択したメニュー</h3>
+
+        <ul class="today-menu-list">
+          ${selectedFoods.map(f => `<li>${f.name}</li>`).join("")}
+        </ul>
+
+        <h3>合計</h3>
+
+        <div class="nutrition-grid">
+          ${NUTRITION_FIELDS.map(f => `
+            <div class="nutrition-item">
+              <div class="n-label">${f.label}</div>
+              <div class="n-value">
+                ${totalFood[f.key].toFixed(1)}
+                <span class="n-unit">${f.unit}</span>
               </div>
             </div>
-          `;
+          `).join("")}
+        </div>
+      </div>
+    `;
 
           setActiveTab(todayTab);
+
+          window.scrollTo({
+            top: 0,
+            behavior: "auto"
+          });
+
         });
 
       /* =========================
@@ -1235,13 +1394,25 @@
 
         page.style.display = "block";
         setActiveTab(activeTab);
+
+        if (page !== menuPage) {
+          document.getElementById("selectedBar").style.display = "none";
+        }
+
+        window.scrollTo({
+          top: 0,
+          behavior: "auto"
+        });
       }
       todayTab.onclick = () => showPage(todayPage, todayTab);
       aiTab.onclick = () => showPage(aiPage, aiTab);
       menuTab.onclick = () => {
         menuMode = "browse";
+        renderMenuList();
         showPage(menuPage, menuTab);
+        updateSelectedBar();
       };
+
       mypageTab.onclick = () => showPage(mypagePage, mypageTab);
     </script>
 
