@@ -293,6 +293,92 @@
       font-weight: bold;
     }
 
+    .selected-status {
+      margin-top: 6px;
+    }
+
+
+    .selected-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .remove-selected-btn {
+      border: none;
+      border-radius: 999px;
+      background: #eeeeee;
+      color: #555;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .cancel-large-btn {
+      border: none;
+      border-radius: 999px;
+      background: #fff3e0;
+      color: #ff5722;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .add-large-btn {
+      border: none;
+      border-radius: 999px;
+      background: #e3f2fd;
+      color: #1e88e5;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .confirm-food-item {
+      margin-bottom: 8px;
+    }
+
+    .confirm-food-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .confirm-food-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .modal-cancel-large-btn,
+    .remove-food-btn {
+      border: none;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 5px 9px;
+      cursor: pointer;
+    }
+
+    .modal-cancel-large-btn {
+      background: #fff3e0;
+      color: #ff5722;
+    }
+
+    .modal-add-large-btn {
+      background: #e3f2fd;
+      color: #1e88e5;
+    }
+
+    .remove-food-btn {
+      background: #eeeeee;
+      color: #555;
+    }
+
     .menu-item.selected-menu:hover {
       background: #e9e9e9;
       border-color: #d0d0d0;
@@ -401,6 +487,28 @@
       display: flex;
       gap: 4px;
       flex-wrap: wrap;
+    }
+
+    .advice-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #fff8e1;
+    }
+
+    .advice-box h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+
+    .advice-box ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .advice-box li {
+      margin-bottom: 6px;
+      line-height: 1.5;
     }
 
     .nutrition-grid {
@@ -531,6 +639,101 @@
       padding-left: 20px;
       font-size: 14px;
       line-height: 1.7;
+    }
+
+    /* =========================
+   マイページ
+========================= */
+    .profile-card {
+      background: #f7f7f7;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .history-date-btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: white;
+      font-weight: bold;
+    }
+
+    .history-detail-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .history-detail-card h3 {
+      margin-bottom: 12px;
+    }
+
+    .calendar-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+
+    .calendar-day {
+      min-height: 50px;
+      border: none;
+      border-radius: 10px;
+      background: #f5f5f5;
+      font-size: 12px;
+    }
+
+    .calendar-day.has-meal {
+      background: #ffe0b2;
+      color: #e65100;
+      font-weight: bold;
+    }
+
+    .calendar-day:disabled {
+      color: #ccc;
+      cursor: default;
+    }
+
+    .calendar-day.today {
+      border: 2px solid #ff5722;
+      box-shadow: 0 0 0 2px rgba(255, 87, 34, .2);
+    }
+
+    .calendar-day.has-meal:hover {
+      transform: scale(1.05);
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .calendar-header h3 {
+      margin: 0;
+    }
+
+    .calendar-header button {
+      border: none;
+      background: #ff5722;
+      color: white;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 20px;
+      font-weight: bold;
     }
 
     /* =========================
@@ -773,8 +976,14 @@
     <div id="mypagePage" style="display:none;">
 
       <div class="card">
+
         <h2>マイページ</h2>
-        <p>マイページ</p>
+
+        <div id="profileCard"></div>
+
+        <div id="calendarArea"></div>
+
+        <div id="historyDetail"></div>
       </div>
 
     </div>
@@ -813,7 +1022,7 @@
         </div>
 
         <div class="modal-buttons">
-          <button type="button" id="reselectBtn">選び直す</button>
+          <button type="button" id="reselectBtn">戻る</button>
           <button type="button" id="confirmRegisterBtn">この内容で登録</button>
         </div>
 
@@ -870,6 +1079,7 @@
       </div>
 
     </div>
+
 
     <script>
 
@@ -1068,6 +1278,8 @@
       let todayRadarChart = null;
       let registeredFoods = [];
       let registeredTotalFood = null;
+      let calendarYear = new Date().getFullYear();
+      let calendarMonth = new Date().getMonth();
       const questions = document.querySelectorAll(".question");
       const progressSteps = document.querySelectorAll(".progress-step");
       const nextBtn = document.getElementById("nextBtn");
@@ -1079,8 +1291,16 @@
       const ageSelect = document.getElementById("age");
       {
         let options = "";
-        for (let i = 18; i <= 30; i++) {
-          options += `<option value="${i}">${i}歳</option>`;
+        for (let i = 18; i <= 80; i += 5) {
+
+          const end = i + 4;
+          const value = i + 2;
+
+          options += `
+    <option value="${value}">
+      ${i}歳～${end}歳
+    </option>
+  `;
         }
         ageSelect.insertAdjacentHTML("beforeend", options);
       }
@@ -1088,8 +1308,16 @@
       const heightSelect = document.getElementById("height");
       {
         let options = "";
-        for (let i = 140; i <= 200; i++) {
-          options += `<option value="${i}">${i}cm</option>`;
+        for (let i = 130; i <= 200; i += 5) {
+
+          const end = i + 4;
+          const value = i + 2;
+
+          options += `
+    <option value="${value}">
+      ${i}cm～${end}cm
+    </option>
+  `;
         }
         heightSelect.insertAdjacentHTML("beforeend", options);
       }
@@ -1097,8 +1325,16 @@
       const weightSelect = document.getElementById("weight");
       {
         let options = "";
-        for (let i = 40; i <= 120; i++) {
-          options += `<option value="${i}">${i}kg</option>`;
+        for (let i = 30; i <= 120; i += 5) {
+
+          const end = i + 4;
+          const value = i + 2;
+
+          options += `
+    <option value="${value}">
+      ${i}kg～${end}kg
+    </option>
+  `;
         }
         weightSelect.insertAdjacentHTML("beforeend", options);
       }
@@ -1233,7 +1469,9 @@
         }
 
         menuList.innerHTML = items.map(item => {
-          const isSelected = selectedFoods.some(f => f.id === item.id);
+          const isSelected = selectedFoods.some(f =>
+            f.baseId === item.id || f.id === item.id
+          );
           const selectedClass = isSelected && menuMode === "select" ? " selected-menu" : "";
 
           return `
@@ -1241,7 +1479,29 @@
               <div>
                 <div class="menu-name">${item.name}</div>
 
-                ${isSelected && menuMode === "select" ? `<span class="selected-badge">✓ 選択済み</span>` : ""}
+${isSelected && menuMode === "select" ? `
+  <div class="selected-status">
+    <span class="selected-badge">✓ 選択済み</span>
+  </div>
+
+  <div class="selected-actions">
+${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
+  <button type="button" class="cancel-large-btn" data-id="${item.id}">
+    大盛り解除
+  </button>
+` : `
+  ${["udon", "ramen", "curry"].includes(item.category) ? `
+    <button type="button" class="add-large-btn" data-id="${item.id}">
+      大盛り追加
+    </button>
+  ` : ""}
+`}
+
+    <button type="button" class="remove-selected-btn" data-id="${item.id}">
+      削除
+    </button>
+  </div>
+` : ""}
 
                 <div class="menu-tags">
                   ${item.tags.map(t => `<span class="tag-badge">${TAG_LABELS[t] || t}</span>`).join("")}
@@ -1268,8 +1528,88 @@
             showDetail(card.dataset.id);
           });
         });
-      }
 
+        menuList.querySelectorAll(".remove-selected-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            const id = btn.dataset.id;
+
+            selectedFoods = selectedFoods.filter(f =>
+              f.baseId !== id && f.id !== id
+            );
+
+            renderMenuList();
+            updateSelectedBar();
+          });
+        });
+
+        menuList.querySelectorAll(".cancel-large-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            const id = btn.dataset.id;
+
+            const index = selectedFoods.findIndex(f =>
+              f.baseId === id && f.isLarge
+            );
+
+            if (index === -1) return;
+
+            const baseFood = MENU_DATA.items.find(item => item.id === id);
+            if (!baseFood) return;
+
+            selectedFoods[index] = {
+              ...baseFood,
+              baseId: baseFood.id,
+              isLarge: false
+            };
+
+            renderMenuList();
+            updateSelectedBar();
+          });
+        });
+
+        menuList.querySelectorAll(".add-large-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            const id = btn.dataset.id;
+
+            const index = selectedFoods.findIndex(f =>
+              f.baseId === id || f.id === id
+            );
+
+            if (index === -1) return;
+
+            const baseFood = MENU_DATA.items.find(item => item.id === id);
+            if (!baseFood) return;
+
+            const largeOption = MENU_DATA.items.find(item =>
+              item.category === baseFood.category &&
+              item.tags.includes("option")
+            );
+
+            if (!largeOption) return;
+
+            selectedFoods[index] = {
+              ...baseFood,
+              baseId: baseFood.id,
+              isLarge: true,
+              name: `${baseFood.name} 大盛り`,
+              price: baseFood.price + largeOption.price,
+              energy_kcal: baseFood.energy_kcal + largeOption.energy_kcal,
+              protein_g: baseFood.protein_g + largeOption.protein_g,
+              fat_g: baseFood.fat_g + largeOption.fat_g,
+              carb_g: baseFood.carb_g + largeOption.carb_g,
+              salt_g: baseFood.salt_g + largeOption.salt_g
+            };
+
+            renderMenuList();
+            updateSelectedBar();
+          });
+        });
+      }
       renderTabs();
       renderMenuList();
 
@@ -1285,6 +1625,115 @@
 
         { key: "energy_kcal", label: "エネルギー", unit: "kcal" }
       ];
+
+      function getDisplayFood() {
+        let displayFood = { ...selectedFood };
+
+        const largeOptionCheck = document.getElementById("largeOptionCheck");
+
+        if (largeOptionCheck && largeOptionCheck.checked) {
+          const largeOption = MENU_DATA.items.find(item =>
+            item.category === selectedFood.category &&
+            item.tags.includes("option")
+          );
+
+          if (largeOption) {
+            displayFood = {
+              ...displayFood,
+              name: `${selectedFood.name} 大盛り`,
+              price: selectedFood.price + largeOption.price,
+              energy_kcal: selectedFood.energy_kcal + largeOption.energy_kcal,
+              protein_g: selectedFood.protein_g + largeOption.protein_g,
+              fat_g: selectedFood.fat_g + largeOption.fat_g,
+              carb_g: selectedFood.carb_g + largeOption.carb_g,
+              salt_g: selectedFood.salt_g + largeOption.salt_g
+            };
+          }
+        }
+
+        return displayFood;
+      }
+
+      function updateDetailNutritionAndChart() {
+        const displayFood = getDisplayFood();
+        const ideal = getIdealNutrition();
+
+        document.getElementById("detailPrice").textContent = `¥${displayFood.price}`;
+
+        document.getElementById("nutritionGrid").innerHTML =
+          NUTRITION_FIELDS.map(f => {
+            const diff = displayFood[f.key] - ideal[f.key];
+            const diffClass = diff >= 0 ? "diff-plus" : "diff-minus";
+            const diffText =
+              diff >= 0
+                ? `↑+${diff.toFixed(1)}${f.unit}`
+                : `↓${Math.abs(diff).toFixed(1)}${f.unit}`;
+
+            return `
+        <div class="nutrition-item">
+          <div class="n-label">${f.label}</div>
+
+          <div class="nutrition-top">
+            <div class="n-value">
+              ${displayFood[f.key].toFixed(1)}<span class="n-unit">${f.unit}</span>
+            </div>
+
+            <div class="${diffClass}">
+              ${diffText}
+            </div>
+          </div>
+
+          <div class="n-standard">
+            基準 ${ideal[f.key].toFixed(1)}${f.unit}
+          </div>
+        </div>
+      `;
+          }).join("");
+
+        if (radarChart) {
+          radarChart.destroy();
+        }
+
+        const ctx = document.getElementById("radarChart");
+
+        radarChart = new Chart(ctx, {
+          type: "radar",
+          data: {
+            labels: RADAR_LABELS,
+            datasets: [
+              {
+                label: "理想",
+                data: idealRadarData(),
+                backgroundColor: "rgba(66,165,245,0.55)",
+                borderWidth: 0,
+                pointRadius: 0,
+                pointHoverRadius: 0
+              },
+              {
+                label: displayFood.name,
+                data: toRadarData(displayFood),
+                borderColor: "#ff5722",
+                backgroundColor: "rgba(255,87,34,0.3)",
+                borderWidth: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                min: 0,
+                max: 10,
+                ticks: {
+                  stepSize: 2
+                }
+              }
+            }
+          }
+        });
+      }
+
       function showDetail(itemId) {
         selectedFood = MENU_DATA.items.find(i => i.id === itemId);
         if (!selectedFood) return;
@@ -1330,80 +1779,11 @@
         document.getElementById("detailTags").innerHTML =
           selectedFood.tags.map(t => `<span class="tag-badge">${TAG_LABELS[t] || t}</span>`).join("");
 
-        const ideal = getIdealNutrition();
+        updateDetailNutritionAndChart();
 
-        document.getElementById("nutritionGrid").innerHTML =
-          NUTRITION_FIELDS.map(f => {
-            const diff = selectedFood[f.key] - ideal[f.key];
-            const diffClass = diff >= 0 ? "diff-plus" : "diff-minus";
-            const diffText =
-              diff >= 0
-                ? `↑+${diff.toFixed(1)}${f.unit}`
-                : `↓${diff.toFixed(1)}${f.unit}`;
-
-            return `
-        <div class="nutrition-item">
-          <div class="n-label">${f.label}</div>
-
-          <div class="nutrition-top">
-            <div class="n-value">
-              ${selectedFood[f.key]}<span class="n-unit">${f.unit}</span>
-            </div>
-
-            <div class="${diffClass}">
-              ${diffText}
-            </div>
-          </div>
-
-          <div class="n-standard">
-            基準 ${ideal[f.key].toFixed(1)}${f.unit}
-          </div>
-        </div>
-      `;
-          }).join("");
-
-        if (radarChart) {
-          radarChart.destroy();
-        }
-
-        const ctx = document.getElementById("radarChart");
-
-        radarChart = new Chart(ctx, {
-          type: "radar",
-          data: {
-            labels: RADAR_LABELS,
-            datasets: [
-              {
-                label: "理想",
-                data: idealRadarData(),
-                backgroundColor: "rgba(66,165,245,0.55)",
-                borderWidth: 0,
-                pointRadius: 0,
-                pointHoverRadius: 0
-              },
-              {
-                label: selectedFood.name,
-                data: toRadarData(selectedFood),
-                borderColor: "#ff5722",
-                backgroundColor: "rgba(255,87,34,0.3)",
-                borderWidth: 3
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              r: {
-                min: 0,
-                max: 10,
-                ticks: {
-                  stepSize: 2
-                }
-              }
-            }
-          }
-        });
+        largeOptionCheck.onchange = () => {
+          updateDetailNutritionAndChart();
+        };
 
         window.scrollTo({
           top: 0,
@@ -1427,12 +1807,225 @@
       function makeTotalFood() {
         return {
           name: selectedFoods.map(f => f.name).join(" + "),
+          price: selectedFoods.reduce((sum, f) => sum + f.price, 0),
           energy_kcal: selectedFoods.reduce((sum, f) => sum + f.energy_kcal, 0),
           protein_g: selectedFoods.reduce((sum, f) => sum + f.protein_g, 0),
           fat_g: selectedFoods.reduce((sum, f) => sum + f.fat_g, 0),
           carb_g: selectedFoods.reduce((sum, f) => sum + f.carb_g, 0),
           salt_g: selectedFoods.reduce((sum, f) => sum + f.salt_g, 0)
+
         };
+      }
+
+      function getNutritionAdvice(totalFood, ideal) {
+        const advice = [];
+
+        if (totalFood.energy_kcal > ideal.energy_kcal + 100) {
+          advice.push("エネルギーが基準より多めです。");
+        }
+
+        if (totalFood.energy_kcal < ideal.energy_kcal - 100) {
+          advice.push("エネルギーが基準より少なめです。");
+        }
+
+        if (totalFood.protein_g < ideal.protein_g * 0.8) {
+          advice.push("たんぱく質が不足しています。");
+        }
+
+        if (totalFood.fat_g > ideal.fat_g * 1.2) {
+          advice.push("脂質を摂りすぎています。");
+        }
+
+        if (totalFood.salt_g > ideal.salt_g * 1.2) {
+          advice.push("食塩相当量が高めです。");
+        }
+
+        if (totalFood.carb_g > ideal.carb_g * 1.2) {
+          advice.push("炭水化物が多めです。");
+        }
+
+        if (advice.length === 0) {
+          advice.push("全体的に基準に近い食事です。");
+        }
+
+        return advice;
+      }
+
+      function renderConfirmModal() {
+        const totalFood = makeTotalFood();
+
+        document.getElementById("confirmModalContent").innerHTML = `
+    <h3>選択したメニュー</h3>
+
+    <ul class="today-menu-list">
+      ${selectedFoods.map((f, index) => `
+        <li class="confirm-food-item">
+          <div class="confirm-food-name">
+            ${f.name}
+          </div>
+
+<div class="confirm-food-actions">
+  ${f.isLarge ? `
+    <button type="button" class="modal-cancel-large-btn" data-index="${index}">
+      大盛り解除
+    </button>
+  ` : `
+    <button type="button" class="modal-add-large-btn" data-index="${index}">
+      大盛り追加
+    </button>
+  `}
+
+  <button type="button" class="remove-food-btn" data-index="${index}">
+    削除
+  </button>
+</div>
+        </li>
+      `).join("")}
+    </ul>
+
+    <h3>合計栄養</h3>
+
+    <div class="nutrition-grid">
+      ${NUTRITION_FIELDS.map(f => `
+        <div class="nutrition-item">
+          <div class="n-label">${f.label}</div>
+          <div class="n-value">
+            ${totalFood[f.key].toFixed(1)}
+            <span class="n-unit">${f.unit}</span>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+        document.querySelectorAll(".remove-food-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const index = Number(btn.dataset.index);
+
+            selectedFoods.splice(index, 1);
+
+            if (selectedFoods.length === 0) {
+              document.getElementById("confirmModal").style.display = "none";
+              renderMenuList();
+              updateSelectedBar();
+              return;
+            }
+
+            renderConfirmModal();
+            renderConfirmRadarChart();
+            renderMenuList();
+            updateSelectedBar();
+          });
+        });
+
+        document.querySelectorAll(".modal-cancel-large-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const index = Number(btn.dataset.index);
+            const food = selectedFoods[index];
+
+            if (!food) return;
+
+            const baseId = food.baseId || food.id;
+            const baseFood = MENU_DATA.items.find(item => item.id === baseId);
+            if (!baseFood) return;
+
+            selectedFoods[index] = {
+              ...baseFood,
+              baseId: baseFood.id,
+              isLarge: false
+            };
+
+            renderConfirmModal();
+            renderConfirmRadarChart();
+            renderMenuList();
+            updateSelectedBar();
+          });
+        });
+
+        document.querySelectorAll(".modal-add-large-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const index = Number(btn.dataset.index);
+            const food = selectedFoods[index];
+
+            if (!food) return;
+
+            const baseId = food.baseId || food.id;
+            const baseFood = MENU_DATA.items.find(item => item.id === baseId);
+            if (!baseFood) return;
+
+            const largeOption = MENU_DATA.items.find(item =>
+              item.category === baseFood.category &&
+              item.tags.includes("option")
+            );
+
+            if (!largeOption) return;
+
+            selectedFoods[index] = {
+              ...baseFood,
+              baseId: baseFood.id,
+              isLarge: true,
+              name: `${baseFood.name} 大盛り`,
+              price: baseFood.price + largeOption.price,
+              energy_kcal: baseFood.energy_kcal + largeOption.energy_kcal,
+              protein_g: baseFood.protein_g + largeOption.protein_g,
+              fat_g: baseFood.fat_g + largeOption.fat_g,
+              carb_g: baseFood.carb_g + largeOption.carb_g,
+              salt_g: baseFood.salt_g + largeOption.salt_g
+            };
+
+            renderConfirmModal();
+            renderConfirmRadarChart();
+            renderMenuList();
+            updateSelectedBar();
+          });
+        });
+      }
+
+      function renderConfirmRadarChart() {
+        const totalFood = makeTotalFood();
+
+        if (confirmRadarChart) {
+          confirmRadarChart.destroy();
+        }
+
+        const confirmCtx = document.getElementById("confirmRadarChart");
+
+        confirmRadarChart = new Chart(confirmCtx, {
+          type: "radar",
+          data: {
+            labels: RADAR_LABELS,
+            datasets: [
+              {
+                label: "理想",
+                data: idealRadarData(),
+                backgroundColor: "rgba(66,165,245,0.55)",
+                borderWidth: 0,
+                pointRadius: 0,
+                pointHoverRadius: 0
+              },
+              {
+                label: "選択合計",
+                data: toRadarData(totalFood),
+                borderColor: "#ff5722",
+                backgroundColor: "rgba(255,87,34,0.3)",
+                borderWidth: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                min: 0,
+                max: 10,
+                ticks: {
+                  stepSize: 2
+                }
+              }
+            }
+          }
+        });
       }
 
       function renderTodayPage() {
@@ -1445,10 +2038,15 @@
 
         const totalFood = registeredTotalFood;
         const ideal = getIdealNutrition();
+        const advice = getNutritionAdvice(totalFood, ideal);
 
         todayFood.innerHTML = `
           <div class="today-card">
             <h3>選択したメニュー</h3>
+
+            <p class="today-total-price">
+  合計金額：¥${totalFood.price}
+</p>
 
             <ul class="today-menu-list">
               ${registeredFoods.map(f => `<li>${f.name}</li>`).join("")}
@@ -1488,6 +2086,13 @@
                 `;
         }).join("")}
             </div>
+            <div class="advice-box">
+  <h3>📊 栄養コメント</h3>
+
+  <ul>
+    ${advice.map(a => `<li>${a}</li>`).join("")}
+  </ul>
+</div>
           </div>
         `;
 
@@ -1541,6 +2146,168 @@
         });
       }
 
+      function renderMyPage() {
+
+        const gender = storage.getItem("gender");
+        const age = storage.getItem("age");
+        const height = storage.getItem("height");
+        const weight = storage.getItem("weight");
+
+        document.getElementById("profileCard").innerHTML = `
+    <div class="profile-card">
+
+      <h3>基本情報</h3>
+
+      <p>性別：${gender === "male" ? "男性" : "女性"}</p>
+      <p>年齢：${age}歳</p>
+      <p>身長：${height}cm</p>
+      <p>体重：${weight}kg</p>
+
+    </div>
+  `;
+
+
+        renderCalendar();
+      }
+
+      function renderCalendar() {
+
+        const mealHistory =
+          JSON.parse(storage.getItem("mealHistory") || "{}");
+
+        const year = calendarYear;
+        const month = calendarMonth;
+
+        const firstDay = new Date(year, month, 1).getDay();
+
+        const lastDate = new Date(year, month + 1, 0).getDate();
+
+        let html = `
+    <div class="calendar-card">
+
+<div class="calendar-header">
+  <button type="button" id="prevMonthBtn">‹</button>
+  <h3>${year}年${month + 1}月</h3>
+  <button type="button" id="nextMonthBtn">›</button>
+</div>
+
+      <div class="calendar-grid">
+
+        <div>日</div>
+        <div>月</div>
+        <div>火</div>
+        <div>水</div>
+        <div>木</div>
+        <div>金</div>
+        <div>土</div>
+  `;
+
+        for (let i = 0; i < firstDay; i++) {
+          html += `<div></div>`;
+        }
+
+        for (let day = 1; day <= lastDate; day++) {
+
+          const dateKey =
+            `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+          const hasMeal = mealHistory[dateKey];
+
+          const todayKey = new Date().toISOString().slice(0, 10);
+          const isToday = dateKey === todayKey;
+
+          html += `
+<button
+  class="calendar-day ${hasMeal ? "has-meal" : ""}"
+  data-date="${dateKey}"
+  ${hasMeal ? "" : "disabled"}
+>
+        ${day}
+
+        ${hasMeal ? "<div>🍽</div>" : ""}
+      </button>
+    `;
+        }
+
+        html += `
+      </div>
+    </div>
+  `;
+
+        document.getElementById("calendarArea").innerHTML = html;
+
+        document.querySelectorAll(".calendar-day").forEach(btn => {
+          btn.addEventListener("click", () => {
+            showHistoryDetail(btn.dataset.date);
+          });
+        });
+
+        document.getElementById("prevMonthBtn").onclick = () => {
+          calendarMonth--;
+
+          if (calendarMonth < 0) {
+            calendarMonth = 11;
+            calendarYear--;
+          }
+
+          renderCalendar();
+        };
+
+        document.getElementById("nextMonthBtn").onclick = () => {
+          calendarMonth++;
+
+          if (calendarMonth > 11) {
+            calendarMonth = 0;
+            calendarYear++;
+          }
+
+          renderCalendar();
+        };
+      }
+
+      function showHistoryDetail(date) {
+
+        const mealHistory =
+          JSON.parse(storage.getItem("mealHistory") || "{}");
+
+        const data = mealHistory[date];
+
+        if (!data) return;
+
+        const ideal = getIdealNutrition();
+        const advice = getNutritionAdvice(data.total, ideal);
+
+
+
+        document.getElementById("historyDetail").innerHTML = `
+    <div class="history-detail-card">
+
+      <h3>${date} の食事記録</h3>
+
+      <ul>
+        ${data.foods.map(f =>
+          `<li>${f.name}</li>`
+        ).join("")}
+      </ul>
+
+      <hr>
+
+      <p>エネルギー：${data.total.energy_kcal.toFixed(1)}kcal</p>
+      <p>たんぱく質：${data.total.protein_g.toFixed(1)}g</p>
+      <p>脂質：${data.total.fat_g.toFixed(1)}g</p>
+      <p>炭水化物：${data.total.carb_g.toFixed(1)}g</p>
+      <p>食塩相当量：${data.total.salt_g.toFixed(1)}g</p>
+<div class="advice-box">
+  <h3>📊 栄養コメント</h3>
+
+  <ul>
+    ${advice.map(a => `<li>${a}</li>`).join("")}
+  </ul>
+</div>
+    </div>
+  `;
+      }
+
       document.getElementById("reselectBtn")
         .addEventListener("click", () => {
           document.getElementById("confirmModal").style.display = "none";
@@ -1552,6 +2319,18 @@
           registeredFoods = [...selectedFoods];
           registeredTotalFood = makeTotalFood();
           selectedFood = registeredTotalFood;
+
+          const todayKey = new Date().toISOString().slice(0, 10);
+
+          const mealHistory = JSON.parse(storage.getItem("mealHistory") || "{}");
+
+          mealHistory[todayKey] = {
+            date: todayKey,
+            foods: registeredFoods,
+            total: registeredTotalFood
+          };
+
+          storage.setItem("mealHistory", JSON.stringify(mealHistory));
 
           document.getElementById("confirmModal").style.display = "none";
           document.getElementById("selectMenuPage").style.display = "none";
@@ -1597,7 +2376,36 @@
             return;
           }
 
-          selectedFoods.push(selectedFood);
+          let foodToAdd = {
+            ...selectedFood,
+            baseId: selectedFood.id,
+            isLarge: false
+          };
+
+          const largeOptionCheck = document.getElementById("largeOptionCheck");
+
+          if (largeOptionCheck.checked) {
+            const largeOption = MENU_DATA.items.find(item =>
+              item.category === selectedFood.category &&
+              item.tags.includes("option")
+            );
+
+            if (largeOption) {
+              foodToAdd = {
+                ...foodToAdd,
+                isLarge: true,
+                name: `${selectedFood.name} 大盛り`,
+                price: selectedFood.price + largeOption.price,
+                energy_kcal: selectedFood.energy_kcal + largeOption.energy_kcal,
+                protein_g: selectedFood.protein_g + largeOption.protein_g,
+                fat_g: selectedFood.fat_g + largeOption.fat_g,
+                carb_g: selectedFood.carb_g + largeOption.carb_g,
+                salt_g: selectedFood.salt_g + largeOption.salt_g
+              };
+            }
+          }
+
+          selectedFoods.push(foodToAdd);
 
           document.getElementById("detailPage").style.display = "none";
           document.getElementById("selectMenuPage").style.display = "block";
@@ -1619,71 +2427,11 @@
 
           const totalFood = makeTotalFood();
 
-          document.getElementById("confirmModalContent").innerHTML = `
-      <h3>選択したメニュー</h3>
-
-      <ul class="today-menu-list">
-        ${selectedFoods.map(f => `<li>${f.name}</li>`).join("")}
-      </ul>
-
-      <h3>合計栄養</h3>
-
-      <div class="nutrition-grid">
-        ${NUTRITION_FIELDS.map(f => `
-          <div class="nutrition-item">
-            <div class="n-label">${f.label}</div>
-            <div class="n-value">
-              ${totalFood[f.key].toFixed(1)}
-              <span class="n-unit">${f.unit}</span>
-            </div>
-          </div>
-        `).join("")}
-      </div>
-    `;
+          renderConfirmModal();
 
           document.getElementById("confirmModal").style.display = "flex";
-          if (confirmRadarChart) {
-            confirmRadarChart.destroy();
-          }
 
-          const confirmCtx = document.getElementById("confirmRadarChart");
-
-          confirmRadarChart = new Chart(confirmCtx, {
-            type: "radar",
-            data: {
-              labels: RADAR_LABELS,
-              datasets: [
-                {
-                  label: "理想",
-                  data: idealRadarData(),
-                  backgroundColor: "rgba(66,165,245,0.55)",
-                  borderWidth: 0,
-                  pointRadius: 0,
-                  pointHoverRadius: 0
-                },
-                {
-                  label: "選択合計",
-                  data: toRadarData(totalFood),
-                  borderColor: "#ff5722",
-                  backgroundColor: "rgba(255,87,34,0.3)",
-                  borderWidth: 3
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                r: {
-                  min: 0,
-                  max: 10,
-                  ticks: {
-                    stepSize: 2
-                  }
-                }
-              }
-            }
-          });
+          renderConfirmRadarChart();
         });
 
       /* =========================
@@ -1736,7 +2484,10 @@
         updateSelectedBar();
       };
 
-      mypageTab.onclick = () => showPage(mypagePage, mypageTab);
+      mypageTab.onclick = () => {
+        renderMyPage();
+        showPage(mypagePage, mypageTab);
+      };
     </script>
 
 </body>
