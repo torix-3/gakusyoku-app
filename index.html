@@ -468,6 +468,13 @@
       background: linear-gradient(135deg, #ffe3da, #ffb199);
     }
 
+    .detail-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+    }
+
     #detailTitle {
       font-size: 24px;
       margin: 0 0 4px;
@@ -518,6 +525,37 @@
     .advice-box li {
       margin-bottom: 6px;
       line-height: 1.5;
+    }
+
+    .recommend-food-btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      background: white;
+      padding: 12px;
+      margin-bottom: 8px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .recommend-food-btn:active {
+      transform: scale(0.98);
+    }
+
+    #recommendCompareText {
+      margin-top: 12px;
+    }
+
+    #cancelRecommendBtn {
+      background: #e0e0e0;
+      color: #555;
+    }
+
+    #addRecommendBtn {
+      background: #ff5722;
+      color: white;
     }
 
     .nutrition-grid {
@@ -686,6 +724,26 @@
     }
 
     .today-cancel-large-btn {
+      border: none;
+      border-radius: 999px;
+      background: #fff3e0;
+      color: #ff5722;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 8px;
+    }
+
+    .today-soup-btn {
+      border: none;
+      border-radius: 999px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 8px;
+    }
+
+    .today-cancel-soup-btn {
       border: none;
       border-radius: 999px;
       background: #fff3e0;
@@ -1001,6 +1059,14 @@
           </label>
         </div>
 
+        <div id="soupOptionArea" class="option-area" style="display:none;">
+          <label class="option-check">
+            <input type="checkbox" id="soupOptionCheck">
+            スープを飲まない
+            <span id="soupOptionText">※塩分を約50%減として計算</span>
+          </label>
+        </div>
+
         <button type="button" class="next-btn enabled" id="registerBtn">
           選択リストに追加
         </button>
@@ -1089,6 +1155,25 @@
         <div class="modal-buttons">
           <button type="button" id="reselectBtn">戻る</button>
           <button type="button" id="confirmRegisterBtn">この内容で登録</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="recommendModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+
+        <h2 id="recommendModalTitle">追加後の変化</h2>
+
+        <div class="modal-chart-area">
+          <canvas id="recommendRadarChart"></canvas>
+        </div>
+
+        <div id="recommendCompareText"></div>
+
+        <div class="modal-buttons">
+          <button type="button" id="cancelRecommendBtn">キャンセル</button>
+          <button type="button" id="addRecommendBtn">この内容で追加</button>
         </div>
 
       </div>
@@ -1185,15 +1270,16 @@
           { "id": "ramen-05", "name": "担々麺", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 420, "energy_kcal": 653, "protein_g": 27.9, "fat_g": 18.7, "carb_g": 82.1, "salt_g": 6.8 },
           { "id": "ramen-06", "name": "カレーラーメン", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 420, "energy_kcal": 597, "protein_g": 15.8, "fat_g": 18.7, "carb_g": 87.3, "salt_g": 5.7 },
           { "id": "ramen-07", "name": "唐揚げカレー", "category": "ramen", "category_label": "ラーメン", "tags": [], "price": 480, "energy_kcal": 775, "protein_g": 23.1, "fat_g": 29.8, "carb_g": 99.6, "salt_g": 6.7 },
-          { "id": "ramen-08", "name": "+大盛り", "category": "ramen", "category_label": "ラーメン", "tags": ["option"], "price": 120, "energy_kcal": 337, "protein_g": 9.5, "fat_g": 1.3, "carb_g": 61.3, "salt_g": 1.2 },
-          { "id": "ramen-09", "name": "醤油ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 886, "protein_g": 27.9, "fat_g": 16.5, "carb_g": 154.3, "salt_g": 8.6 },
-          { "id": "ramen-10", "name": "味噌ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 957, "protein_g": 33.2, "fat_g": 18.1, "carb_g": 164.1, "salt_g": 7 },
-          { "id": "ramen-11", "name": "とんこつラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 972, "protein_g": 28.7, "fat_g": 24.2, "carb_g": 157.5, "salt_g": 7.7 },
-          { "id": "ramen-12", "name": "塩ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 940, "protein_g": 29, "fat_g": 21.4, "carb_g": 155.1, "salt_g": 8.8 },
-          { "id": "ramen-13", "name": "担々麺唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 690, "energy_kcal": 1157, "protein_g": 41.2, "fat_g": 31.7, "carb_g": 166.5, "salt_g": 7.8 },
-          { "id": "ramen-14", "name": "カレーラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 690, "energy_kcal": 1101, "protein_g": 29.1, "fat_g": 31.7, "carb_g": 171.7, "salt_g": 6.7 },
-          { "id": "teishoku-02", "name": "とりポン定食", "category": "teishoku", "category_label": "定食", "tags": [], "price": 530, "energy_kcal": 738, "protein_g": 29.8, "fat_g": 30.6, "carb_g": 91.3, "salt_g": 4.9 },
-          { "id": "teishoku-04", "name": "うどん定食(＋とんかつ)", "category": "teishoku", "category_label": "定食", "tags": [], "price": 550, "energy_kcal": 750, "protein_g": 21.5, "fat_g": 14, "carb_g": 137.3, "salt_g": 5.7 },
+          { "id": "ramen-08", "name": "醤油ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 886, "protein_g": 27.9, "fat_g": 16.5, "carb_g": 154.3, "salt_g": 8.6 },
+          { "id": "ramen-09", "name": "味噌ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 957, "protein_g": 33.2, "fat_g": 18.1, "carb_g": 164.1, "salt_g": 7 },
+          { "id": "ramen-10", "name": "とんこつラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 972, "protein_g": 28.7, "fat_g": 24.2, "carb_g": 157.5, "salt_g": 7.7 },
+          { "id": "ramen-11", "name": "塩ラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 650, "energy_kcal": 940, "protein_g": 29, "fat_g": 21.4, "carb_g": 155.1, "salt_g": 8.8 },
+          { "id": "ramen-12", "name": "担々麺唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 690, "energy_kcal": 1157, "protein_g": 41.2, "fat_g": 31.7, "carb_g": 166.5, "salt_g": 7.8 },
+          { "id": "ramen-13", "name": "カレーラーメン唐揚げセット", "category": "ramen", "category_label": "ラーメン", "tags": ["set"], "price": 690, "energy_kcal": 1101, "protein_g": 29.1, "fat_g": 31.7, "carb_g": 171.7, "salt_g": 6.7 },
+          { "id": "ramen-14", "name": "+大盛り", "category": "ramen", "category_label": "ラーメン", "tags": ["option"], "price": 120, "energy_kcal": 337, "protein_g": 9.5, "fat_g": 1.3, "carb_g": 61.3, "salt_g": 1.2 },
+
+          { "id": "teishoku-01", "name": "とりポン定食", "category": "teishoku", "category_label": "定食", "tags": [], "price": 530, "energy_kcal": 738, "protein_g": 29.8, "fat_g": 30.6, "carb_g": 91.3, "salt_g": 4.9 },
+          { "id": "teishoku-02", "name": "うどん定食(＋とんかつ)", "category": "teishoku", "category_label": "定食", "tags": [], "price": 550, "energy_kcal": 750, "protein_g": 21.5, "fat_g": 14, "carb_g": 137.3, "salt_g": 5.7 },
 
           { "id": "don-01", "name": "かつ丼", "category": "don", "category_label": "丼", "tags": [], "price": 480, "energy_kcal": 587, "protein_g": 21.2, "fat_g": 16.4, "carb_g": 88.1, "salt_g": 3.6 },
           { "id": "don-02", "name": "唐揚げ丼", "category": "don", "category_label": "丼", "tags": [], "price": 480, "energy_kcal": 698, "protein_g": 23.6, "fat_g": 25.1, "carb_g": 94.5, "salt_g": 4.2 },
@@ -1205,13 +1291,14 @@
           { "id": "don-08", "name": "鶏そぼろ丼セット", "category": "don", "category_label": "丼", "tags": ["set"], "price": 430, "energy_kcal": 697, "protein_g": 21.6, "fat_g": 12.4, "carb_g": 127.4, "salt_g": 6.8 },
           { "id": "don-09", "name": "とりマヨ丼", "category": "don", "category_label": "丼", "tags": [], "price": 510, "energy_kcal": 779, "protein_g": 16.3, "fat_g": 34.6, "carb_g": 102, "salt_g": 5 },
           { "id": "don-010", "name": "とりマヨスペシャル", "category": "don", "category_label": "丼", "tags": [], "price": 610, "energy_kcal": 1056, "protein_g": 27.3, "fat_g": 51.9, "carb_g": 120.4, "salt_g": 6.6 },
+
           { "id": "curry-01", "name": "常翔特製カレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 380, "energy_kcal": 573, "protein_g": 10.9, "fat_g": 14.6, "carb_g": 99.5, "salt_g": 3 },
           { "id": "curry-02", "name": "ハヤシライス", "category": "curry", "category_label": "カレー", "tags": [], "price": 380, "energy_kcal": 539, "protein_g": 11.4, "fat_g": 13.9, "carb_g": 93.2, "salt_g": 3.3 },
-          { "id": "curry-03", "name": "カレー大盛", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 485, "protein_g": 9, "fat_g": 7.8, "carb_g": 94.7, "salt_g": 1.2 },
-          { "id": "curry-04", "name": "ハヤシ大盛", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 476, "protein_g": 9.3, "fat_g": 7.5, "carb_g": 93.2, "salt_g": 1.6 },
-          { "id": "curry-05", "name": "常翔特製カツカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 750, "protein_g": 19.4, "fat_g": 25.1, "carb_g": 111.1, "salt_g": 3.4 },
-          { "id": "curry-06", "name": "常翔特製唐揚げカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 769, "protein_g": 18.2, "fat_g": 27.7, "carb_g": 111.8, "salt_g": 4 },
-          { "id": "curry-07", "name": "ふわとろオムハヤシ", "category": "curry", "category_label": "カレー", "tags": [], "price": 450, "energy_kcal": 575, "protein_g": 18.1, "fat_g": 20.3, "carb_g": 80.5, "salt_g": 2.1 },
+          { "id": "curry-03", "name": "常翔特製カツカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 750, "protein_g": 19.4, "fat_g": 25.1, "carb_g": 111.1, "salt_g": 3.4 },
+          { "id": "curry-04", "name": "常翔特製唐揚げカレー", "category": "curry", "category_label": "カレー", "tags": [], "price": 480, "energy_kcal": 769, "protein_g": 18.2, "fat_g": 27.7, "carb_g": 111.8, "salt_g": 4 },
+          { "id": "curry-05", "name": "ふわとろオムハヤシ", "category": "curry", "category_label": "カレー", "tags": [], "price": 450, "energy_kcal": 575, "protein_g": 18.1, "fat_g": 20.3, "carb_g": 80.5, "salt_g": 2.1 },
+          { "id": "curry-06", "name": "カレー大盛", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 485, "protein_g": 9, "fat_g": 7.8, "carb_g": 94.7, "salt_g": 1.2 },
+          { "id": "curry-07", "name": "ハヤシ大盛", "category": "curry", "category_label": "カレー", "tags": ["option", "ticket"], "price": 200, "energy_kcal": 476, "protein_g": 9.3, "fat_g": 7.5, "carb_g": 93.2, "salt_g": 1.6 },
 
           { "id": "side-01", "name": "味噌汁", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 50, "energy_kcal": 19, "protein_g": 1.3, "fat_g": 0.4, "carb_g": 4.3, "salt_g": 0.9 },
           { "id": "side-02", "name": "温泉卵", "category": "side", "category_label": "サイドメニュー", "tags": [], "price": 70, "energy_kcal": 107, "protein_g": 7.3, "fat_g": 5.1, "carb_g": 0.2, "salt_g": 2.2 },
@@ -1384,6 +1471,8 @@
       let radarChart = null;
       let confirmRadarChart = null;
       let todayRadarChart = null;
+      let recommendRadarChart = null;
+      let pendingRecommendFood = null;
       let registeredFoods = [];
       let registeredTotalFood = null;
       let calendarYear = new Date().getFullYear();
@@ -1797,7 +1886,15 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
             };
           }
         }
+        const soupOptionCheck = document.getElementById("soupOptionCheck");
 
+        if (soupOptionCheck && soupOptionCheck.checked) {
+          displayFood = {
+            ...displayFood,
+            isSoupLess: true,
+            salt_g: displayFood.salt_g * 0.5
+          };
+        }
         return displayFood;
       }
 
@@ -1894,6 +1991,8 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
 
         const largeOptionArea = document.getElementById("largeOptionArea");
         const largeOptionCheck = document.getElementById("largeOptionCheck");
+        const soupOptionArea = document.getElementById("soupOptionArea");
+        const soupOptionCheck = document.getElementById("soupOptionCheck");
         const largeOptionText = document.getElementById("largeOptionText");
 
         largeOptionCheck.checked = false;
@@ -1913,12 +2012,24 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
         } else {
           largeOptionArea.style.display = "none";
         }
+        const canSoupMenu = ["udon", "ramen"].includes(selectedFood.category);
+
+        soupOptionArea.style.display = canSoupMenu ? "block" : "none";
+        soupOptionCheck.checked = false;
 
         document.getElementById("selectMenuPage").style.display = "none";
         document.getElementById("detailPage").style.display = "block";
         document.getElementById("selectedBar").style.display = "none";
 
-        document.getElementById("detailHero").textContent = category ? category.emoji : "🍽️";
+        const detailHero = document.getElementById("detailHero");
+
+        detailHero.innerHTML = `
+  <img
+    src="images/${selectedFood.category}/${selectedFood.id}.png"
+    alt="${selectedFood.name}"
+    onerror="this.src='images/no-image.png'"
+  >
+`;
         document.getElementById("detailTitle").textContent = selectedFood.name;
         document.getElementById("detailCategory").textContent = selectedFood.category_label;
         document.getElementById("detailPrice").textContent = `¥${selectedFood.price}`;
@@ -1929,6 +2040,9 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
         updateDetailNutritionAndChart();
 
         largeOptionCheck.onchange = () => {
+          updateDetailNutritionAndChart();
+        };
+        soupOptionCheck.onchange = () => {
           updateDetailNutritionAndChart();
         };
 
@@ -2211,6 +2325,187 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
 
         storage.setItem("mealHistory", JSON.stringify(mealHistory));
       }
+      function getLackingNutrients(totalFood, ideal) {
+        const lacking = [];
+
+        if (totalFood.protein_g < ideal.protein_g * 0.8) {
+          lacking.push("たんぱく質");
+        }
+
+        if (totalFood.fat_g < ideal.fat_g * 0.7) {
+          lacking.push("脂質");
+        }
+
+        if (totalFood.carb_g < ideal.carb_g * 0.8) {
+          lacking.push("炭水化物");
+        }
+
+        if (totalFood.energy_kcal < ideal.energy_kcal * 0.8) {
+          lacking.push("エネルギー");
+        }
+
+        return lacking;
+      }
+      function getRecommendFoods(lackingNutrients) {
+        const sideFoods = MENU_DATA.items.filter(item =>
+          item.category === "side" &&
+          !item.tags.includes("option")
+        );
+
+        if (lackingNutrients.includes("たんぱく質")) {
+          return sideFoods.filter(item =>
+            item.protein_g >= 3
+          );
+        }
+
+        if (lackingNutrients.includes("炭水化物")) {
+          return sideFoods.filter(item =>
+            item.carb_g >= 10
+          );
+        }
+
+        if (lackingNutrients.includes("エネルギー")) {
+          return sideFoods.filter(item =>
+            item.energy_kcal >= 80
+          );
+        }
+
+        return sideFoods.slice(0, 3);
+      }
+
+      function showRecommendPreview(recommendFood) {
+        if (!registeredTotalFood) return;
+
+        const afterFood = {
+          name: `${registeredTotalFood.name} + ${recommendFood.name}`,
+          price: registeredTotalFood.price + recommendFood.price,
+          energy_kcal: registeredTotalFood.energy_kcal + recommendFood.energy_kcal,
+          protein_g: registeredTotalFood.protein_g + recommendFood.protein_g,
+          fat_g: registeredTotalFood.fat_g + recommendFood.fat_g,
+          carb_g: registeredTotalFood.carb_g + recommendFood.carb_g,
+          salt_g: registeredTotalFood.salt_g + recommendFood.salt_g
+        };
+
+        showRecommendModal(recommendFood, afterFood);
+      }
+
+      function showRecommendModal(recommendFood, afterFood) {
+        pendingRecommendFood = recommendFood;
+
+        const modal = document.getElementById("recommendModal");
+        const title = document.getElementById("recommendModalTitle");
+        const compareText = document.getElementById("recommendCompareText");
+
+        title.textContent = `${recommendFood.name}を追加すると`;
+
+        compareText.innerHTML = `
+    <div class="nutrition-grid">
+      ${NUTRITION_FIELDS.map(f => `
+        <div class="nutrition-item">
+          <div class="n-label">${f.label}</div>
+          <div class="n-value">
+            ${registeredTotalFood[f.key].toFixed(1)}
+            <span class="n-unit">${f.unit}</span>
+            →
+            ${afterFood[f.key].toFixed(1)}
+            <span class="n-unit">${f.unit}</span>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
+        modal.style.display = "flex";
+
+        const ctx = document.getElementById("recommendRadarChart").getContext("2d");
+
+        if (recommendRadarChart) {
+          recommendRadarChart.destroy();
+        }
+
+        recommendRadarChart = new Chart(ctx, {
+          type: "radar",
+          data: {
+            labels: RADAR_LABELS,
+            datasets: [
+              {
+                label: "理想",
+                data: idealRadarData(),
+                borderWidth: 2,
+                pointRadius: 0
+              },
+              {
+                label: "現在",
+                data: toRadarData(registeredTotalFood),
+                borderWidth: 2
+              },
+              {
+                label: "追加後",
+                data: toRadarData(afterFood),
+                borderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 800
+            },
+            scales: {
+              r: {
+                min: 0,
+                max: 10,
+                ticks: {
+                  stepSize: 2
+                }
+              }
+            }
+          }
+        });
+      }
+
+      document.getElementById("cancelRecommendBtn").addEventListener("click", () => {
+        document.getElementById("recommendModal").style.display = "none";
+        pendingRecommendFood = null;
+      });
+
+      document.getElementById("addRecommendBtn").addEventListener("click", () => {
+        if (!pendingRecommendFood) return;
+
+        registeredFoods.push({
+          ...pendingRecommendFood,
+          baseId: pendingRecommendFood.id,
+          isLarge: false
+        });
+
+        registeredTotalFood = registeredFoods.reduce((total, food) => {
+          return {
+            name: "本日の合計",
+            price: total.price + food.price,
+            energy_kcal: total.energy_kcal + food.energy_kcal,
+            protein_g: total.protein_g + food.protein_g,
+            fat_g: total.fat_g + food.fat_g,
+            carb_g: total.carb_g + food.carb_g,
+            salt_g: total.salt_g + food.salt_g
+          };
+        }, {
+          name: "本日の合計",
+          price: 0,
+          energy_kcal: 0,
+          protein_g: 0,
+          fat_g: 0,
+          carb_g: 0,
+          salt_g: 0
+        });
+
+        saveTodayMealToHistory();
+        renderTodayPage();
+
+        document.getElementById("recommendModal").style.display = "none";
+        pendingRecommendFood = null;
+      });
+
       function renderTodayPage() {
         const todayFood = document.getElementById("todayFood");
 
@@ -2222,6 +2517,8 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
         const totalFood = registeredTotalFood;
         const ideal = getIdealNutrition();
         const advice = getNutritionAdvice(totalFood, ideal);
+        const lackingNutrients = getLackingNutrients(totalFood, ideal);
+        const recommendFoods = getRecommendFoods(lackingNutrients);
 
         todayFood.innerHTML = `
           <div class="today-card">
@@ -2236,6 +2533,8 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
           const baseId = f.baseId || f.id;
           const baseFood = MENU_DATA.items.find(item => item.id === baseId);
           const canLargeMenu = baseFood && ["udon", "ramen", "curry"].includes(baseFood.category);
+          const canSoupMenu =
+            baseFood && ["udon", "ramen"].includes(baseFood.category);
 
           return `
       <li class="today-food-item">
@@ -2254,6 +2553,18 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
             `
             ) : ""}
 
+${canSoupMenu ? (
+              f.isSoupLess ? `
+    <button type="button" class="today-cancel-soup-btn" data-index="${index}">
+      スープあり
+    </button>
+  ` : `
+    <button type="button" class="today-soup-btn" data-index="${index}">
+      スープなし
+    </button>
+  `
+            ) : ""}
+
           <button type="button" class="today-remove-btn" data-index="${index}">
             削除
           </button>
@@ -2263,19 +2574,40 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
         }).join("")}
 </ul>
 
-            <div class="chart-area">
-              <canvas id="todayRadarChart"></canvas>
-            </div>
+<div class="chart-area">
+  <canvas id="todayRadarChart"></canvas>
+</div>
 
-            <div class="nutrition-grid">
-              ${NUTRITION_FIELDS.map(f => {
-          const diff = totalFood[f.key] - ideal[f.key];
-          const diffClass = diff >= 0 ? "diff-plus" : "diff-minus";
-          const diffText = diff >= 0
-            ? `↑+${diff.toFixed(1)}${f.unit}`
-            : `↓${Math.abs(diff).toFixed(1)}${f.unit}`;
+<div class="advice-box">
+  <h3>不足している栄養素</h3>
+  ${lackingNutrients.length > 0
+            ? `<ul>${lackingNutrients.map(n => `<li>${n}</li>`).join("")}</ul>`
+            : `<p>大きな不足はありません</p>`
+          }
+</div>
 
-          return `
+<div class="advice-box">
+  <h3>おすすめ追加メニュー</h3>
+  <ul>
+    ${recommendFoods.map(food => `
+      <li>
+        <button type="button" class="recommend-food-btn" data-id="${food.id}">
+          ${food.name}（+${food.protein_g}g / ${food.energy_kcal}kcal）
+        </button>
+      </li>
+    `).join("")}
+  </ul>
+</div>
+
+<div class="nutrition-grid">
+  ${NUTRITION_FIELDS.map(f => {
+            const diff = totalFood[f.key] - ideal[f.key];
+            const diffClass = diff >= 0 ? "diff-plus" : "diff-minus";
+            const diffText = diff >= 0
+              ? `↑+${diff.toFixed(1)}${f.unit}`
+              : `↓${Math.abs(diff).toFixed(1)}${f.unit}`;
+
+            return `
                   <div class="nutrition-item">
                     <div class="n-label">${f.label}</div>
 
@@ -2295,7 +2627,7 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
                     </div>
                   </div>
                 `;
-        }).join("")}
+          }).join("")}
             </div>
             <div class="advice-box">
   <h3>📊 栄養コメント</h3>
@@ -2435,6 +2767,61 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
             renderTodayPage();
           });
         });
+        document.querySelectorAll(".today-soup-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const index = Number(btn.dataset.index);
+            const food = registeredFoods[index];
+
+            if (!food) return;
+
+            registeredFoods[index] = {
+              ...food,
+              isSoupLess: true,
+              name: food.name.includes("（スープなし）")
+                ? food.name
+                : `${food.name}（スープなし）`,
+              salt_g: food.salt_g * 0.5
+            };
+
+            registeredTotalFood = calcTotalFood(registeredFoods);
+            saveTodayMealToHistory();
+            renderTodayPage();
+          });
+        });
+
+        document.querySelectorAll(".today-cancel-soup-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const index = Number(btn.dataset.index);
+            const food = registeredFoods[index];
+
+            if (!food) return;
+
+            const baseId = food.baseId || food.id;
+            const baseFood = MENU_DATA.items.find(item => item.id === baseId);
+            if (!baseFood) return;
+
+            registeredFoods[index] = {
+              ...baseFood,
+              baseId: baseFood.id,
+              isLarge: food.isLarge || false,
+              isSoupLess: false
+            };
+
+            registeredTotalFood = calcTotalFood(registeredFoods);
+            saveTodayMealToHistory();
+            renderTodayPage();
+          });
+        });
+        document.querySelectorAll(".recommend-food-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const foodId = btn.dataset.id;
+
+            const recommendFood = MENU_DATA.items.find(item => item.id === foodId);
+            if (!recommendFood) return;
+
+            showRecommendPreview(recommendFood);
+          });
+        });
       }
 
       function renderMyPage() {
@@ -2458,7 +2845,6 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
 </button>
     </div>
   `;
-
 
         renderCalendar();
         document.getElementById("editProfileBtn").onclick = () => {
@@ -2732,6 +3118,16 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
               };
             }
           }
+          const soupOptionCheck = document.getElementById("soupOptionCheck");
+
+          if (soupOptionCheck && soupOptionCheck.checked) {
+            foodToAdd = {
+              ...foodToAdd,
+              isSoupLess: true,
+              name: `${foodToAdd.name}（スープなし）`,
+              salt_g: foodToAdd.salt_g * 0.5
+            };
+          }
 
           selectedFoods.push(foodToAdd);
 
@@ -2762,7 +3158,6 @@ ${selectedFoods.find(f => f.baseId === item.id && f.isLarge) ? `
           } else {
             document.getElementById("confirmRegisterBtn").textContent = "メニューを追加";
           }
-
           document.getElementById("confirmModal").style.display = "flex";
 
           renderConfirmRadarChart();
