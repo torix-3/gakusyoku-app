@@ -1,0 +1,2752 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f5f5f5;
+  font-family: sans-serif;
+  overflow-y: auto;
+}
+
+.container {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 16px;
+  position: relative;
+  transition: padding-bottom 0.2s;
+}
+
+.container.has-bottom-nav {
+  padding-bottom: calc(105px + env(safe-area-inset-bottom));
+}
+
+#detailPage {
+  padding-bottom: 100px;
+}
+
+/* =========================
+   認証入口画面
+========================= */
+.auth-page {
+  min-height: calc(100vh - 32px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px 0;
+}
+
+.auth-card {
+  width: 100%;
+
+  padding: 30px 22px;
+
+  background: white;
+  border-radius: 28px;
+
+  text-align: center;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.auth-logo {
+  width: 72px;
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 18px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(135deg,
+      #ff7043,
+      #ff5722);
+
+  color: white;
+  font-size: 36px;
+
+  box-shadow:
+    0 8px 20px rgba(255, 87, 34, 0.25);
+}
+
+.auth-title {
+  margin: 0;
+
+  color: #333;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.auth-description {
+  margin: 10px 0 26px;
+
+  color: #888;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.auth-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-choice-btn {
+  width: 100%;
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 12px 16px;
+
+  border: none;
+  border-radius: 18px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.auth-choice-btn:active {
+  transform: scale(0.98);
+}
+
+.auth-choice-btn.primary {
+  background:
+    linear-gradient(135deg,
+      #ff7043,
+      #ff5722);
+
+  color: white;
+
+  box-shadow:
+    0 7px 16px rgba(255, 87, 34, 0.22);
+}
+
+.auth-choice-btn.secondary {
+  background: #f7f7f7;
+  color: #444;
+
+  border: 1px solid #e8e8e8;
+}
+
+.auth-choice-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  text-align: left;
+}
+
+.auth-choice-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.2);
+
+  font-size: 20px;
+}
+
+.auth-choice-btn.secondary .auth-choice-icon {
+  background: white;
+}
+
+.auth-choice-text strong {
+  display: block;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.auth-choice-text small {
+  display: block;
+
+  margin-top: 3px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  opacity: 0.8;
+}
+
+.auth-choice-arrow {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.auth-note {
+  margin-top: 20px;
+
+  color: #aaa;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* =========================
+   新規登録・ログインフォーム
+========================= */
+.auth-form-page {
+  min-height: calc(100vh - 32px);
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px 0;
+}
+
+.auth-form-card {
+  width: 100%;
+  padding: 26px 22px;
+
+  background: white;
+  border-radius: 28px;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.auth-form-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.auth-form-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 14px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(135deg,
+      #ff7043,
+      #ff5722);
+
+  color: white;
+  font-size: 28px;
+
+  box-shadow:
+    0 7px 18px rgba(255, 87, 34, 0.22);
+}
+
+.auth-form-title {
+  margin: 0;
+
+  color: #333;
+  font-size: 23px;
+  font-weight: 900;
+}
+
+.auth-form-description {
+  margin: 8px 0 0;
+
+  color: #999;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* 入力欄 */
+.auth-field {
+  margin-bottom: 16px;
+}
+
+.auth-field label {
+  display: block;
+
+  margin: 0 0 7px;
+
+  text-align: left;
+
+  color: #555;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.auth-field input {
+  width: 100%;
+  min-height: 52px;
+
+  padding: 13px 14px;
+
+  border: 1px solid #dddddd;
+  border-radius: 15px;
+
+  background: #fafafa;
+  color: #333;
+
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.auth-field input:focus {
+  background: white;
+  border-color: #ff7043;
+
+  box-shadow:
+    0 0 0 4px rgba(255, 112, 67, 0.1);
+}
+
+.auth-field input.invalid {
+  border-color: #e53935;
+  background: #fff8f8;
+}
+
+/* 入力条件 */
+.auth-input-note {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #999;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* エラーメッセージ */
+.auth-error {
+  display: none;
+
+  margin-top: 7px;
+
+  color: #e53935;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.auth-error.show {
+  display: block;
+}
+
+/* パスワード表示ボタン */
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap input {
+  padding-right: 68px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+
+  transform: translateY(-50%);
+
+  border: none;
+  border-radius: 10px;
+
+  padding: 7px 9px;
+
+  background: #eeeeee;
+  color: #666;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+/* フォーム下部ボタン */
+.auth-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+.auth-submit-btn,
+.auth-back-btn {
+  width: 100%;
+  min-height: 52px;
+
+  border: none;
+  border-radius: 16px;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.auth-submit-btn {
+  background:
+    linear-gradient(135deg,
+      #ff7043,
+      #ff5722);
+
+  color: white;
+
+  box-shadow:
+    0 6px 15px rgba(255, 87, 34, 0.22);
+}
+
+.auth-submit-btn:disabled {
+  background: #dddddd;
+  color: #999;
+
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.auth-back-btn {
+  background: #f3f3f3;
+  color: #666;
+}
+
+.auth-submit-btn:not(:disabled):active,
+.auth-back-btn:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+       進行バー
+    ========================= */
+.progress-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.progress-step {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: #ddd;
+  transition: 0.3s;
+}
+
+.progress-step.active {
+  background: #ff5722;
+}
+
+/* =========================
+       入力画面カード
+       ※メニュー一覧・本日の食事などは全画面表示にするため、
+         白いカードUIは基本情報入力だけに使う
+    ========================= */
+#inputCard {
+  background: white;
+  border-radius: 28px;
+  padding: 30px 24px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  height: calc(100vh - 105px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+.page {
+  min-height: calc(100vh - 32px);
+  padding: 0;
+}
+
+#selectMenuPage {
+  padding-bottom: 170px;
+}
+
+/* 一覧・詳細・タブ系ページは中央寄せせず上から表示 */
+#selectMenuPage .card,
+#detailPage .card,
+#todayPage .card,
+#aiPage .card,
+#mypagePage .card {
+  height: auto;
+  min-height: calc(100vh - 40px);
+  justify-content: flex-start;
+}
+
+.question {
+  display: none;
+}
+
+.question.active {
+  display: block;
+}
+
+label {
+  display: block;
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+/* =========================
+       性別ボタン
+    ========================= */
+.gender-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.gender-btn {
+  flex: 1;
+  border: none;
+  border-radius: 20px;
+  padding: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  background: #e5e5e5;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.gender-btn:hover {
+  background: #d8d8d8;
+}
+
+.gender-btn.selected {
+  background: #ff5722;
+  color: white;
+}
+
+/* =========================
+       select
+    ========================= */
+select {
+  width: 100%;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  font-size: 22px;
+  background: white;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  font-size: 22px;
+  background: white;
+}
+
+/* =========================
+       次へボタン / 共通ボタン
+    ========================= */
+.button-area {
+  margin-top: 40px;
+}
+
+.next-btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 18px;
+  border: none;
+  border-radius: 20px;
+  background: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+  transition: 0.2s;
+}
+
+.next-btn.enabled {
+  background: #ff5722;
+  color: white;
+  cursor: pointer;
+}
+
+/* =========================
+       スマホ最適化
+    ========================= */
+@media (max-height: 750px) {
+  label {
+    font-size: 24px;
+    margin-bottom: 28px;
+  }
+}
+
+/* =========================
+       学食一覧ページ見出し
+    ========================= */
+#selectMenuPage h2 {
+  margin: 0 0 14px;
+  font-size: 22px;
+}
+
+/* =========================
+       SmartNews風 横スクロールタブ
+    ========================= */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+
+  width: calc(100% + 32px);
+  max-width: none;
+
+  margin: 0 -16px 16px;
+  padding: 0 16px;
+
+  border-bottom: 1px solid #eee;
+  scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-item {
+  flex: 0 0 auto;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 10px 14px 12px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #aaa;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tab-item:hover {
+  color: #ff5722;
+}
+
+.tab-item.active {
+  color: #ff5722;
+  border-bottom-color: #ff5722;
+}
+
+/* =========================
+   学食一覧（写真付きメニューカード）
+========================= */
+#menuList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+.menu-item {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+
+  background: white;
+  border: 1px solid #eeeeee;
+  border-radius: 22px;
+
+  display: flex;
+  flex-direction: column;
+
+  text-align: left;
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 12px 28px rgba(0, 0, 0, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.menu-item:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 87, 34, 0.35);
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.08),
+    0 16px 34px rgba(255, 87, 34, 0.08);
+}
+
+.menu-item:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   メニュー画像
+========================= */
+.menu-image-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #f1f1f1;
+}
+
+.menu-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.menu-item:hover .menu-image {
+  transform: scale(1.04);
+}
+
+/* 画像上のカロリー表示 */
+.menu-calorie-badge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+
+  padding: 5px 8px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.92);
+  color: #555;
+
+  font-size: 10px;
+  font-weight: bold;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(5px);
+}
+
+/* =========================
+   カードの文字部分
+========================= */
+.menu-content {
+  min-width: 0;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 12px;
+}
+
+.menu-item .menu-name {
+  min-height: 40px;
+
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #2f2f2f;
+
+  overflow-wrap: anywhere;
+}
+
+.menu-item .menu-tags {
+  min-height: 18px;
+  margin-top: 7px;
+
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tag-badge {
+  padding: 3px 7px;
+
+  border-radius: 999px;
+  background: #fff0eb;
+  color: #f4511e;
+
+  font-size: 9px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.menu-item .menu-meta {
+  margin-top: auto;
+  padding-top: 10px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.menu-item .menu-price {
+  font-size: 19px;
+  font-weight: 900;
+  color: #ff5722;
+}
+
+.menu-item .menu-kcal {
+  font-size: 11px;
+  color: #999;
+}
+
+.menu-detail-hint {
+  color: #b0b0b0;
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* =========================
+   栄養を見るボタン
+========================= */
+
+.menu-nutrition-btn {
+  margin: 0;
+  padding: 4px 0;
+
+  border: none;
+  background: transparent;
+
+  color: #888;
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* PCでマウスを乗せたとき */
+.menu-nutrition-btn:hover {
+  color: #ff5722;
+}
+
+/* スマホで押したとき */
+.menu-nutrition-btn:active {
+  opacity: 0.6;
+}
+
+/* =========================
+   メニューカード 裏面
+========================= */
+
+.menu-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 表面もカードいっぱいに使う */
+.menu-front {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 表面の情報部分を残りいっぱいに広げる */
+.menu-front .menu-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 値段部分を下側に揃える */
+.menu-front .menu-meta {
+  margin-top: auto;
+}
+
+.menu-front,
+.menu-back {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* 最初は裏面を非表示 */
+.menu-back {
+  display: none;
+  padding: 12px;
+  background: #fff;
+}
+
+/* 裏面表示 */
+.menu-item.flipped .menu-front {
+  display: none;
+}
+
+.menu-item.flipped .menu-back {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 料理名 */
+.menu-back-title {
+  margin-bottom: 8px;
+
+  color: #333;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+/* 個人基準との比較説明 */
+.menu-back-guide {
+  margin-top: -4px;
+  margin-bottom: 9px;
+
+  color: #999;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* 4項目全体 */
+.quick-nutrition-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 項目名 + 判定 */
+.quick-nutrition-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 3px;
+}
+
+/* 実際の数値 */
+.quick-nutrition-value {
+  margin-top: 2px;
+
+  text-align: right;
+
+  color: #aaa;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* 詳細を見る */
+.menu-back-detail-btn {
+  width: 100%;
+
+  margin-top: 10px;
+  padding: 8px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #ff5722;
+  color: #fff;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+/* 表に戻る */
+.menu-back-return {
+  margin-top: 5px;
+
+  text-align: center;
+
+  color: #aaa;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* =========================
+   栄養ゲージ
+========================= */
+
+.quick-nutrition-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.quick-nutrition-item {
+  width: 100%;
+}
+
+/* 栄養名 + 判定 */
+.quick-nutrition-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 5px;
+}
+
+.quick-nutrition-name {
+  color: #555;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* 少なめ・適量・多め */
+.quick-nutrition-status {
+  padding: 3px 6px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: 900;
+}
+
+/* 少なめ */
+.quick-nutrition-status.low {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+/* 適量 */
+.quick-nutrition-status.good {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+/* 多め */
+.quick-nutrition-status.high {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+
+/* =========================
+   ゲージ本体
+========================= */
+
+.quick-gauge {
+  position: relative;
+
+  width: 100%;
+  height: 9px;
+
+  /* 
+    0〜80%   ：少なめ
+    80〜120% ：適量
+    120%以上 ：多め
+
+    ゲージ全体は基準値160%まで表示
+  */
+  background: linear-gradient(to right,
+      #dceeff 0%,
+      #dceeff 50%,
+
+      #c8e6c9 50%,
+      #c8e6c9 75%,
+
+      #ffdede 75%,
+      #ffdede 100%);
+
+  border-radius: 999px;
+}
+
+
+/* 以前の適量ゾーン用要素は透明にする */
+.quick-gauge-good-zone {
+  display: none;
+}
+
+
+/* 80%の境界線 */
+.quick-gauge::before {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  top: -2px;
+
+  width: 1px;
+  height: 13px;
+
+  background: rgba(0, 0, 0, 0.15);
+}
+
+
+/* 120%の境界線 */
+.quick-gauge::after {
+  content: "";
+
+  position: absolute;
+
+  left: 75%;
+  top: -2px;
+
+  width: 1px;
+  height: 13px;
+
+  background: rgba(0, 0, 0, 0.15);
+}
+
+
+/* 現在位置 */
+.quick-gauge-marker {
+  position: absolute;
+
+  top: 50%;
+
+  width: 13px;
+  height: 13px;
+
+  background: #444;
+  border: 2px solid #fff;
+  border-radius: 50%;
+
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+
+  transform: translate(-50%, -50%);
+
+  z-index: 2;
+}
+
+/* 実際の数値 */
+.quick-nutrition-value {
+  margin-top: 3px;
+
+  text-align: right;
+
+  color: #aaa;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* =========================
+   塩分専用ゲージ
+========================= */
+
+.quick-gauge.salt-gauge {
+  background: linear-gradient(to right,
+      #e8f5e9 0%,
+      #e8f5e9 75%,
+
+      #ffdede 75%,
+      #ffdede 100%);
+}
+
+/* 塩分では80%の境界線は不要 */
+.quick-gauge.salt-gauge::before {
+  display: none;
+}
+
+/* 120%の境界だけ残す */
+.quick-gauge.salt-gauge::after {
+  display: block;
+}
+
+/* =========================
+   裏面下部
+========================= */
+
+.menu-back-detail-btn {
+  width: 100%;
+
+  margin-top: 13px;
+  padding: 9px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #ff5722;
+  color: #fff;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.menu-back-return {
+  margin-top: 7px;
+
+  text-align: center;
+
+  color: #aaa;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* =========================
+   選択済みカード
+========================= */
+.menu-item.selected-menu {
+  opacity: 1;
+  cursor: default;
+
+  background: #fafafa;
+  border: 2px solid #ffab91;
+
+  box-shadow: none;
+}
+
+.menu-item.selected-menu:hover {
+  transform: none;
+  background: #fafafa;
+  border-color: #ffab91;
+}
+
+.menu-item.selected-menu:active {
+  transform: none;
+}
+
+.menu-item.selected-menu .menu-image {
+  filter: brightness(0.72);
+}
+
+/* 選択済み表示 */
+.selected-status {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+
+  margin: 0;
+}
+
+.selected-badge {
+  display: inline-flex;
+  align-items: center;
+
+  margin: 0;
+  padding: 6px 9px;
+  border-radius: 999px;
+
+  background: #ff5722;
+  color: white;
+
+  font-size: 10px;
+  font-weight: bold;
+
+  box-shadow: 0 3px 10px rgba(255, 87, 34, 0.3);
+}
+
+/* =========================
+   選択済みカードの操作ボタン
+========================= */
+.selected-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+
+  margin-top: 9px;
+  padding-top: 9px;
+
+  border-top: 1px solid #eeeeee;
+}
+
+.remove-selected-btn,
+.cancel-large-btn,
+.add-large-btn {
+  min-height: 28px;
+  padding: 5px 8px;
+
+  border: none;
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.remove-selected-btn {
+  background: #eeeeee;
+  color: #555;
+}
+
+.cancel-large-btn {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.add-large-btn {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+/* =========================
+   確認モーダル内のメニュー
+   ※ここは消さずに必要
+========================= */
+.confirm-food-item {
+  margin-bottom: 8px;
+}
+
+.confirm-food-name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.confirm-food-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.modal-cancel-large-btn,
+.modal-add-large-btn,
+.remove-food-btn {
+  border: none;
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: bold;
+
+  padding: 5px 9px;
+  cursor: pointer;
+}
+
+.modal-cancel-large-btn {
+  background: #fff3e0;
+  color: #ff5722;
+}
+
+.modal-add-large-btn {
+  background: #e3f2fd;
+  color: #1e88e5;
+}
+
+.remove-food-btn {
+  background: #eeeeee;
+  color: #555;
+}
+
+/* =========================
+   メニューが存在しない場合
+========================= */
+.empty-msg {
+  grid-column: 1 / -1;
+
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+
+  padding: 30px 0;
+}
+
+/* =========================
+       メニュー詳細ページ
+    ========================= */
+.back-link {
+  background: none;
+  border: none;
+  color: #ff5722;
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.detail-hero {
+  width: 100%;
+  height: 160px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  background: linear-gradient(135deg, #ffe3da, #ffb199);
+}
+
+.detail-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+#detailTitle {
+  font-size: 24px;
+  margin: 0 0 4px;
+}
+
+.detail-category {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.detail-price {
+  font-size: 26px;
+  font-weight: bold;
+  color: #ff5722;
+}
+
+.detail-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.advice-box {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fff8e1;
+}
+
+.advice-box h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.advice-box ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.advice-box li {
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+#recommendCompareText {
+  margin-top: 12px;
+}
+
+#cancelRecommendBtn {
+  background: #e0e0e0;
+  color: #555;
+}
+
+#addRecommendBtn {
+  background: #ff5722;
+  color: white;
+}
+
+/* =========================
+   栄養成分カード
+========================= */
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.nutrition-item {
+  position: relative;
+  overflow: hidden;
+
+  min-width: 0;
+  padding: 13px 10px;
+
+  text-align: center;
+
+  background: white;
+  border: 1px solid #eeeeee;
+  border-radius: 17px;
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.04);
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nutrition-item:last-child {
+  grid-column: 1 / -1;
+}
+
+.nutrition-item::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background: #dddddd;
+}
+
+/* 不足 */
+.nutrition-item.is-low {
+  background:
+    linear-gradient(180deg,
+      #f7fbff,
+      #ffffff);
+
+  border-color: #d7e9f7;
+}
+
+.nutrition-item.is-low::before {
+  background: #42a5f5;
+}
+
+/* 適正 */
+.nutrition-item.is-good {
+  background:
+    linear-gradient(180deg,
+      #f4fbf5,
+      #ffffff);
+
+  border-color: #d8eddc;
+}
+
+.nutrition-item.is-good::before {
+  background: #43a047;
+}
+
+/* 多め */
+.nutrition-item.is-high {
+  background:
+    linear-gradient(180deg,
+      #fff8f5,
+      #ffffff);
+
+  border-color: #f5d8cf;
+}
+
+.nutrition-item.is-high::before {
+  background: #ff7043;
+}
+
+.nutrition-item .n-label {
+  margin-top: 2px;
+
+  color: #777;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.nutrition-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  margin-top: 6px;
+}
+
+.nutrition-item .n-value {
+  color: #333;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.nutrition-item .n-unit {
+  color: #999;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.n-standard {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #9aa0a6;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.diff-plus,
+.diff-minus,
+.diff-good {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 22px;
+
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.diff-minus {
+  color: #1976d2;
+  background: #e3f2fd;
+}
+
+.diff-plus {
+  color: #e64a19;
+  background: #fff0eb;
+}
+
+.diff-good {
+  color: #2e7d32;
+  background: #e8f5e9;
+}
+
+/* ここから下は残す */
+.chart-area {
+  height: 280px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+#todayPage .chart-area {
+  height: 280px;
+  width: 100%;
+  position: relative;
+}
+
+#todayRadarChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#registerBtn {
+  margin-top: 10px;
+}
+
+.option-area {
+  margin: 10px 0;
+  background: #f7f7f7;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.option-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.option-check input {
+  width: 18px;
+  height: 18px;
+}
+
+#largeOptionText {
+  color: #999;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.chart-area {
+  height: 280px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+#todayPage .chart-area {
+  height: 280px;
+  width: 100%;
+  position: relative;
+}
+
+#todayRadarChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#registerBtn {
+  margin-top: 10px;
+}
+
+.option-area {
+  margin: 10px 0;
+  background: #f7f7f7;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.option-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.option-check input {
+  width: 18px;
+  height: 18px;
+}
+
+#largeOptionText {
+  color: #999;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* =========================
+   本日の食事ページ
+========================= */
+#todayPage {
+  padding-bottom: 100px;
+}
+
+#todayPage>.card {
+  min-height: auto;
+}
+
+#todayPage>.card>h2 {
+  margin: 0 0 16px;
+
+  color: #2f2f2f;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+/* 本日の食事全体 */
+.today-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  margin-top: 0;
+  padding: 0;
+
+  background: transparent;
+  border-radius: 0;
+}
+
+/* 各セクション */
+.today-section {
+  padding: 16px;
+
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 22px;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 12px 28px rgba(0, 0, 0, 0.04);
+}
+
+/* セクションタイトル */
+.today-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-bottom: 14px;
+}
+
+.today-section-title>div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 0;
+
+  color: #333;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.today-section-icon {
+  flex: 0 0 auto;
+
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: #fff0eb;
+
+  font-size: 18px;
+}
+
+/* 登録品数 */
+.today-food-count {
+  flex: 0 0 auto;
+
+  padding: 5px 9px;
+  border-radius: 999px;
+
+  background: #fff0eb;
+  color: #ff5722;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* =========================
+   今日食べたメニュー一覧
+========================= */
+.today-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+/* 料理1品のカード */
+.today-food-item {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 12px;
+
+  align-items: center;
+
+  padding: 10px;
+
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+  border-radius: 17px;
+}
+
+/* 料理画像 */
+.today-food-image-area {
+  width: 62px;
+  height: 62px;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+  background: #eeeeee;
+}
+
+.today-food-image {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+  object-fit: cover;
+}
+
+/* 料理情報 */
+.today-food-content {
+  min-width: 0;
+}
+
+.today-food-name {
+  color: #333;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+}
+
+/* 価格・カロリー */
+.today-food-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 4px;
+}
+
+.today-food-price {
+  color: #ff5722;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.today-food-kcal {
+  color: #999;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* 大盛りなどの状態 */
+.today-food-option {
+  display: inline-flex;
+  align-items: center;
+
+  margin-top: 5px;
+  padding: 3px 7px;
+
+  border-radius: 999px;
+
+  background: #fff3e0;
+  color: #ef6c00;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* 操作ボタン部分 */
+.today-food-actions {
+  grid-column: 1 / -1;
+
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  margin-top: 2px;
+  padding-top: 9px;
+
+  border-top: 1px solid #eeeeee;
+}
+
+.today-food-actions button {
+  min-height: 30px;
+
+  padding: 5px 9px;
+
+  border: none;
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+.today-food-actions button:hover {
+  filter: brightness(0.97);
+}
+
+.today-food-actions button:active {
+  transform: scale(0.95);
+}
+
+/* 大盛り追加 */
+.today-add-large-btn {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+/* 大盛り解除 */
+.today-cancel-large-btn {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+/* スープなし */
+.today-soup-btn {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* スープありに戻す */
+.today-cancel-soup-btn {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+/* 削除 */
+.today-remove-btn {
+  background: #eeeeee;
+  color: #555;
+}
+
+/* =========================
+   合計金額
+========================= */
+.today-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 14px;
+  padding: 14px 16px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(135deg,
+      #fff4ef,
+      #fffaf8);
+
+  border: 1px solid rgba(255, 87, 34, 0.12);
+}
+
+.today-summary span {
+  color: #777;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.today-summary strong {
+  color: #ff5722;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+/* =========================
+   レーダーチャート説明
+========================= */
+.today-section-description {
+  margin: -4px 0 8px;
+
+  color: #999;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* 本日の食事ページのチャート */
+#todayPage .chart-area {
+  width: 100%;
+  height: 270px;
+
+  margin: 0;
+
+  position: relative;
+}
+
+#todayRadarChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* =========================
+   未登録状態
+========================= */
+.today-empty-state {
+  padding: 40px 20px;
+
+  text-align: center;
+
+  background: white;
+  border-radius: 22px;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.today-empty-icon {
+  margin-bottom: 12px;
+
+  font-size: 52px;
+}
+
+.today-empty-title {
+  margin-bottom: 6px;
+
+  color: #444;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.today-empty-text {
+  color: #999;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================
+   不足栄養素
+========================= */
+.lacking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lacking-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 11px 12px;
+
+  background: #fff8f5;
+  border: 1px solid rgba(255, 87, 34, 0.12);
+  border-radius: 13px;
+
+  color: #555;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 左側の丸 */
+.lacking-dot {
+  flex: 0 0 auto;
+
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+  background: #ff7043;
+
+  box-shadow:
+    0 0 0 4px rgba(255, 112, 67, 0.12);
+}
+
+/* 不足がない場合 */
+.lacking-good {
+  padding: 16px;
+
+  text-align: center;
+
+  background: #edf8ee;
+  border: 1px solid #d8edda;
+  border-radius: 14px;
+
+  color: #2e7d32;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* =========================
+   おすすめ追加メニュー
+========================= */
+.recommend-food-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.recommend-food-btn {
+  position: relative;
+
+  width: 100%;
+  min-height: 64px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 18px;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0;
+  padding: 12px 13px;
+
+  border: 1px solid #eeeeee;
+  border-radius: 16px;
+
+  background: #fafafa;
+
+  text-align: left;
+  cursor: pointer;
+
+  box-shadow: none;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.recommend-food-btn:hover {
+  background: #fff7f4;
+  border-color: rgba(255, 87, 34, 0.25);
+}
+
+.recommend-food-btn:active {
+  transform: scale(0.98);
+}
+
+.recommend-food-name {
+  min-width: 0;
+
+  color: #333;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.recommend-food-info {
+  color: #ff5722;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.recommend-food-arrow {
+  color: #bbb;
+  font-size: 22px;
+  font-weight: normal;
+  line-height: 1;
+}
+
+.recommend-empty {
+  padding: 18px;
+
+  text-align: center;
+
+  background: #f7f7f7;
+  border-radius: 14px;
+
+  color: #999;
+  font-size: 12px;
+}
+
+/* =========================
+   食事コメント
+========================= */
+#todayPage .advice-box {
+  position: relative;
+
+  margin-top: 0;
+  padding: 15px 15px 15px 17px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(135deg,
+      #fff9e8,
+      #fffdf5);
+
+  border: 1px solid #f4e4a9;
+  border-radius: 16px;
+}
+
+/* 左側のアクセント線 */
+#todayPage .advice-box::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 5px;
+  height: 100%;
+
+  background:
+    linear-gradient(180deg,
+      #ffb300,
+      #ff7043);
+}
+
+#todayPage .advice-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+#todayPage .advice-box li {
+  margin-bottom: 8px;
+
+  color: #555;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+#todayPage .advice-box li:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================
+   マイページ
+========================= */
+.profile-card {
+  background: #f7f7f7;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.history-date-btn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: white;
+  font-weight: bold;
+}
+
+.history-detail-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.history-detail-card h3 {
+  margin-bottom: 12px;
+}
+
+.calendar-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+
+.calendar-day {
+  min-height: 50px;
+  border: none;
+  border-radius: 10px;
+  background: #f5f5f5;
+  font-size: 12px;
+}
+
+.calendar-day.has-meal {
+  background: #ffe0b2;
+  color: #e65100;
+  font-weight: bold;
+}
+
+.calendar-day:disabled {
+  color: #ccc;
+  cursor: default;
+}
+
+.calendar-day.today {
+  border: 2px solid #ff5722;
+  box-shadow: 0 0 0 2px rgba(255, 87, 34, .2);
+}
+
+.calendar-day.has-meal:hover {
+  transform: scale(1.05);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.calendar-header h3 {
+  margin: 0;
+}
+
+.calendar-header button {
+  border: none;
+  background: #ff5722;
+  color: white;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.edit-profile-btn {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  background: #ff5722;
+  color: white;
+  font-weight: bold;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+/* =========================
+   下部ナビ
+========================= */
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 1000;
+
+  transform: translateX(-50%);
+
+  width: 100%;
+  max-width: 430px;
+
+  min-height: 76px;
+
+  padding:
+    8px 10px calc(8px + env(safe-area-inset-bottom));
+
+  display: none;
+  align-items: center;
+  gap: 6px;
+
+  background: rgba(255, 255, 255, 0.94);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+  box-shadow:
+    0 -5px 24px rgba(0, 0, 0, 0.08);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ナビボタン */
+.bottom-nav button {
+  position: relative;
+
+  flex: 1;
+  min-width: 0;
+  height: 58px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+
+  border: none;
+  border-radius: 18px;
+  background: transparent;
+
+  color: #999;
+  font-size: 10px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.bottom-nav button:active {
+  transform: scale(0.94);
+}
+
+/* アイコン */
+.nav-icon {
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  line-height: 1;
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+/* 文字 */
+.nav-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 選択中 */
+.bottom-nav button.active-tab {
+  background: #fff0eb;
+  color: #ff5722;
+}
+
+.bottom-nav button.active-tab .nav-icon {
+  transform: translateY(-1px) scale(1.08);
+}
+
+/* 選択中の上側マーク */
+.bottom-nav button.active-tab::before {
+  content: "";
+
+  position: absolute;
+  top: 3px;
+  left: 50%;
+
+  width: 22px;
+  height: 3px;
+
+  transform: translateX(-50%);
+
+  border-radius: 999px;
+  background: #ff5722;
+}
+
+/* マウス操作時 */
+.bottom-nav button:hover {
+  background: #fff7f4;
+  color: #ff7043;
+}
+
+/* 一番右の線などを消す */
+.bottom-nav button:last-child {
+  border-right: none;
+}
+
+/* =========================
+   選択中バー
+========================= */
+.selected-bar {
+  position: fixed;
+
+  left: 50%;
+  bottom: calc(88px + env(safe-area-inset-bottom));
+
+  transform: translateX(-50%);
+
+  width: calc(100% - 32px);
+  max-width: 398px;
+
+  padding: 12px 14px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  z-index: 900;
+
+  background: rgba(255, 255, 255, .96);
+  border: 1px solid rgba(255, 87, 34, .15);
+  border-radius: 20px;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, .15);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.selected-bar span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #444;
+}
+
+.selected-bar button {
+  border: none;
+  border-radius: 14px;
+  padding: 11px 16px;
+
+  background: linear-gradient(135deg,
+      #ff7043,
+      #ff5722);
+
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.selected-bar button:hover {
+  transform: translateY(-2px);
+}
+
+.selected-bar button:active {
+  transform: scale(.96);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 398px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 22px;
+  padding: 18px;
+}
+
+.modal-box h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-weight: bold;
+}
+
+.modal-chart-area {
+  height: 240px;
+  position: relative;
+  margin-top: 12px;
+}
+
+#reselectBtn {
+  background: #e0e0e0;
+  color: #555;
+}
+
+#confirmRegisterBtn {
+  background: #ff5722;
+  color: white;
+}
+
+/* =========================
+   アプリヘッダー
+========================= */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin: -16px -16px 18px;
+  padding:
+    calc(14px + env(safe-area-inset-top)) 18px 14px;
+
+  background:
+    linear-gradient(135deg,
+      #ff7043 0%,
+      #ff5722 55%,
+      #f4511e 100%);
+
+  box-shadow:
+    0 4px 14px rgba(244, 81, 30, 0.22);
+
+  overflow: hidden;
+}
+
+/* 背景の飾り */
+.app-header::before {
+  content: "";
+  position: absolute;
+
+  width: 130px;
+  height: 130px;
+
+  top: -75px;
+  right: -30px;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.app-header::after {
+  content: "";
+  position: absolute;
+
+  width: 70px;
+  height: 70px;
+
+  bottom: -45px;
+  left: 25px;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ヘッダー左側 */
+.header-main {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+}
+
+/* ロゴ部分 */
+.header-logo {
+  flex: 0 0 auto;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+
+  font-size: 22px;
+
+  backdrop-filter: blur(8px);
+}
+
+/* タイトル部分 */
+.header-text {
+  min-width: 0;
+}
+
+.app-header h1 {
+  margin: 0;
+
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.25;
+
+  letter-spacing: 0.02em;
+}
+
+.header-subtitle {
+  margin-top: 2px;
+
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 10px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* 右側のミニ表示 */
+.header-status {
+  position: relative;
+  z-index: 1;
+
+  flex: 0 0 auto;
+
+  padding: 7px 10px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+
+  backdrop-filter: blur(8px);
+}

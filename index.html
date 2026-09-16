@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>限界大学生の学食ナビ - 基本情報入力</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+
+  <div class="container" id="appContainer">
+
+    <!-- =========================
+     新規登録・ログイン選択画面
+========================= -->
+    <div id="authChoicePage" class="auth-page">
+
+      <div class="auth-card">
+
+        <div class="auth-logo">
+          🍴
+        </div>
+
+        <h2 class="auth-title">
+          常翔ウェルフェア
+        </h2>
+
+        <p class="auth-description">
+          学食を選ぶだけで、毎日の食事と<br>
+          栄養バランスをかんたんに管理できます。
+        </p>
+
+        <div class="auth-choice-list">
+
+          <button type="button" id="openRegisterBtn" class="auth-choice-btn primary">
+
+            <span class="auth-choice-main">
+
+              <span class="auth-choice-icon">
+                ✨
+              </span>
+
+              <span class="auth-choice-text">
+                <strong>新規登録</strong>
+                <small>はじめて利用する方</small>
+              </span>
+
+            </span>
+
+            <span class="auth-choice-arrow">
+              ›
+            </span>
+
+          </button>
+
+          <button type="button" id="openLoginBtn" class="auth-choice-btn secondary">
+
+            <span class="auth-choice-main">
+
+              <span class="auth-choice-icon">
+                🔑
+              </span>
+
+              <span class="auth-choice-text">
+                <strong>ログイン</strong>
+                <small>登録済みの方</small>
+              </span>
+
+            </span>
+
+            <span class="auth-choice-arrow">
+              ›
+            </span>
+
+          </button>
+
+        </div>
+
+        <p class="auth-note">
+          登録した情報は、食事履歴を個人ごとに<br>
+          管理するために使用します。
+        </p>
+
+      </div>
+
+    </div>
+    <!-- =========================
+     新規登録フォーム
+========================= -->
+    <div id="registerPage" class="auth-form-page">
+
+      <div class="auth-form-card">
+
+        <div class="auth-form-header">
+
+          <div class="auth-form-icon">
+            ✨
+          </div>
+
+          <h2 class="auth-form-title">
+            新規登録
+          </h2>
+
+          <p class="auth-form-description">
+            ニックネームとパスワードを設定してください。
+          </p>
+
+        </div>
+
+        <div class="auth-field">
+
+          <label for="registerNickname">
+            ニックネーム
+          </label>
+
+          <input type="text" id="registerNickname" placeholder="例：taro123" maxlength="20" autocomplete="username">
+
+          <span class="auth-input-note">
+            半角英数字4～20文字
+          </span>
+
+          <div id="registerNicknameError" class="auth-error">
+            ニックネームは半角英数字4～20文字で入力してください。
+          </div>
+
+        </div>
+
+        <div class="auth-field">
+
+          <label for="registerPassword">
+            パスワード
+          </label>
+
+          <div class="password-input-wrap">
+
+            <input type="password" id="registerPassword" placeholder="パスワードを入力" maxlength="64"
+              autocomplete="new-password">
+
+            <button type="button" class="password-toggle-btn" data-target="registerPassword">
+              表示
+            </button>
+
+          </div>
+
+          <span class="auth-input-note">
+            半角英数字8文字以上
+          </span>
+
+          <div id="registerPasswordError" class="auth-error">
+            パスワードは半角英数字8文字以上で入力してください。
+          </div>
+
+        </div>
+
+        <div class="auth-field">
+
+          <label for="registerPasswordConfirm">
+            パスワード確認
+          </label>
+
+          <div class="password-input-wrap">
+
+            <input type="password" id="registerPasswordConfirm" placeholder="もう一度入力" maxlength="64"
+              autocomplete="new-password">
+
+            <button type="button" class="password-toggle-btn" data-target="registerPasswordConfirm">
+              表示
+            </button>
+
+          </div>
+
+          <div id="registerPasswordConfirmError" class="auth-error">
+            パスワードが一致していません。
+          </div>
+
+        </div>
+
+        <div class="auth-form-actions">
+
+          <button type="button" id="registerSubmitBtn" class="auth-submit-btn" disabled>
+            登録して次へ
+          </button>
+
+          <button type="button" id="backFromRegisterBtn" class="auth-back-btn">
+            戻る
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- =========================
+     ログインフォーム
+========================= -->
+    <div id="loginPage" class="auth-form-page">
+
+      <div class="auth-form-card">
+
+        <div class="auth-form-header">
+
+          <div class="auth-form-icon">
+            🔑
+          </div>
+
+          <h2 class="auth-form-title">
+            ログイン
+          </h2>
+
+          <p class="auth-form-description">
+            登録済みのニックネームと<br>
+            パスワードを入力してください。
+          </p>
+
+        </div>
+
+        <div class="auth-field">
+
+          <label for="loginNickname">
+            ニックネーム
+          </label>
+
+          <input type="text" id="loginNickname" placeholder="ニックネーム" maxlength="20" autocomplete="username">
+
+          <div id="loginNicknameError" class="auth-error">
+            ニックネームを入力してください。
+          </div>
+
+        </div>
+
+        <div class="auth-field">
+
+          <label for="loginPassword">
+            パスワード
+          </label>
+
+          <div class="password-input-wrap">
+
+            <input type="password" id="loginPassword" placeholder="パスワード" maxlength="64"
+              autocomplete="current-password">
+
+            <button type="button" class="password-toggle-btn" data-target="loginPassword">
+              表示
+            </button>
+
+          </div>
+
+          <div id="loginPasswordError" class="auth-error">
+            パスワードを入力してください。
+          </div>
+
+        </div>
+
+        <div id="loginGeneralError" class="auth-error">
+          ニックネームまたはパスワードが正しくありません。
+        </div>
+
+        <div class="auth-form-actions">
+
+          <button type="button" id="loginSubmitBtn" class="auth-submit-btn" disabled>
+            ログイン
+          </button>
+
+          <button type="button" id="backFromLoginBtn" class="auth-back-btn">
+            戻る
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+    <!-- 学食一覧画面 -->
+    <div id="selectMenuPage" class="page" style="display:none;">
+
+      <h2>学食メニュー一覧</h2>
+
+      <div class="tab-bar" id="tabBar"></div>
+
+      <div id="menuList"></div>
+
+      <div id="selectedBar" class="selected-bar" style="display:none;">
+        <span id="selectedCount">選択中 0品</span>
+        <button type="button" id="finishSelectBtn">まとめて登録</button>
+      </div>
+
+    </div>
+
+    <!-- メニュー詳細画面 -->
+    <div id="detailPage" style="display:none;">
+
+      <div class="card">
+
+        <button type="button" class="back-link" id="backToMenuBtn">← 一覧へ戻る</button>
+
+        <div class="detail-hero" id="detailHero"></div>
+
+        <h2 id="detailTitle"></h2>
+        <div class="detail-category" id="detailCategory"></div>
+
+        <div class="detail-meta">
+          <span class="detail-price" id="detailPrice"></span>
+          <span class="detail-tags" id="detailTags"></span>
+        </div>
+
+        <div class="nutrition-grid" id="nutritionGrid"></div>
+
+        <div class="chart-area">
+          <canvas id="radarChart"></canvas>
+        </div>
+
+        <div id="largeOptionArea" class="option-area" style="display:none;">
+          <label class="option-check">
+            <input type="checkbox" id="largeOptionCheck">
+            大盛りにする
+            <span id="largeOptionText"></span>
+          </label>
+        </div>
+
+        <div id="soupOptionArea" class="option-area" style="display:none;">
+          <label class="option-check">
+            <input type="checkbox" id="soupOptionCheck">
+            スープを飲まない
+            <span id="soupOptionText">※塩分を約50%減として計算</span>
+          </label>
+        </div>
+
+        <button type="button" class="next-btn enabled" id="registerBtn">
+          選択リストに追加
+        </button>
+
+        <button type="button" class="back-link" id="backToMenuBtnBottom">
+          ← 一覧へ戻る
+        </button>
+
+      </div>
+
+    </div>
+    <!-- 本日の食事ページ -->
+    <div id="todayPage" style="display:none;">
+
+      <div class="card">
+
+        <h2>本日の食事</h2>
+
+        <div id="todayFood">
+          まだ登録されていません
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- AIページ -->
+    <!-- <div id="aiPage" style="display:none;">
+
+      <div class="card">
+        <h2>AIチャット</h2>
+        <p>AIチャット画面</p>
+      </div>
+
+    </div> -->
+
+    <!-- マイページ -->
+    <div id="mypagePage" style="display:none;">
+
+      <div class="card">
+
+        <h2>マイページ</h2>
+
+        <div id="profileCard"></div>
+
+        <div id="calendarArea"></div>
+
+        <div id="historyDetail"></div>
+      </div>
+
+    </div>
+    <!-- 下部ナビ -->
+    <div id="bottomNav" class="bottom-nav">
+
+      <button type="button" id="todayTab">
+
+        <span class="nav-icon">
+          🍽️
+        </span>
+
+        <span class="nav-label">
+          本日の食事
+        </span>
+
+      </button>
+
+      <button type="button" id="menuTab">
+
+        <span class="nav-icon">
+          🍱
+        </span>
+
+        <span class="nav-label">
+          メニュー
+        </span>
+
+      </button>
+
+      <button type="button" id="mypageTab">
+
+        <span class="nav-icon">
+          👤
+        </span>
+
+        <span class="nav-label">
+          マイページ
+        </span>
+
+      </button>
+
+    </div>
+
+    <div id="confirmModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+
+        <h2>本日の合計栄養バランス</h2>
+
+        <div id="confirmModalContent"></div>
+
+        <div class="modal-chart-area">
+          <canvas id="confirmRadarChart"></canvas>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="button" id="reselectBtn">戻る</button>
+          <button type="button" id="confirmRegisterBtn">この内容で登録</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="recommendModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+
+        <h2 id="recommendModalTitle">追加後の変化</h2>
+
+        <div class="modal-chart-area">
+          <canvas id="recommendRadarChart"></canvas>
+        </div>
+
+        <div id="recommendCompareText"></div>
+
+        <div class="modal-buttons">
+          <button type="button" id="cancelRecommendBtn">キャンセル</button>
+          <button type="button" id="addRecommendBtn">この内容で追加</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 進行バー -->
+    <div class="progress-container" style="display:none;">
+      <div class="progress-step active"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+    </div>
+
+    <!-- 入力画面 -->
+    <div class="card" id="inputCard" style="display:none;">
+
+      <!-- 学籍番号 (Step 0) -->
+      <div class="question active">
+        <label>学籍番号を入力してください</label>
+        <input type="text" id="studentId" placeholder="例：20250001">
+      </div>
+      <!-- 性別 (Step 1) -->
+      <div class="question">
+        <label>性別を選択してください</label>
+        <div class="gender-buttons">
+          <button type="button" class="gender-btn" data-value="male">男性</button>
+          <button type="button" class="gender-btn" data-value="female">女性</button>
+        </div>
+      </div>
+
+      <!-- 年齢 (Step 2) -->
+      <div class="question">
+        <label>年齢を選択してください</label>
+        <select id="age">
+          <option value="">選択してください</option>
+        </select>
+      </div>
+
+      <!-- 身長 (Step 3) -->
+      <div class="question">
+        <label>身長を選択してください</label>
+        <select id="height">
+          <option value="">選択してください</option>
+        </select>
+      </div>
+
+      <!-- 体重 (Step 4) -->
+      <div class="question">
+        <label>体重を選択してください</label>
+        <select id="weight">
+          <option value="">選択してください</option>
+        </select>
+      </div>
+
+      <!-- 次へボタン -->
+      <div class="button-area">
+        <button type="button" class="next-btn" id="nextBtn" disabled>次へ</button>
+      </div>
+
+    </div>
+    
+<script src="script.js"></script>
+
+</body>
+</html>
