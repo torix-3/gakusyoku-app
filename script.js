@@ -343,10 +343,134 @@ const storage = {
     }
   }
 };
+
+
 /* =========================
-   起動時はログアウト状態にする
+   30分無操作で自動タイムアウト
 ========================= */
-localStorage.removeItem("currentUser");
+
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30分
+
+
+let sessionTimeoutId = null;
+
+
+/* =========================
+   自動ログアウト
+========================= */
+function sessionLogout() {
+
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("lastActivityTime");
+
+  if (sessionTimeoutId) {
+    clearTimeout(sessionTimeoutId);
+    sessionTimeoutId = null;
+  }
+
+  alert(
+    "30分間操作がなかったため、自動的にログアウトしました。"
+  );
+
+  location.reload();
+}
+
+
+/* =========================
+   操作があったとき
+========================= */
+function resetSessionTimeout() {
+
+  /* ログインしていなければ何もしない */
+  if (!localStorage.getItem("currentUser")) {
+    return;
+  }
+
+  /* 最終操作時刻を保存 */
+  localStorage.setItem(
+    "lastActivityTime",
+    Date.now().toString()
+  );
+
+  /* 前のタイマーを解除 */
+  if (sessionTimeoutId) {
+    clearTimeout(sessionTimeoutId);
+  }
+
+  /* 30分後にログアウト */
+  sessionTimeoutId = setTimeout(
+    sessionLogout,
+    SESSION_TIMEOUT
+  );
+}
+
+
+/* =========================
+   ページ起動時のセッション確認
+========================= */
+function restoreSessionTimeout() {
+
+  const currentUser =
+    localStorage.getItem("currentUser");
+
+  if (!currentUser) {
+    return;
+  }
+
+  const lastActivityTime =
+    Number(
+      localStorage.getItem("lastActivityTime")
+    );
+
+  /* 最終操作時刻がない場合 */
+  if (!lastActivityTime) {
+    resetSessionTimeout();
+    return;
+  }
+
+  const elapsedTime =
+    Date.now() - lastActivityTime;
+
+  /* すでに30分経過している */
+  if (elapsedTime >= SESSION_TIMEOUT) {
+
+    sessionLogout();
+    return;
+  }
+
+  /* 残り時間 */
+  const remainingTime =
+    SESSION_TIMEOUT - elapsedTime;
+
+  sessionTimeoutId = setTimeout(
+    sessionLogout,
+    remainingTime
+  );
+}
+
+
+/* =========================
+   ユーザー操作を監視
+========================= */
+
+[
+  "click",
+  "keydown",
+  "touchstart",
+  "scroll"
+].forEach(eventName => {
+
+  window.addEventListener(
+    eventName,
+    resetSessionTimeout,
+    { passive: true }
+  );
+
+});
+
+
+/* ページ起動時にセッションを復元 */
+restoreSessionTimeout();
 
 /* =========================
    ユーザーごとの保存キーを作る
@@ -378,6 +502,10 @@ function saveUsers(users) {
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbxmIq-JrBRw-tou_PHnOwKnmJobvkDUlakm0oNepcvaVCqe5-dgnXnppDkLtqyrE0tS/exec";
 
+/* メニュー評価データ送信用 */
+const MEAL_EVALUATION_API_URL =
+  "https://script.google.com/macros/s/AKfycbxaurf6XB5pC_H8zMQQAG0i-egg4oVVC2dGB0Aw5_gcNv0RBlKRoVfvBKs0Oawb_M9VGw/exec";
+
 function sendMealDataToSheet() {
   if (!registeredTotalFood || registeredFoods.length === 0) return;
 
@@ -406,6 +534,66 @@ function sendMealDataToSheet() {
   });
 }
 
+async function sendMealEvaluationToSheet(evaluationData) {
+
+  const data = {
+    mealEvaluations: [evaluationData]
+  };
+
+  try {
+
+    await fetch(MEAL_EVALUATION_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data)
+    });
+
+    console.log(
+      "メニュー評価データを送信しました。",
+      evaluationData
+    );
+
+  } catch (error) {
+
+    console.error(
+      "メニュー評価データの送信に失敗しました。",
+      error
+    );
+
+  }
+}
+
+/* =========================
+   アプリ全体アンケート送信
+========================= */
+async function sendAppSurveyToSheet(surveyData) {
+
+  const data = {
+    appSurvey: surveyData
+  };
+
+  try {
+
+    await fetch(MEAL_EVALUATION_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data)
+    });
+
+    console.log(
+      "アプリ全体アンケートを送信しました。",
+      surveyData
+    );
+
+  } catch (error) {
+
+    console.error(
+      "アプリ全体アンケートの送信に失敗しました。",
+      error
+    );
+
+  }
+}
 /* =========================
 基本設定と要素の取得
 ========================= */
@@ -671,6 +859,9 @@ loginSubmitBtn.addEventListener("click", () => {
   // ★現在ログイン中のユーザーを保存
   localStorage.setItem("currentUser", inputNickname);
 
+  // ★30分タイムアウト開始
+  resetSessionTimeout();
+
   // ★ログインしたユーザーの基本情報を読み込む
   loadUserProfileIntoForm();
 
@@ -774,6 +965,9 @@ registerSubmitBtn.addEventListener("click", () => {
 
   // ★現在ログイン中のユーザーを保存
   localStorage.setItem("currentUser", nickname);
+
+  // ★30分タイムアウト開始
+  resetSessionTimeout();
 
   // ★新規登録したユーザーの基本情報を読み込む
   loadUserProfileIntoForm();
@@ -966,6 +1160,8 @@ nextBtn.addEventListener("click", () => {
     document.getElementById("appContainer").classList.add("has-bottom-nav");
     document.getElementById("bottomNav").style.display = "flex";
     setActiveTab(menuTab);
+    /* 今日のおすすめを表示 */
+    recommendOverlay.style.display = "flex";
     window.scrollTo({ top: 0, behavior: "auto" });
     return;
   }
@@ -2620,6 +2816,207 @@ function renderTodayPage() {
 
                           </div>
 
+<!-- メニュー評価 -->
+<div class="meal-rating" data-index="${index}">
+
+  <div class="meal-rating-title">
+    このメニューを評価
+  </div>
+
+  <!-- 満足度 -->
+  <div class="meal-rating-row">
+
+    <span class="meal-rating-label">
+      満足度
+    </span>
+
+    <div class="meal-stars"
+      data-rating-type="satisfaction">
+
+      ${[1, 2, 3, 4, 5].map(value => `
+        <button
+          type="button"
+          class="meal-star"
+          data-value="${value}"
+          aria-label="満足度 ${value}">
+          ☆
+        </button>
+      `).join("")}
+
+    </div>
+
+  </div>
+
+
+  <!-- 味 -->
+  <div class="meal-rating-row">
+
+    <span class="meal-rating-label">
+      味
+    </span>
+
+    <div class="meal-stars"
+      data-rating-type="taste">
+
+      ${[1, 2, 3, 4, 5].map(value => `
+        <button
+          type="button"
+          class="meal-star"
+          data-value="${value}"
+          aria-label="味 ${value}">
+          ☆
+        </button>
+      `).join("")}
+
+    </div>
+
+  </div>
+
+
+  <!-- 味の濃さ -->
+  <div class="meal-scale-block">
+
+    <div class="meal-rating-label">
+      味の濃さ
+    </div>
+
+    <div class="meal-scale-options"
+      data-rating-type="strength">
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="1">
+        薄すぎる
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="2">
+        薄い
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="3">
+        ちょうどいい
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="4">
+        濃い
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="5">
+        濃すぎる
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 量 -->
+  <div class="meal-scale-block">
+
+    <div class="meal-rating-label">
+      量
+    </div>
+
+    <div class="meal-scale-options"
+      data-rating-type="amount">
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="1">
+        少なすぎる
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="2">
+        少ない
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="3">
+        ちょうどいい
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="4">
+        多い
+      </button>
+
+      <button type="button"
+        class="meal-scale-option"
+        data-value="5">
+        多すぎる
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 価格満足度 -->
+  <div class="meal-rating-row">
+
+    <span class="meal-rating-label">
+      価格満足度
+    </span>
+
+    <div class="meal-stars"
+      data-rating-type="price">
+
+      ${[1, 2, 3, 4, 5].map(value => `
+        <button
+          type="button"
+          class="meal-star"
+          data-value="${value}"
+          aria-label="価格満足度 ${value}">
+          ☆
+        </button>
+      `).join("")}
+
+    </div>
+
+  </div>
+
+
+  <!-- コメント -->
+  <div class="meal-comment-block">
+
+    <label>
+      感想・コメント
+      <span>任意</span>
+    </label>
+
+    <textarea
+      class="meal-comment"
+      data-index="${index}"
+      placeholder="このメニューについて感想があれば入力してください"
+    ></textarea>
+
+  </div>
+
+  <div class="meal-rating-submit-area">
+
+  <button
+    type="button"
+    class="meal-rating-submit-btn"
+    data-index="${index}">
+    この内容で送信
+  </button>
+
+</div>
+
+</div>
+
                           <div class="today-food-actions">
 
                             ${canLargeMenu ? (
@@ -2872,7 +3269,6 @@ function renderTodayPage() {
                       </div>
 
                     </section>
-
                   </div>
                   `;
 
@@ -3058,6 +3454,394 @@ function renderTodayPage() {
 
       showRecommendPreview(recommendFood);
     });
+  });
+  /* =========================
+   メニュー評価
+========================= */
+
+  /* =========================
+     保存済み評価を復元
+  ========================= */
+
+  const savedMealEvaluations =
+    JSON.parse(
+      storage.getItem(getUserKey("mealEvaluations")) || "[]"
+    );
+
+  const now = new Date();
+
+  const todayDate =
+    `${now.getFullYear()}-` +
+    `${String(now.getMonth() + 1).padStart(2, "0")}-` +
+    `${String(now.getDate()).padStart(2, "0")}`;
+
+
+  todayFood.querySelectorAll(".meal-rating").forEach(ratingArea => {
+
+    const index = Number(ratingArea.dataset.index);
+    const food = registeredFoods[index];
+
+    if (!food) return;
+
+    const menuId = food.baseId || food.id;
+
+
+    /* 今日・このメニューの回答を探す */
+    const savedEvaluation =
+      [...savedMealEvaluations].reverse().find(item =>
+        item.date === todayDate &&
+        item.menuId === menuId
+      );
+
+
+    /* 回答がなければ何もしない */
+    if (!savedEvaluation) return;
+
+
+    /* =========================
+       星評価を復元
+    ========================= */
+
+    const restoreStars = (type, value) => {
+
+      const group =
+        ratingArea.querySelector(
+          `.meal-stars[data-rating-type="${type}"]`
+        );
+
+      if (!group) return;
+
+      group.querySelectorAll(".meal-star").forEach(star => {
+
+        const starValue =
+          Number(star.dataset.value);
+
+        if (starValue <= value) {
+          star.textContent = "★";
+          star.classList.add("selected");
+        } else {
+          star.textContent = "☆";
+          star.classList.remove("selected");
+        }
+
+      });
+
+    };
+
+
+    restoreStars(
+      "satisfaction",
+      savedEvaluation.satisfaction
+    );
+
+    restoreStars(
+      "taste",
+      savedEvaluation.taste
+    );
+
+    restoreStars(
+      "price",
+      savedEvaluation.price
+    );
+
+
+    /* =========================
+       味の濃さ・量を復元
+    ========================= */
+
+    const restoreScale = (type, value) => {
+
+      const group =
+        ratingArea.querySelector(
+          `.meal-scale-options[data-rating-type="${type}"]`
+        );
+
+      if (!group) return;
+
+      const option =
+        group.querySelector(
+          `.meal-scale-option[data-value="${value}"]`
+        );
+
+      if (option) {
+        option.classList.add("selected");
+      }
+
+    };
+
+
+    restoreScale(
+      "strength",
+      savedEvaluation.strength
+    );
+
+    restoreScale(
+      "amount",
+      savedEvaluation.amount
+    );
+
+
+    /* =========================
+       コメントを復元
+    ========================= */
+
+    const comment =
+      ratingArea.querySelector(".meal-comment");
+
+    if (comment) {
+      comment.value =
+        savedEvaluation.comment || "";
+
+      comment.disabled = true;
+    }
+
+
+    /* =========================
+       回答済み状態
+    ========================= */
+
+    const submitBtn =
+      ratingArea.querySelector(".meal-rating-submit-btn");
+
+    if (submitBtn) {
+      submitBtn.textContent = "✓ 回答済み";
+      submitBtn.disabled = true;
+      submitBtn.classList.add("submitted");
+    }
+
+
+    /* 回答済みなら評価ボタンも変更不可 */
+    ratingArea
+      .querySelectorAll(".meal-star, .meal-scale-option")
+      .forEach(button => {
+
+        button.disabled = true;
+
+      });
+
+  });
+
+  /* 星評価 */
+  todayFood.querySelectorAll(".meal-stars").forEach(starGroup => {
+
+    const stars = starGroup.querySelectorAll(".meal-star");
+
+    stars.forEach(star => {
+
+      star.addEventListener("click", () => {
+
+        const selectedValue =
+          Number(star.dataset.value);
+
+        stars.forEach(item => {
+
+          const value =
+            Number(item.dataset.value);
+
+          if (value <= selectedValue) {
+            item.textContent = "★";
+            item.classList.add("selected");
+          } else {
+            item.textContent = "☆";
+            item.classList.remove("selected");
+          }
+
+        });
+
+      });
+
+    });
+
+  });
+
+
+  /* 味の濃さ・量 */
+  todayFood.querySelectorAll(".meal-scale-options").forEach(group => {
+
+    const options =
+      group.querySelectorAll(".meal-scale-option");
+
+    options.forEach(option => {
+
+      option.addEventListener("click", () => {
+
+        options.forEach(item => {
+          item.classList.remove("selected");
+        });
+
+        option.classList.add("selected");
+
+      });
+
+    });
+
+  });
+  /* =========================
+   メニュー評価 送信
+========================= */
+
+  todayFood.querySelectorAll(".meal-rating-submit-btn").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+      const index = Number(btn.dataset.index);
+      const food = registeredFoods[index];
+
+      if (!food) return;
+
+      /* この料理の評価欄だけ取得 */
+      const ratingArea =
+        btn.closest(".meal-rating");
+
+      if (!ratingArea) return;
+
+
+      /* 星評価を取得 */
+      const getStarValue = (type) => {
+
+        const group =
+          ratingArea.querySelector(
+            `.meal-stars[data-rating-type="${type}"]`
+          );
+
+        if (!group) return null;
+
+        const selectedStars =
+          group.querySelectorAll(".meal-star.selected");
+
+        return selectedStars.length || null;
+      };
+
+
+      /* 5段階評価を取得 */
+      const getScaleValue = (type) => {
+
+        const group =
+          ratingArea.querySelector(
+            `.meal-scale-options[data-rating-type="${type}"]`
+          );
+
+        if (!group) return null;
+
+        const selected =
+          group.querySelector(".meal-scale-option.selected");
+
+        return selected
+          ? Number(selected.dataset.value)
+          : null;
+      };
+
+
+      /* 回答内容 */
+      const evaluation = {
+
+        menuId: food.baseId || food.id,
+        menuName: food.name,
+
+        satisfaction:
+          getStarValue("satisfaction"),
+
+        taste:
+          getStarValue("taste"),
+
+        strength:
+          getScaleValue("strength"),
+
+        amount:
+          getScaleValue("amount"),
+
+        price:
+          getStarValue("price"),
+
+        comment:
+          ratingArea.querySelector(".meal-comment")
+            ?.value.trim() || ""
+
+      };
+
+
+      /* 必須項目チェック */
+      if (
+        !evaluation.satisfaction ||
+        !evaluation.taste ||
+        !evaluation.strength ||
+        !evaluation.amount ||
+        !evaluation.price
+      ) {
+
+        alert("すべての評価項目に回答してください。");
+
+        return;
+      }
+
+
+      /* =========================
+         評価をlocalStorageに保存
+      ========================= */
+
+      const studentId =
+        storage.getItem(getUserKey("studentId")) || "";
+
+      const now = new Date();
+
+      /* YYYY-MM-DD */
+      const date =
+        `${now.getFullYear()}-` +
+        `${String(now.getMonth() + 1).padStart(2, "0")}-` +
+        `${String(now.getDate()).padStart(2, "0")}`;
+
+
+      /* 保存する回答データ */
+      const evaluationData = {
+        studentId: studentId,
+
+        date: date,
+
+        menuId: evaluation.menuId,
+        menuName: evaluation.menuName,
+
+        satisfaction: evaluation.satisfaction,
+        taste: evaluation.taste,
+        strength: evaluation.strength,
+        amount: evaluation.amount,
+        price: evaluation.price,
+
+        comment: evaluation.comment,
+
+        submittedAt: now.toISOString()
+      };
+
+
+      /* これまでの回答を取得 */
+      const savedEvaluations =
+        JSON.parse(
+          storage.getItem(getUserKey("mealEvaluations")) || "[]"
+        );
+
+
+      /* 新しい回答を追加 */
+      savedEvaluations.push(evaluationData);
+
+
+      /* 保存 */
+      storage.setItem(
+        getUserKey("mealEvaluations"),
+        JSON.stringify(savedEvaluations)
+      );
+
+
+      /* 送信ボタンを回答済みに変更 */
+      btn.textContent = "✓ 回答済み";
+      btn.disabled = true;
+      btn.classList.add("submitted");
+
+      /* 今回回答した1件だけGoogleスプレッドシートへ送信 */
+      sendMealEvaluationToSheet(evaluationData);
+
+      alert("回答を送信しました！");
+
+    });
+
   });
 }
 
@@ -3452,4 +4236,291 @@ mypageTab.onclick = () => {
   renderMyPage();
   showPage(mypagePage, mypageTab);
 };
+/* =========================
+   今日のおすすめモーダル
+========================= */
 
+const recommendOverlay =
+  document.getElementById("recommendOverlay");
+
+const closeRecommendPopup =
+  document.getElementById("closeRecommendPopup");
+
+if (recommendOverlay && closeRecommendPopup) {
+
+  closeRecommendPopup.addEventListener("click", () => {
+
+    recommendOverlay.style.display = "none";
+
+  });
+
+}
+
+/* =========================
+   一時的にログインをスキップ
+   → 基本情報入力から開始
+========================= */
+
+progressContainer.style.display = "flex";
+inputCard.style.display = "flex";
+
+currentStep = 0;
+
+/* 基本情報を1問目から開始 */
+questions.forEach((question, index) => {
+  question.classList.toggle("active", index === 0);
+});
+
+progressSteps.forEach((step, index) => {
+  step.classList.toggle("active", index === 0);
+});
+
+/* 次へボタンの状態を更新 */
+updateStudentIdButton();
+
+window.scrollTo({
+  top: 0,
+  behavior: "auto"
+});
+
+/* =========================
+   アプリ全体アンケート
+========================= */
+
+const appSurveyCard = document.getElementById("appSurveyCard");
+
+if (appSurveyCard) {
+
+  /* 1〜5の回答ボタン */
+  appSurveyCard
+    .querySelectorAll(".app-survey-scale")
+    .forEach(scale => {
+
+      const buttons = scale.querySelectorAll("button");
+
+      buttons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+          /* 同じ質問の選択を一度解除 */
+          buttons.forEach(item => {
+            item.classList.remove("selected");
+          });
+
+          /* 押した回答を選択 */
+          button.classList.add("selected");
+
+        });
+
+      });
+
+    });
+
+}
+/* =========================
+   アプリ全体アンケート 送信準備
+========================= */
+
+const submitAppSurveyBtn =
+  document.getElementById("submitAppSurveyBtn");
+
+if (submitAppSurveyBtn && appSurveyCard) {
+
+  submitAppSurveyBtn.addEventListener("click", () => {
+
+    const answers = {};
+
+    const questions =
+      appSurveyCard.querySelectorAll(".app-survey-question");
+
+    /* 各質問の回答を取得 */
+    questions.forEach(question => {
+
+      const questionName =
+        question.dataset.question;
+
+      const selected =
+        question.querySelector(
+          ".app-survey-scale button.selected"
+        );
+
+      answers[questionName] =
+        selected
+          ? Number(selected.dataset.value)
+          : null;
+    });
+
+    /* 未回答があるか確認 */
+    const hasUnanswered =
+      Object.values(answers).some(
+        value => value === null
+      );
+
+    if (hasUnanswered) {
+      alert("すべての質問に回答してください。");
+      return;
+    }
+
+    /* 自由記述 */
+    const comment =
+      document
+        .getElementById("appSurveyComment")
+        ?.value.trim() || "";
+
+    /* 学籍番号 */
+    const studentId =
+      storage.getItem(getUserKey("studentId")) || "";
+
+    const now = new Date();
+
+    const surveyData = {
+      studentId: studentId,
+
+      nutritionAwareness:
+        answers.nutritionAwareness,
+
+      menuHelpfulness:
+        answers.menuHelpfulness,
+
+      nutritionClarity:
+        answers.nutritionClarity,
+
+      recommendationHelpfulness:
+        answers.recommendationHelpfulness,
+
+      easeOfUse:
+        answers.easeOfUse,
+
+      continuedUse:
+        answers.continuedUse,
+
+      comment: comment,
+
+      submittedAt:
+        now.toISOString()
+    };
+
+    /* Googleスプレッドシートへ送信 */
+    sendAppSurveyToSheet(surveyData);
+
+    /* 回答済みとして保存 */
+    storage.setItem(
+      getUserKey("appSurveyCompleted"),
+      "true"
+    );
+
+    /* 回答内容も保存 */
+    storage.setItem(
+      getUserKey("appSurveyData"),
+      JSON.stringify(surveyData)
+    );
+
+    /* 送信ボタンを回答済みに変更 */
+    submitAppSurveyBtn.textContent = "✓ 回答済み";
+    submitAppSurveyBtn.disabled = true;
+    submitAppSurveyBtn.classList.add("submitted");
+
+    /* 回答欄を操作できないようにする */
+    appSurveyCard
+      .querySelectorAll(".app-survey-scale button")
+      .forEach(button => {
+        button.disabled = true;
+      });
+
+    const appSurveyComment =
+      document.getElementById("appSurveyComment");
+
+    if (appSurveyComment) {
+      appSurveyComment.disabled = true;
+    }
+
+    console.log(
+      "アプリ全体アンケート",
+      surveyData
+    );
+
+    alert("アンケートを送信しました！");
+  });
+
+  /* =========================
+   アプリ全体アンケート
+   回答済み状態を復元
+========================= */
+
+  const appSurveyCompleted =
+    storage.getItem(
+      getUserKey("appSurveyCompleted")
+    ) === "true";
+
+  const savedAppSurveyData =
+    JSON.parse(
+      storage.getItem(
+        getUserKey("appSurveyData")
+      ) || "null"
+    );
+
+  if (
+    appSurveyCompleted &&
+    savedAppSurveyData &&
+    appSurveyCard
+  ) {
+
+    /* 1〜5の回答を復元 */
+    appSurveyCard
+      .querySelectorAll(".app-survey-question")
+      .forEach(question => {
+
+        const questionName =
+          question.dataset.question;
+
+        const savedValue =
+          savedAppSurveyData[questionName];
+
+        const selectedButton =
+          question.querySelector(
+            `.app-survey-scale button[data-value="${savedValue}"]`
+          );
+
+        if (selectedButton) {
+          selectedButton.classList.add("selected");
+        }
+
+        /* 回答ボタンを操作不可にする */
+        question
+          .querySelectorAll(".app-survey-scale button")
+          .forEach(button => {
+            button.disabled = true;
+          });
+
+      });
+
+
+    /* コメントを復元 */
+    const appSurveyComment =
+      document.getElementById("appSurveyComment");
+
+    if (appSurveyComment) {
+
+      appSurveyComment.value =
+        savedAppSurveyData.comment || "";
+
+      appSurveyComment.disabled = true;
+    }
+
+
+    /* 送信ボタンを回答済みにする */
+    if (submitAppSurveyBtn) {
+
+      submitAppSurveyBtn.textContent =
+        "✓ 回答済み";
+
+      submitAppSurveyBtn.disabled = true;
+
+      submitAppSurveyBtn.classList.add(
+        "submitted"
+      );
+    }
+
+  }
+
+}

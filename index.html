@@ -285,6 +285,37 @@
 
       <h2>学食メニュー一覧</h2>
 
+      <!-- =========================
+     今日のおすすめモーダル
+========================= -->
+      <div id="recommendOverlay" class="recommend-overlay" style="display:none;">
+
+        <div class="recommend-popup">
+
+          <button type="button" id="closeRecommendPopup" class="recommend-popup-close" aria-label="閉じる">
+            ×
+          </button>
+
+          <div class="recommend-popup-label">
+            ✨ 今日のおすすめ
+          </div>
+
+          <img src="images/春のごちそうランチ.png" alt="春のごちそうランチ" class="recommend-popup-image">
+
+          <div class="recommend-popup-content">
+
+            <h3>🌸 春のごちそうランチ</h3>
+
+            <p>
+              季節限定のおすすめメニューです！
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
       <div class="tab-bar" id="tabBar"></div>
 
       <div id="menuList"></div>
@@ -356,10 +387,151 @@
         <div id="todayFood">
           まだ登録されていません
         </div>
+        <!-- =========================
+     アプリ全体アンケート
+========================= -->
+        <div id="appSurveyCard" class="app-survey-card">
 
+          <div class="app-survey-header">
+            <h3>アプリについてのアンケート</h3>
+            <p>
+              実際にアプリを使ってみた感想を教えてください。
+            </p>
+          </div>
+
+          <div class="app-survey-question" data-question="nutritionAwareness">
+            <p>
+              1. アプリを使うことで、普段より栄養バランスを意識して食事を選べましたか？
+            </p>
+
+            <div class="app-survey-scale">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+
+            <div class="app-survey-scale-labels">
+              <span>まったく<br>そう思わない</span>
+              <span>とても<br>そう思う</span>
+            </div>
+          </div>
+
+          <div class="app-survey-question" data-question="menuHelpfulness">
+            <p>
+              2. アプリの情報は、メニューを選ぶ際の参考になりましたか？
+            </p>
+
+            <div class="app-survey-scale">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+
+            <div class="app-survey-scale-labels">
+              <span>まったく<br>そう思わない</span>
+              <span>とても<br>そう思う</span>
+            </div>
+          </div>
+
+          <div class="app-survey-question" data-question="nutritionClarity">
+            <p>
+              3. 栄養バランスの表示は分かりやすかったですか？
+            </p>
+
+            <div class="app-survey-scale">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+
+            <div class="app-survey-scale-labels">
+              <span>まったく<br>そう思わない</span>
+              <span>とても<br>そう思う</span>
+            </div>
+          </div>
+
+          <div class="app-survey-question" data-question="recommendationHelpfulness">
+            <p>
+              4. おすすめメニューの提案は役に立ちましたか？
+            </p>
+
+            <div class="app-survey-scale">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+
+            <div class="app-survey-scale-labels">
+              <span>まったく<br>そう思わない</span>
+              <span>とても<br>そう思う</span>
+            </div>
+          </div>
+
+          <div class="app-survey-question" data-question="easeOfUse">
+            <p>
+              5. アプリを負担なく利用できましたか？
+            </p>
+
+            <div class="app-survey-scale">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+
+            <div class="app-survey-scale-labels">
+              <span>まったく<br>そう思わない</span>
+              <span>とても<br>そう思う</span>
+            </div>
+          </div>
+
+          <div class="app-survey-question" data-question="continuedUse">
+            <p>
+              6. 今後も学食を利用する際に、このアプリを使いたいと思いますか？
+            </p>
+
+            <div class="app-survey-scale">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+
+            <div class="app-survey-scale-labels">
+              <span>まったく<br>そう思わない</span>
+              <span>とても<br>そう思う</span>
+            </div>
+          </div>
+
+          <div class="app-survey-comment">
+            <label for="appSurveyComment">
+              感想・改善してほしい点
+              <span>任意</span>
+            </label>
+
+            <textarea id="appSurveyComment" placeholder="アプリを使って感じたことがあれば入力してください"></textarea>
+          </div>
+
+          <button type="button" id="submitAppSurveyBtn" class="app-survey-submit-btn">
+            アンケートを送信
+          </button>
+
+        </div>
       </div>
 
     </div>
+
+
 
     <!-- AIページ -->
     <!-- <div id="aiPage" style="display:none;">
@@ -386,6 +558,7 @@
       </div>
 
     </div>
+
     <!-- 下部ナビ -->
     <div id="bottomNav" class="bottom-nav">
 
@@ -521,8 +694,9 @@
       </div>
 
     </div>
-    
-<script src="script.js"></script>
+
+    <script src="script.js"></script>
 
 </body>
+
 </html>
