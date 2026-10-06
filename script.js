@@ -1,4 +1,34 @@
 /* =========================
+   QRアクセスキー
+========================= */
+
+const ACCESS_KEY = "K7mP4x";
+
+const urlParams = new URLSearchParams(window.location.search);
+const accessKey = urlParams.get("key");
+
+if (accessKey !== ACCESS_KEY) {
+  document.documentElement.innerHTML = `
+    <body style="
+      margin:0;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      font-family:sans-serif;
+      background:#f5f5f5;
+      text-align:center;
+    ">
+      <div>
+        <h2>このQRコードは現在使用できません</h2>
+        <p>最新のQRコードからアクセスしてください。</p>
+      </div>
+    </body>
+  `;
+
+  throw new Error("Invalid access key");
+}
+/* =========================
    パスワード表示・非表示
 ========================= */
 document.querySelectorAll(".password-toggle-btn").forEach(button => {
