@@ -323,18 +323,37 @@ function getBasalRate(gender, age) {
   const age = Number(storage.getItem(getUserKey("age"))) || 20;
   const height = Number(storage.getItem(getUserKey("height"))) || 170;
   const weight = Number(storage.getItem(getUserKey("weight"))) || 60; const heightM = height / 100; const bmi = weight / (heightM * heightM); const basalRate = getBasalRate(gender, age);
-  let activityLevel = getActivityLevel(age); if (bmi >= 25) {
-    activityLevel -= 0.1;
-  } else if (bmi < 18.5) { activityLevel += 0.1; } const dailyEnergy = weight * basalRate * activityLevel; const
-    mealEnergy = dailyEnergy / 3; return {
+  const activityLevel = getActivityLevel(age);
+
+  const dailyEnergy = weight * basalRate * activityLevel; const
+    mealEnergy = dailyEnergy * 0.4; return {
       energy_kcal: mealEnergy, protein_g: mealEnergy * 0.165 / 4, fat_g:
-        mealEnergy * 0.25 / 9, carb_g: mealEnergy * 0.575 / 4, salt_g: gender === "male" ? 2.5 : 2.2
+        mealEnergy * 0.25 / 9, carb_g: mealEnergy * 0.575 / 4, salt_g: gender === "male" ? 3.0 : 2.6
     };
-} function
-  toRadarData(item) {
-  return [item.energy_kcal / RADAR_MAX.energy_kcal * 10, item.protein_g / RADAR_MAX.protein_g
-    * 10, item.fat_g / RADAR_MAX.fat_g * 10, item.carb_g / RADAR_MAX.carb_g * 10, item.salt_g / RADAR_MAX.salt_g *
-  10].map(v => Math.round(Math.min(v, 10) * 10) / 10);
+}
+function toRadarData(item) {
+  const ideal = getIdealNutrition();
+
+  const fields = [
+    "energy_kcal",
+    "protein_g",
+    "fat_g",
+    "carb_g",
+    "salt_g"
+  ];
+
+  return fields.map(key => {
+    const actual = Number(item[key]) || 0;
+    const target = Number(ideal[key]) || 0;
+
+    if (target <= 0) return 0;
+
+    const value = (actual / target) * 5;
+
+    return Math.round(
+      Math.min(Math.max(value, 0), 10) * 10
+    ) / 10;
+  });
 }
 
 function idealRadarData() {
@@ -516,6 +535,25 @@ function getUserKey(key) {
 }
 
 /* =========================
+   研究参加者IDの自動生成
+========================= */
+function getParticipantId() {
+  const key = getUserKey("participantId");
+
+  let participantId = storage.getItem(key);
+
+  if (!participantId) {
+    participantId = "P-" + Array.from(
+      crypto.getRandomValues(new Uint8Array(16)),
+      byte => byte.toString(16).padStart(2, "0")
+    ).join("");
+    storage.setItem(key, participantId);
+  }
+
+  return participantId;
+}
+
+/* =========================
    登録済みユーザー一覧を取得
 ========================= */
 function getUsers() {
@@ -540,7 +578,7 @@ function sendMealDataToSheet() {
   if (!registeredTotalFood || registeredFoods.length === 0) return;
 
   const data = {
-    studentId: storage.getItem(getUserKey("studentId")) || "",
+    studentId: getParticipantId(),
     gender: storage.getItem(getUserKey("gender")) || "",
     age: storage.getItem(getUserKey("age")) || "",
     height: storage.getItem(getUserKey("height")) || "",
@@ -567,7 +605,10 @@ function sendMealDataToSheet() {
 async function sendMealEvaluationToSheet(evaluationData) {
 
   const data = {
-    mealEvaluations: [evaluationData]
+    mealEvaluations: [{
+      ...evaluationData,
+      studentId: getParticipantId()
+    }]
   };
 
   try {
@@ -599,7 +640,10 @@ async function sendMealEvaluationToSheet(evaluationData) {
 async function sendAppSurveyToSheet(surveyData) {
 
   const data = {
-    appSurvey: surveyData
+    appSurvey: {
+      ...surveyData,
+      studentId: getParticipantId()
+    }
   };
 
   try {
@@ -628,8 +672,7 @@ async function sendAppSurveyToSheet(surveyData) {
 基本設定と要素の取得
 ========================= */
 
-
-let currentStep = 0;
+let currentStep = 1;
 let selectedFood = null;
 let activeCategory = MENU_DATA.categories[0].id;
 let menuMode = "select"; // select=登録用 / browse=見るだけ用
@@ -699,24 +742,22 @@ const progressContainer =
 
 const inputCard =
   document.getElementById("inputCard");
+
+// 基本情報入力画面を表示
+progressContainer.style.display = "flex";
+inputCard.style.display = "flex";
 const studentIdInput = document.getElementById("studentId");
 
 let selectedGender = null;
 
 /* =========================
-   学籍番号を入力したら次へを有効化
+   参加者IDを自動設定
 ========================= */
 function updateStudentIdButton() {
-  if (studentIdInput.value.trim() !== "") {
-    enableButton();
-  } else {
-    disableButton();
-  }
+  if (!studentIdInput) return;
+
+  studentIdInput.value = getParticipantId();
 }
-
-studentIdInput.addEventListener("input", updateStudentIdButton);
-
-// 最初から値が入っている場合も判定
 updateStudentIdButton();
 /* =========================
    認証画面の切り替え
@@ -901,14 +942,15 @@ loginSubmitBtn.addEventListener("click", () => {
   loginPage.style.display = "none";
 
   /* 保存済みの基本情報を確認 */
-  const savedStudentId = storage.getItem(getUserKey("studentId"));
+  const participantId = getParticipantId();
+
   const savedGender = storage.getItem(getUserKey("gender"));
   const savedAge = storage.getItem(getUserKey("age"));
   const savedHeight = storage.getItem(getUserKey("height"));
   const savedWeight = storage.getItem(getUserKey("weight"));
 
   const hasAllProfileData =
-    savedStudentId &&
+    participantId &&
     savedGender &&
     savedAge &&
     savedHeight &&
@@ -943,20 +985,24 @@ loginSubmitBtn.addEventListener("click", () => {
   progressContainer.style.display = "flex";
   inputCard.style.display = "flex";
 
-  currentStep = 0;
+  // 学籍番号の入力をスキップし、性別選択から開始
+  currentStep = 1;
 
   questions.forEach((question, index) => {
-    question.classList.toggle("active", index === 0);
+    question.classList.toggle("active", index === 1);
   });
 
   progressSteps.forEach((step, index) => {
-    step.classList.toggle("active", index === 0);
+    step.classList.toggle("active", index < currentStep - 1);
   });
-
-  if (savedStudentId) {
-    studentIdInput.value = savedStudentId;
+  // 性別が未選択なら「次へ」を無効化
+  if (selectedGender) {
+    enableButton();
+  } else {
+    disableButton();
   }
 
+  // 学籍番号の代わりに参加者IDを自動設定
   updateStudentIdButton();
 
   window.scrollTo({
@@ -1010,15 +1056,23 @@ registerSubmitBtn.addEventListener("click", () => {
   progressContainer.style.display = "flex";
   inputCard.style.display = "flex";
 
-  currentStep = 0;
+  // 学籍番号をスキップして性別選択から開始
+  currentStep = 1;
 
   questions.forEach((question, index) => {
-    question.classList.toggle("active", index === 0);
+    question.classList.toggle("active", index === 1);
   });
 
   progressSteps.forEach((step, index) => {
     step.classList.toggle("active", index === 0);
   });
+
+  // 保存済みの性別があれば次へ進める
+  if (selectedGender) {
+    enableButton();
+  } else {
+    disableButton();
+  }
 
   // 学籍番号が入っているか確認してボタン状態を決める
   updateStudentIdButton();
@@ -1086,13 +1140,13 @@ function loadUserProfileIntoForm() {
   heightSelect.value = "";
   weightSelect.value = "";
 
-  const savedStudentId = storage.getItem(getUserKey("studentId"));
+  const savedParticipantId = getParticipantId();
   const savedGender = storage.getItem(getUserKey("gender"));
   const savedAge = storage.getItem(getUserKey("age"));
   const savedHeight = storage.getItem(getUserKey("height"));
   const savedWeight = storage.getItem(getUserKey("weight"));
-  if (savedStudentId) {
-    studentIdInput.value = savedStudentId;
+  if (savedParticipantId) {
+    studentIdInput.value = savedParticipantId;
   }
   if (savedGender) {
     selectedGender = savedGender;
@@ -1105,26 +1159,22 @@ function loadUserProfileIntoForm() {
   if (savedHeight) { heightSelect.value = savedHeight; }
   if (savedWeight) { weightSelect.value = savedWeight; }
 
-  if (savedStudentId) {
-    currentStep = 1;
+  // 学籍番号の入力をスキップし、性別選択から開始
+  currentStep = 1;
 
-    questions[0].classList.remove("active");
-    questions[1].classList.add("active");
+  questions.forEach((question, index) => {
+    question.classList.toggle("active", index === 1);
+  });
 
-    progressSteps[0].classList.add("active");
-    progressSteps[1].classList.add("active");
+  progressSteps.forEach((step, index) => {
+    step.classList.toggle("active", index === 0);
+  });
 
-    if (selectedGender) {
-      enableButton();
-    } else {
-      disableButton();
-    }
+  // 性別が選択されている場合のみ次へ進める
+  if (selectedGender) {
+    enableButton();
   } else {
-    if (studentIdInput.value.trim() !== "") {
-      enableButton();
-    } else {
-      disableButton();
-    }
+    disableButton();
   }
 }
 
@@ -1173,7 +1223,7 @@ nextBtn.addEventListener("click", () => {
   if (currentStep === 4 && weightSelect.value === "") return;
 
   if (currentStep === 4) {
-    storage.setItem(getUserKey("studentId"), studentIdInput.value.trim());
+    storage.setItem(getUserKey("participantId"), getParticipantId());
     storage.setItem(getUserKey("gender"), selectedGender);
     storage.setItem(getUserKey("age"), ageSelect.value);
     storage.setItem(getUserKey("height"), heightSelect.value);
@@ -1199,7 +1249,9 @@ nextBtn.addEventListener("click", () => {
   questions[currentStep].classList.remove("active");
   currentStep++;
   questions[currentStep].classList.add("active");
-  progressSteps[currentStep].classList.add("active");
+  progressSteps.forEach((step, index) => {
+    step.classList.toggle("active", index < currentStep - 1);
+  });
 
   disableButton();
 
@@ -1257,11 +1309,11 @@ function getQuickNutritionStatus(actual, ideal, type) {
   ========================= */
   if (type === "salt") {
 
-    if (ratio > 1.2) {
-      status = "多め";
+    if (ratio > 1.0) {
+      status = "基準超過";
       className = "high";
     } else {
-      status = "控えめ";
+      status = "基準以内";
       className = "good";
     }
 
@@ -2184,7 +2236,7 @@ function updateDetailNutritionAndChart() {
       labels: RADAR_LABELS,
       datasets: [
         {
-          label: "理想",
+          label: "基準値",
           data: idealRadarData(),
           backgroundColor: "rgba(66,165,245,0.55)",
           borderWidth: 0,
@@ -2327,10 +2379,9 @@ function getNutritionAdvice(totalFood, ideal) {
     advice.push("脂質を摂りすぎています。");
   }
 
-  if (totalFood.salt_g > ideal.salt_g * 1.2) {
-    advice.push("食塩相当量が高めです。");
+  if (totalFood.salt_g > ideal.salt_g) {
+    advice.push("食塩相当量が昼食の基準値を超えています。");
   }
-
   if (totalFood.carb_g > ideal.carb_g * 1.2) {
     advice.push("炭水化物が多めです。");
   }
@@ -2487,7 +2538,7 @@ function renderConfirmRadarChart() {
       labels: RADAR_LABELS,
       datasets: [
         {
-          label: "理想",
+          label: "基準値",
           data: idealRadarData(),
           backgroundColor: "rgba(66,165,245,0.55)",
           borderWidth: 0,
@@ -2562,32 +2613,74 @@ function getLackingNutrients(totalFood, ideal) {
     } if (totalFood.energy_kcal < ideal.energy_kcal * 0.8) {
       lacking.push("エネルギー");
     } return lacking;
-} function getRecommendFoods(lackingNutrients) {
-  const
-    sideFoods = MENU_DATA.items.filter(item =>
-      item.category === "side" &&
-      !item.tags.includes("option")
-    );
+}
+function getRecommendFoods(lackingNutrients) {
+  if (!registeredTotalFood) return [];
 
-  if (lackingNutrients.includes("たんぱく質")) {
-    return sideFoods.filter(item =>
-      item.protein_g >= 3
-    );
+  const ideal = getIdealNutrition();
+
+  const registeredNames = new Set(
+    registeredFoods.map(food => food.name)
+  );
+
+  const candidates = MENU_DATA.items.filter(item =>
+    item.category === "side" &&
+    !item.tags.includes("option") &&
+    !registeredNames.has(item.name)
+  );
+
+  const nutrientKeys = [
+    "energy_kcal",
+    "protein_g",
+    "fat_g",
+    "carb_g"
+  ];
+
+  function calculateScore(food) {
+    let score = 0;
+
+    for (const key of nutrientKeys) {
+      const target = Number(ideal[key]) || 0;
+      if (target <= 0) continue;
+
+      const before = Number(registeredTotalFood[key]) || 0;
+      const after = before + (Number(food[key]) || 0);
+
+      const beforeGap = Math.abs(1 - before / target);
+      const afterGap = Math.abs(1 - after / target);
+
+      score += beforeGap - afterGap;
+    }
+
+    const saltLimit = Number(ideal.salt_g) || 0;
+
+    if (saltLimit > 0) {
+      const beforeSalt = Number(registeredTotalFood.salt_g) || 0;
+      const afterSalt = beforeSalt + (Number(food.salt_g) || 0);
+
+      const beforeExcess = Math.max(
+        0, beforeSalt / saltLimit - 1
+      );
+
+      const afterExcess = Math.max(
+        0, afterSalt / saltLimit - 1
+      );
+
+      score -= (afterExcess - beforeExcess) * 2;
+    }
+
+    return score;
   }
 
-  if (lackingNutrients.includes("炭水化物")) {
-    return sideFoods.filter(item =>
-      item.carb_g >= 10
-    );
-  }
-
-  if (lackingNutrients.includes("エネルギー")) {
-    return sideFoods.filter(item =>
-      item.energy_kcal >= 80
-    );
-  }
-
-  return sideFoods.slice(0, 3);
+  return candidates
+    .map(food => ({
+      food,
+      score: calculateScore(food)
+    }))
+    .filter(result => result.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map(result => result.food);
 }
 
 function showRecommendPreview(recommendFood) {
@@ -2646,7 +2739,7 @@ function showRecommendModal(recommendFood, afterFood) {
       labels: RADAR_LABELS,
       datasets: [
         {
-          label: "理想",
+          label: "基準値",
           data: idealRadarData(),
           borderWidth: 2,
           pointRadius: 0
@@ -2853,55 +2946,49 @@ function renderTodayPage() {
     このメニューを評価
   </div>
 
-  <!-- 満足度 -->
-  <div class="meal-rating-row">
+<!-- 味 -->
+<div class="meal-scale-block">
 
-    <span class="meal-rating-label">
-      満足度
-    </span>
+  <div class="meal-rating-label">
+    味
+  </div>
 
-    <div class="meal-stars"
-      data-rating-type="satisfaction">
+  <div class="meal-scale-options"
+    data-rating-type="taste">
 
-      ${[1, 2, 3, 4, 5].map(value => `
-        <button
-          type="button"
-          class="meal-star"
-          data-value="${value}"
-          aria-label="満足度 ${value}">
-          ☆
-        </button>
-      `).join("")}
+    <button type="button"
+      class="meal-scale-option"
+      data-value="1">
+      とてもおいしくない
+    </button>
 
-    </div>
+    <button type="button"
+      class="meal-scale-option"
+      data-value="2">
+      おいしくない
+    </button>
+
+    <button type="button"
+      class="meal-scale-option"
+      data-value="3">
+      普通
+    </button>
+
+    <button type="button"
+      class="meal-scale-option"
+      data-value="4">
+      おいしい
+    </button>
+
+    <button type="button"
+      class="meal-scale-option"
+      data-value="5">
+      とてもおいしい
+    </button>
 
   </div>
 
-
-  <!-- 味 -->
-  <div class="meal-rating-row">
-
-    <span class="meal-rating-label">
-      味
-    </span>
-
-    <div class="meal-stars"
-      data-rating-type="taste">
-
-      ${[1, 2, 3, 4, 5].map(value => `
-        <button
-          type="button"
-          class="meal-star"
-          data-value="${value}"
-          aria-label="味 ${value}">
-          ☆
-        </button>
-      `).join("")}
-
-    </div>
-
-  </div>
-
+</div>
 
   <!-- 味の濃さ -->
   <div class="meal-scale-block">
@@ -2993,30 +3080,49 @@ function renderTodayPage() {
   </div>
 
 
-  <!-- 価格満足度 -->
-  <div class="meal-rating-row">
+ <!-- 価格 -->
+<div class="meal-scale-block">
 
-    <span class="meal-rating-label">
-      価格満足度
-    </span>
+  <div class="meal-rating-label">
+    料理の内容に対して価格をどう感じましたか？
+  </div>
 
-    <div class="meal-stars"
-      data-rating-type="price">
+  <div class="meal-scale-options"
+    data-rating-type="price">
 
-      ${[1, 2, 3, 4, 5].map(value => `
-        <button
-          type="button"
-          class="meal-star"
-          data-value="${value}"
-          aria-label="価格満足度 ${value}">
-          ☆
-        </button>
-      `).join("")}
+    <button type="button"
+      class="meal-scale-option"
+      data-value="1">
+      とても高い
+    </button>
 
-    </div>
+    <button type="button"
+      class="meal-scale-option"
+      data-value="2">
+      高い
+    </button>
+
+    <button type="button"
+      class="meal-scale-option"
+      data-value="3">
+      妥当
+    </button>
+
+    <button type="button"
+      class="meal-scale-option"
+      data-value="4">
+      安い
+    </button>
+
+    <button type="button"
+      class="meal-scale-option"
+      data-value="5">
+      とても安い
+    </button>
 
   </div>
 
+</div>
 
   <!-- コメント -->
   <div class="meal-comment-block">
@@ -3099,6 +3205,9 @@ function renderTodayPage() {
 
                     </section>
 
+                    <!-- アプリ全体アンケートの移動先 -->
+<div id="appSurveyPosition"></div>
+
                     <!-- =========================
          栄養バランス
     ========================== -->
@@ -3114,7 +3223,7 @@ function renderTodayPage() {
                       </div>
 
                       <p class="today-section-description">
-                        青色が目標、オレンジ色が今日の摂取量です。
+                        青色は栄養素の目標量（食塩相当量は上限の目安）、オレンジ色は今日の摂取量を示しています。
                       </p>
 
                       <div class="chart-area">
@@ -3150,9 +3259,20 @@ function renderTodayPage() {
     let diffClass = "diff-good";
     let diffText = "適正";
 
-    if (ratio < 0.8) {
-      nutritionState = "is-low"; diffClass = "diff-minus"; diffText = `不足
-                          ${Math.abs(diff).toFixed(1)}${field.unit}`;
+    if (field.key === "salt_g") {
+      if (ratio > 1.0) {
+        nutritionState = "is-high";
+        diffClass = "diff-plus";
+        diffText = `基準超過 +${diff.toFixed(1)}${field.unit}`;
+      } else {
+        nutritionState = "is-good";
+        diffClass = "diff-good";
+        diffText = "基準以内";
+      }
+    } else if (ratio < 0.8) {
+      nutritionState = "is-low";
+      diffClass = "diff-minus";
+      diffText = `不足 ${Math.abs(diff).toFixed(1)}${field.unit}`;
     } else if (ratio > 1.2) {
       nutritionState = "is-high";
       diffClass = "diff-plus";
@@ -3317,7 +3437,7 @@ function renderTodayPage() {
         labels: RADAR_LABELS,
         datasets: [
           {
-            label: "理想",
+            label: "基準値",
             data: idealRadarData(),
             backgroundColor: "rgba(66,165,245,0.55)",
             borderWidth: 0,
@@ -3768,11 +3888,8 @@ function renderTodayPage() {
         menuId: food.baseId || food.id,
         menuName: food.name,
 
-        satisfaction:
-          getStarValue("satisfaction"),
-
         taste:
-          getStarValue("taste"),
+          getScaleValue("taste"),
 
         strength:
           getScaleValue("strength"),
@@ -3781,7 +3898,7 @@ function renderTodayPage() {
           getScaleValue("amount"),
 
         price:
-          getStarValue("price"),
+          getScaleValue("price"),
 
         comment:
           ratingArea.querySelector(".meal-comment")
@@ -3792,15 +3909,12 @@ function renderTodayPage() {
 
       /* 必須項目チェック */
       if (
-        !evaluation.satisfaction ||
         !evaluation.taste ||
         !evaluation.strength ||
         !evaluation.amount ||
         !evaluation.price
       ) {
-
         alert("すべての評価項目に回答してください。");
-
         return;
       }
 
@@ -3873,6 +3987,13 @@ function renderTodayPage() {
     });
 
   });
+  // アプリアンケートをメニュー評価の下へ移動
+  const appSurvey = document.getElementById("appSurveyCard");
+  const surveyPosition = document.getElementById("appSurveyPosition");
+
+  if (appSurvey && surveyPosition) {
+    surveyPosition.appendChild(appSurvey);
+  }
 }
 
 function renderMyPage() {
@@ -3915,7 +4036,7 @@ function renderMyPage() {
     questions[0].classList.add("active");
 
     progressSteps.forEach((step, index) => {
-      step.classList.toggle("active", index === 0);
+      step.classList.toggle("active", index < currentStep - 1);
     });
 
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -4285,33 +4406,6 @@ if (recommendOverlay && closeRecommendPopup) {
   });
 
 }
-
-/* =========================
-   一時的にログインをスキップ
-   → 基本情報入力から開始
-========================= */
-
-progressContainer.style.display = "flex";
-inputCard.style.display = "flex";
-
-currentStep = 0;
-
-/* 基本情報を1問目から開始 */
-questions.forEach((question, index) => {
-  question.classList.toggle("active", index === 0);
-});
-
-progressSteps.forEach((step, index) => {
-  step.classList.toggle("active", index === 0);
-});
-
-/* 次へボタンの状態を更新 */
-updateStudentIdButton();
-
-window.scrollTo({
-  top: 0,
-  behavior: "auto"
-});
 
 /* =========================
    アプリ全体アンケート
