@@ -3242,10 +3242,13 @@ input[type="text"] {
 /* =========================
    一時的にログイン画面を非表示
 ========================= */
-#authChoicePage,
+#authChoicePage {
+  display: flex;
+}
+
 #registerPage,
 #loginPage {
-  display: none !important;
+  display: none;
 }
 
 /* アプリアンケート回答済み */
@@ -3265,4 +3268,18 @@ input[type="text"] {
 
 .app-survey-scale button:disabled {
   cursor: default;
+}
+
+/* 新規登録・ログイン画面を使用しない */
+#authChoicePage,
+#registerPage,
+#loginPage {
+  display: none !important;
+}
+
+/* 新規登録・ログイン画面は非表示 */
+#authChoicePage,
+#registerPage,
+#loginPage {
+  display: none !important;
 }
