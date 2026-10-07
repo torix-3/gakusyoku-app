@@ -640,7 +640,9 @@
 
     <!-- 進行バー -->
     <div class="progress-container" style="display:none;">
-      <div class="progress-step active"></div>
+      <!-- 学籍番号用のステップは内部的に残す -->
+
+
       <div class="progress-step"></div>
       <div class="progress-step"></div>
       <div class="progress-step"></div>
@@ -650,13 +652,12 @@
     <!-- 入力画面 -->
     <div class="card" id="inputCard" style="display:none;">
 
-      <!-- 学籍番号 (Step 0) -->
-      <div class="question active">
-        <label>学籍番号を入力してください</label>
-        <input type="text" id="studentId" placeholder="例：20250001">
+      <!-- 参加者ID（内部管理用・画面には表示しない） -->
+      <div class="question" style="display:none;">
+        <input type="hidden" id="studentId">
       </div>
       <!-- 性別 (Step 1) -->
-      <div class="question">
+      <div class="question active">
         <label>性別を選択してください</label>
         <div class="gender-buttons">
           <button type="button" class="gender-btn" data-value="male">男性</button>
