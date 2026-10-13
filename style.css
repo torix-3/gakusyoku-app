@@ -3283,3 +3283,186 @@ input[type="text"] {
 #loginPage {
   display: none !important;
 }
+
+/* ==============================
+   アプリ全体アンケート UI改善
+============================== */
+
+.app-survey-card {
+  width: 100%;
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.app-survey-header h3 {
+  margin: 0 0 12px;
+  font-size: 21px;
+}
+
+.app-survey-header p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #666;
+}
+
+.app-survey-section-title {
+  margin: 28px 0 16px;
+  padding: 10px 12px;
+  background: #fff3e7;
+  border-left: 4px solid #f39835;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.app-survey-question {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.app-survey-question>p {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+/* 1〜5の数字ボタン */
+.app-survey-question .app-survey-scale {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.app-survey-question .app-survey-scale button {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 0;
+  border: 2px solid #dedede;
+  border-radius: 10px;
+  background: #fff;
+  color: #333;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* 選択した数字をオレンジ色に */
+.app-survey-question .app-survey-scale button.selected {
+  background: #f39835;
+  border-color: #f39835;
+  color: #fff;
+}
+
+/* キーボード操作時のフォーカス */
+.app-survey-question .app-survey-scale button:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* 左右の評価説明 */
+.app-survey-endpoints {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.app-survey-endpoints span {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: #777;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.app-survey-endpoints span:last-child {
+  text-align: right;
+}
+
+/* 選択中の回答を表示 */
+.app-survey-selected-text {
+  margin-top: 12px;
+  padding: 10px;
+  background: #fff7ed;
+  border-radius: 8px;
+  color: #a6530d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 自由記述 */
+.app-survey-comment {
+  margin-bottom: 20px;
+}
+
+.app-survey-comment label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.app-survey-comment label span {
+  font-size: 12px;
+  color: #888;
+  font-weight: 400;
+}
+
+.app-survey-comment textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 16px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+/* 回答済みボタン */
+.app-survey-scale button:disabled {
+  cursor: default;
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+  .app-survey-card {
+    padding: 12px;
+    margin: 12px auto;
+  }
+
+  .app-survey-question {
+    padding: 12px;
+  }
+
+  .app-survey-question .app-survey-scale {
+    gap: 6px;
+  }
+
+  .app-survey-question .app-survey-scale button {
+    min-height: 46px;
+    font-size: 16px;
+    padding: 6px 0;
+  }
+
+  .app-survey-endpoints span {
+    font-size: 11px;
+  }
+
+  .app-survey-header h3 {
+    font-size: 19px;
+  }
+}

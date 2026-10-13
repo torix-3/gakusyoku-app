@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>限界大学生の学食ナビ</title>
+
+<style>
+body{
+    font-family:sans-serif;
+    background:#f5f5f5;
+    padding:20px;
+    margin:0;
+}
+
+/* 上の進行バー */
+.progress-container{
+    display:flex;
+    gap:8px;
+    margin-bottom:30px;
+}
+
+.progress-step{
+    flex:1;
+    height:8px;
+    background:#ddd;
+    border-radius:10px;
+}
+
+.active{
+    background:#ff5722;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+/* 性別ボタン */
+.gender-buttons{
+    display:flex;
+    gap:10px;
+    margin-bottom:30px;
+}
+
+.gender-btn{
+    flex:1;
+    padding:18px;
+    border:none;
+    border-radius:15px;
+    font-size:18px;
+    background:#eee;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.gender-btn.selected{
+    background:#ff5722;
+    color:white;
+}
+
+/* スライダー */
+.form-group{
+    margin-bottom:30px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.value{
+    color:#ff5722;
+    font-size:20px;
+    font-weight:bold;
+}
+
+input[type="range"]{
+    width:100%;
+    accent-color:#ff5722;
+}
+
+/* 次へボタン */
+button[type="submit"]{
+    width:100%;
+    padding:18px;
+    border:none;
+    border-radius:15px;
+    background:#ccc;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+button[type="submit"].enabled{
+    background:#ff5722;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="progress-container">
+    <div class="progress-step active"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+    <div class="progress-step"></div>
+</div>
+
+<div class="card">
+
+<h2>基本情報の入力</h2>
+
+<form id="profileForm">
+
+    <!-- 性別 -->
+    <div class="form-group">
+        <label>性別</label>
+
+        <div class="gender-buttons">
+            <button type="button" class="gender-btn" data-gender="male">
+                男性
+            </button>
+
+            <button type="button" class="gender-btn" data-gender="female">
+                女性
+            </button>
+        </div>
+    </div>
+
+    <!-- 年齢 -->
+    <div class="form-group">
+        <label>
+            年齢 :
+            <span class="value" id="ageValue">20</span> 歳
+        </label>
+
+        <input type="range" id="age" min="18" max="30" value="20">
+    </div>
+
+    <!-- 身長 -->
+    <div class="form-group">
+        <label>
+            身長 :
+            <span class="value" id="heightValue">170</span> cm
+        </label>
+
+        <input type="range" id="height" min="140" max="200" value="170">
+    </div>
+
+    <!-- 体重 -->
+    <div class="form-group">
+        <label>
+            体重 :
+            <span class="value" id="weightValue">60</span> kg
+        </label>
+
+        <input type="range" id="weight" min="40" max="120" value="60">
+    </div>
+
+    <button type="submit" id="nextBtn">
+        次へ
+    </button>
+
+</form>
+
+</div>
+
+<script>
+
+let selectedGender = null;
+
+const genderButtons = document.querySelectorAll(".gender-btn");
+const nextBtn = document.getElementById("nextBtn");
+
+/* 性別選択 */
+genderButtons.forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        genderButtons.forEach(b => b.classList.remove("selected"));
+
+        btn.classList.add("selected");
+
+        selectedGender = btn.dataset.gender;
+
+        checkForm();
+    });
+
+});
+
+/* スライダー表示更新 */
+const age = document.getElementById("age");
+const height = document.getElementById("height");
+const weight = document.getElementById("weight");
+
+age.addEventListener("input", () => {
+    document.getElementById("ageValue").textContent = age.value;
+});
+
+height.addEventListener("input", () => {
+    document.getElementById("heightValue").textContent = height.value;
+});
+
+weight.addEventListener("input", () => {
+    document.getElementById("weightValue").textContent = weight.value;
+});
+
+/* 入力チェック */
+function checkForm(){
+
+    if(selectedGender){
+
+        nextBtn.classList.add("enabled");
+
+    }else{
+
+        nextBtn.classList.remove("enabled");
+
+    }
+}
+
+/* 送信 */
+document.getElementById("profileForm")
+.addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    if(!selectedGender){
+        return;
+    }
+
+    alert("次の画面へ！");
+});
+
+</script>
+
+</body>
+</html>
