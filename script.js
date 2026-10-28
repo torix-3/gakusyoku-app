@@ -2,7 +2,7 @@
    QRアクセスキー
 ========================= */
 
-const ACCESS_KEY = "W8nR5q";
+const ACCESS_KEY = "HHxlxtsMQMRlem";
 
 const urlParams = new URLSearchParams(window.location.search);
 const accessKey = urlParams.get("key");
@@ -635,44 +635,11 @@ async function sendMealEvaluationToSheet(evaluationData) {
 }
 
 /* =========================
-   アプリ全体アンケート送信
-========================= */
-async function sendAppSurveyToSheet(surveyData) {
-
-  const data = {
-    appSurvey: {
-      ...surveyData,
-      studentId: getParticipantId()
-    }
-  };
-
-  try {
-
-    await fetch(MEAL_EVALUATION_API_URL, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(data)
-    });
-
-    console.log(
-      "アプリ全体アンケートを送信しました。",
-      surveyData
-    );
-
-  } catch (error) {
-
-    console.error(
-      "アプリ全体アンケートの送信に失敗しました。",
-      error
-    );
-
-  }
-}
-/* =========================
 基本設定と要素の取得
 ========================= */
 
 let currentStep = 1;
+let isEditingProfile = false;
 let selectedFood = null;
 let activeCategory = MENU_DATA.categories[0].id;
 let menuMode = "select"; // select=登録用 / browse=見るだけ用
@@ -1228,6 +1195,25 @@ nextBtn.addEventListener("click", () => {
     storage.setItem(getUserKey("age"), ageSelect.value);
     storage.setItem(getUserKey("height"), heightSelect.value);
     storage.setItem(getUserKey("weight"), weightSelect.value);
+
+
+    // 基本情報の編集だった場合はマイページに戻る
+    if (isEditingProfile) {
+      isEditingProfile = false;
+
+      document.querySelector(".progress-container").style.display = "none";
+      document.getElementById("inputCard").style.display = "none";
+
+      document.getElementById("mypagePage").style.display = "block";
+      document.getElementById("bottomNav").style.display = "flex";
+      document.getElementById("appContainer").classList.add("has-bottom-nav");
+
+      setActiveTab(mypageTab);
+      renderMyPage();
+
+      window.scrollTo({ top: 0, behavior: "auto" });
+      return;
+    }
 
     menuMode = "select";
     selectedFoods = [];
@@ -3205,8 +3191,6 @@ function renderTodayPage() {
 
                     </section>
 
-                    <!-- アプリ全体アンケートの移動先 -->
-<div id="appSurveyPosition"></div>
 
                     <!-- =========================
          栄養バランス
@@ -3987,13 +3971,6 @@ function renderTodayPage() {
     });
 
   });
-  // アプリアンケートをメニュー評価の下へ移動
-  const appSurvey = document.getElementById("appSurveyCard");
-  const surveyPosition = document.getElementById("appSurveyPosition");
-
-  if (appSurvey && surveyPosition) {
-    surveyPosition.appendChild(appSurvey);
-  }
 }
 
 function renderMyPage() {
@@ -4019,6 +3996,7 @@ function renderMyPage() {
                   `;
 
   renderCalendar();
+
   document.getElementById("editProfileBtn").onclick = () => {
     document.getElementById("mypagePage").style.display = "none";
     document.querySelector(".progress-container").style.display = "flex";
@@ -4026,21 +4004,15 @@ function renderMyPage() {
     document.getElementById("bottomNav").style.display = "none";
     document.getElementById("appContainer").classList.remove("has-bottom-nav");
 
-    currentStep = 0;
+    // 登録済みの基本情報を読み込む
+    loadUserProfileIntoForm();
 
-    studentIdInput.value = "";
-    nextBtn.disabled = true;
-    nextBtn.classList.remove("enabled");
-
-    questions.forEach(q => q.classList.remove("active"));
-    questions[0].classList.add("active");
-
-    progressSteps.forEach((step, index) => {
-      step.classList.toggle("active", index < currentStep - 1);
-    });
+    // 編集中であることを記録
+    isEditingProfile = true;
 
     window.scrollTo({ top: 0, behavior: "auto" });
   };
+
 }
 
 function renderCalendar() {
@@ -4405,256 +4377,28 @@ if (recommendOverlay && closeRecommendPopup) {
 
   });
 
-}
-
-/* =========================
-   アプリ全体アンケート
-========================= */
-
-const appSurveyCard = document.getElementById("appSurveyCard");
-
-
-if (appSurveyCard) {
-  appSurveyCard.querySelectorAll(".app-survey-question")
-    .forEach(question => {
-      const labels = (question.dataset.labels || "").split("|");
-
-      if (labels.length !== 5) return;
-
-      const scale = document.createElement("div");
-      scale.className = "app-survey-scale";
-
-      const selectedText = document.createElement("div");
-      selectedText.className = "app-survey-selected-text";
-      selectedText.setAttribute("aria-live", "polite");
-      selectedText.textContent = "回答を選択してください";
-
-      for (let value = 1; value <= 5; value++) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.dataset.value = value;
-        button.textContent = value;
-        button.setAttribute("aria-label", `${value}：${labels[value - 1]}`);
-        button.setAttribute("aria-pressed", "false");
-
-        button.addEventListener("click", () => {
-          scale.querySelectorAll("button").forEach(item => {
-            item.classList.remove("selected");
-            item.setAttribute("aria-pressed", "false");
-          });
-
-          button.classList.add("selected");
-          button.setAttribute("aria-pressed", "true");
-
-          selectedText.textContent =
-            `${value}：${labels[value - 1]}`;
-        });
-
-        scale.appendChild(button);
-      }
-
-      const endpoints = document.createElement("div");
-      endpoints.className = "app-survey-endpoints";
-
-      const left = document.createElement("span");
-      left.textContent = `1：${labels[0]}`;
-
-      const right = document.createElement("span");
-      right.textContent = `5：${labels[4]}`;
-
-      endpoints.append(left, right);
-
-      question.append(scale, endpoints, selectedText);
-    });
-}
-
-/* =========================
-   アプリ全体アンケート 送信準備
-========================= */
-
-const submitAppSurveyBtn =
-  document.getElementById("submitAppSurveyBtn");
-
-
-if (submitAppSurveyBtn && appSurveyCard) {
-
-  const surveyQuestions =
-    appSurveyCard.querySelectorAll(".app-survey-question");
-
-  const goodPointsInput =
-    document.getElementById("appSurveyGoodPoints");
-
-  const improvementsInput =
-    document.getElementById("appSurveyImprovements");
 
   /* =========================
-     回答済み画面にする共通処理
+     学食切り替え機能
   ========================= */
-  function disableAppSurvey() {
-    submitAppSurveyBtn.textContent = "✓ 回答済み";
-    submitAppSurveyBtn.disabled = true;
-    submitAppSurveyBtn.classList.add("submitted");
 
-    appSurveyCard
-      .querySelectorAll(".app-survey-scale button")
-      .forEach(button => {
-        button.disabled = true;
+  let activeBuilding = "3";
+
+  document.querySelectorAll(".cafeteria-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      // 選択された号館を保存
+      activeBuilding = btn.dataset.building;
+
+      // ボタンの色を切り替える
+      document.querySelectorAll(".cafeteria-btn").forEach(b => {
+        b.classList.toggle("active", b === btn);
       });
 
-    if (goodPointsInput) goodPointsInput.disabled = true;
-    if (improvementsInput) improvementsInput.disabled = true;
-  }
-
-  /* =========================
-     アンケート送信
-  ========================= */
-  submitAppSurveyBtn.addEventListener("click", () => {
-
-    const answers = {};
-
-    surveyQuestions.forEach(question => {
-      const questionName = question.dataset.question;
-
-      const selected = question.querySelector(
-        ".app-survey-scale button.selected"
-      );
-
-      answers[questionName] = selected
-        ? Number(selected.dataset.value)
-        : null;
+      console.log("現在選択中の学食:", activeBuilding + "号館");
     });
-
-    /* 9問すべて回答しているか確認 */
-    if (
-      surveyQuestions.length !== 9 ||
-      Object.values(answers).some(value => value === null)
-    ) {
-      alert("5段階評価の9問すべてに回答してください。");
-      return;
-    }
-
-    /* 自由記述2問 */
-    const goodPoints =
-      goodPointsInput?.value.trim() || "";
-
-    const improvements =
-      improvementsInput?.value.trim() || "";
-
-    /* 参加者ID */
-    const studentId =
-      storage.getItem(getUserKey("studentId")) || "";
-
-    const now = new Date();
-
-    /* 保存・送信用データ */
-    const surveyData = {
-      studentId: studentId,
-
-      screenClarity: answers.screenClarity,
-      operationEase: answers.operationEase,
-      graphVisibility: answers.graphVisibility,
-
-      nutritionAwareness: answers.nutritionAwareness,
-      menuHelpfulness: answers.menuHelpfulness,
-      nutritionClarity: answers.nutritionClarity,
-      recommendationHelpfulness:
-        answers.recommendationHelpfulness,
-
-      continuedUse: answers.continuedUse,
-      mealChoiceEase: answers.mealChoiceEase,
-
-      goodPoints: goodPoints,
-      improvements: improvements,
-
-      submittedAt: now.toISOString()
-    };
-
-    /* Googleスプレッドシートへ送信 */
-    sendAppSurveyToSheet(surveyData);
-
-    /* 回答済みとして保存 */
-    storage.setItem(
-      getUserKey("appSurveyCompleted"),
-      "true"
-    );
-
-    /* 回答内容も保存 */
-    storage.setItem(
-      getUserKey("appSurveyData"),
-      JSON.stringify(surveyData)
-    );
-
-    disableAppSurvey();
-
-    console.log("アプリ全体アンケート", surveyData);
-
-    alert("アンケートの送信処理を実行しました。");
   });
 
-  /* =========================
-     回答済み状態を復元
-  ========================= */
-  const appSurveyCompleted =
-    storage.getItem(
-      getUserKey("appSurveyCompleted")
-    ) === "true";
 
-  let savedAppSurveyData = null;
-
-  try {
-    savedAppSurveyData = JSON.parse(
-      storage.getItem(
-        getUserKey("appSurveyData")
-      ) || "null"
-    );
-  } catch (error) {
-    console.warn("アンケート保存データの読み込み失敗", error);
-  }
-
-  if (appSurveyCompleted && savedAppSurveyData) {
-
-    surveyQuestions.forEach(question => {
-      const questionName = question.dataset.question;
-      const savedValue = savedAppSurveyData[questionName];
-
-      const selectedButton = question.querySelector(
-        `.app-survey-scale button[data-value="${savedValue}"]`
-      );
-
-      if (selectedButton) {
-        selectedButton.classList.add("selected");
-        selectedButton.setAttribute("aria-pressed", "true");
-
-        /* 選択した回答の文章も復元 */
-        const labels =
-          (question.dataset.labels || "").split("|");
-
-        const selectedText =
-          question.querySelector(".app-survey-selected-text");
-
-        if (
-          selectedText &&
-          Number.isInteger(savedValue) &&
-          savedValue >= 1 &&
-          savedValue <= 5
-        ) {
-          selectedText.textContent =
-            `${savedValue}：${labels[savedValue - 1]}`;
-        }
-      }
-    });
-
-    /* 自由記述2問を復元 */
-    if (goodPointsInput) {
-      goodPointsInput.value =
-        savedAppSurveyData.goodPoints || "";
-    }
-
-    if (improvementsInput) {
-      improvementsInput.value =
-        savedAppSurveyData.improvements || "";
-    }
-
-    disableAppSurvey();
-  }
 }
+
