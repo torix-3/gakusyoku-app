@@ -3174,9 +3174,11 @@ function updateDetailNutritionAndChart() {
       const diff = displayFood[f.key] - ideal[f.key];
       const diffClass = diff >= 0 ? "diff-plus" : "diff-minus";
       const diffText =
-        diff >= 0
-          ? `↑+${diff.toFixed(1)}${f.unit}`
-          : `↓${Math.abs(diff).toFixed(1)}${f.unit}`;
+        diff > 0
+          ? `↑${diff.toFixed(1)}${f.unit}`
+          : diff < 0
+            ? `↓${Math.abs(diff).toFixed(1)}${f.unit}`
+            : `±0.0${f.unit}`;
 
       return `
               <div class="nutrition-item">
@@ -3192,9 +3194,9 @@ function updateDetailNutritionAndChart() {
                   </div>
                 </div>
 
-                <div class="n-standard">
-                  基準 ${ideal[f.key].toFixed(1)}${f.unit}
-                </div>
+<div class="n-standard">
+  ${ideal[f.key].toFixed(1)}${f.unit}
+</div>
               </div>
               `;
     }).join("");
@@ -3423,6 +3425,7 @@ function getNutritionAdvice(totalFood, ideal) {
 
 function renderConfirmModal() {
   const totalFood = makeTotalFood();
+  const ideal = getIdealNutrition();
 
   document.getElementById("confirmModalContent").innerHTML = `
                 <h3>選択したメニュー</h3>
@@ -3453,18 +3456,56 @@ function renderConfirmModal() {
                   `).join("")}
                 </ul>
 
-                <h3>合計栄養</h3>
+<h3>合計栄養</h3>
 
-                <div class="nutrition-grid">
-                  ${NUTRITION_FIELDS.map(f => `
-                  <div class="nutrition-item">
-                    <div class="n-label">${f.label}</div>
-                    <div class="n-value">
-                      ${totalFood[f.key].toFixed(1)}
-                      <span class="n-unit">${f.unit}</span>
-                    </div>
-                  </div>
-                  `).join("")}
+<div class="nutrition-column-header">
+  <span>栄養素</span>
+  <span>摂取量</span>
+  <span>差分</span>
+  <span>目標値</span>
+</div>
+
+<div class="nutrition-grid">
+${NUTRITION_FIELDS.map(f => {
+    const actual = totalFood[f.key];
+    const target = ideal[f.key];
+    const diff = actual - target;
+    const ratio = target > 0 ? actual / target : 1;
+
+    const diffClass =
+      diff > 0 ? "diff-plus" :
+        diff < 0 ? "diff-minus" : "diff-good";
+
+    const diffText =
+      diff > 0 ? `↑${diff.toFixed(1)}${f.unit}` :
+        diff < 0 ? `↓${Math.abs(diff).toFixed(1)}${f.unit}` :
+          `±0.0${f.unit}`;
+
+    const nutritionState =
+      f.key === "salt_g"
+        ? (ratio > 1 ? "is-high" : "is-good")
+        : ratio < 0.8 ? "is-low"
+          : ratio > 1.2 ? "is-high"
+            : "is-good";
+
+    return `
+    <div class="nutrition-item ${nutritionState}">
+      <div class="n-label">${f.label}</div>
+
+      <div class="nutrition-top">
+        <div class="n-value">
+          ${actual.toFixed(1)}
+          <span class="n-unit">${f.unit}</span>
+        </div>
+        <span class="${diffClass}">${diffText}</span>
+      </div>
+
+      <span class="n-standard">
+        ${target.toFixed(1)}${f.unit}
+      </span>
+    </div>
+  `;
+  }).join("")}
                 </div>
                 `;
 
@@ -4271,7 +4312,15 @@ function renderTodayPage() {
 
                       </div>
 
-                      <div class="nutrition-grid">
+  <!-- 栄養成分の見出し -->
+<div class="nutrition-column-header">
+  <span>栄養素</span>
+  <span>摂取量</span>
+  <span>差分</span>
+  <span>目標値</span>
+</div>
+
+<div class="nutrition-grid">
 
                         ${NUTRITION_FIELDS.map(field => {
     const actualValue = totalFood[field.key];
@@ -4282,26 +4331,26 @@ function renderTodayPage() {
 
     let nutritionState = "is-good";
     let diffClass = "diff-good";
-    let diffText = "適正";
+    let diffText = "±0.0";
 
+    if (diff > 0) {
+      diffClass = "diff-plus";
+      diffText = `↑${diff.toFixed(1)}${field.unit}`;
+    } else if (diff < 0) {
+      diffClass = "diff-minus";
+      diffText = `↓${Math.abs(diff).toFixed(1)}${field.unit}`;
+    } else {
+      diffClass = "diff-good";
+      diffText = `±0.0${field.unit}`;
+    }
+
+    /* 既存の栄養状態の判定は維持 */
     if (field.key === "salt_g") {
-      if (ratio > 1.0) {
-        nutritionState = "is-high";
-        diffClass = "diff-plus";
-        diffText = `基準超過 +${diff.toFixed(1)}${field.unit}`;
-      } else {
-        nutritionState = "is-good";
-        diffClass = "diff-good";
-        diffText = "基準以内";
-      }
+      nutritionState = ratio > 1.0 ? "is-high" : "is-good";
     } else if (ratio < 0.8) {
       nutritionState = "is-low";
-      diffClass = "diff-minus";
-      diffText = `不足 ${Math.abs(diff).toFixed(1)}${field.unit}`;
     } else if (ratio > 1.2) {
       nutritionState = "is-high";
-      diffClass = "diff-plus";
-      diffText = `多め +${diff.toFixed(1)}${field.unit}`;
     }
 
     return `
@@ -4326,9 +4375,9 @@ function renderTodayPage() {
 
                             </div>
 
-                            <span class="n-standard">
-                              目標 ${idealValue.toFixed(1)}${field.unit}
-                            </span>
+<span class="n-standard">
+  ${idealValue.toFixed(1)}${field.unit}
+</span>
 
                           </div>
                           `;
@@ -5024,12 +5073,34 @@ function renderMyPage() {
   document.getElementById("profileCard").innerHTML = `
                   <div class="profile-card">
 
-                    <h3>基本情報</h3>
-                    <p>学籍番号：${studentId || "未登録"}</p>
-                    <p>性別：${gender === "male" ? "男性" : "女性"}</p>
-                    <p>年齢：${age}歳</p>
-                    <p>身長：${height}cm</p>
-                    <p>体重：${weight}kg</p>
+<h3>基本情報</h3>
+
+<div class="profile-student">
+  <span>学籍番号</span>
+  <strong>${studentId || "未登録"}</strong>
+</div>
+
+<div class="profile-info-grid">
+  <div class="profile-info-item">
+    <span>性別</span>
+    <strong>${gender === "male" ? "男性" : "女性"}</strong>
+  </div>
+
+  <div class="profile-info-item">
+    <span>年齢</span>
+    <strong>${age}歳</strong>
+  </div>
+
+  <div class="profile-info-item">
+    <span>身長</span>
+    <strong>${height}cm</strong>
+  </div>
+
+  <div class="profile-info-item">
+    <span>体重</span>
+    <strong>${weight}kg</strong>
+  </div>
+</div>
                     <button type="button" id="editProfileBtn" class="edit-profile-btn">
                       基本情報を変更
                     </button>
@@ -5064,12 +5135,55 @@ function renderCalendar() {
   const year = calendarYear;
   const month = calendarMonth;
 
+  // 表示中の月の食事履歴を取得
+  const monthKey =
+    `${year}-${String(month + 1).padStart(2, "0")}-`;
+
+  const monthlyRecords = Object.entries(mealHistory)
+    .filter(([date]) => date.startsWith(monthKey))
+    .map(([, record]) => record);
+
+  // 月の合計金額
+  const monthlyTotal = monthlyRecords.reduce((sum, record) => {
+    return sum + (Number(record.total?.price) || 0);
+  }, 0);
+
+  // 利用日数
+  const monthlyDays = monthlyRecords.filter(
+    record => record.foods?.length > 0
+  ).length;
+
+  // 1日あたりの平均金額
+  const monthlyAverage =
+    monthlyDays > 0 ? Math.round(monthlyTotal / monthlyDays) : 0;
+
   const firstDay = new Date(year, month, 1).getDay();
 
   const lastDate = new Date(year, month + 1, 0).getDate();
 
   let html = `
-                  <div class="calendar-card">
+  <div class="monthly-report">
+    <h3>🍽️ ${month + 1}月の学食レポート</h3>
+
+    <div class="monthly-total">
+      <span>今月の合計金額</span>
+      <strong>¥${monthlyTotal.toLocaleString()}</strong>
+    </div>
+
+    <div class="monthly-stats">
+      <div class="monthly-stat">
+        <span>利用日数</span>
+        <strong>${monthlyDays}日</strong>
+      </div>
+
+      <div class="monthly-stat">
+        <span>1日あたりの平均</span>
+        <strong>¥${monthlyAverage.toLocaleString()}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="calendar-card">
 
                     <div class="calendar-header">
                       <button type="button" id="prevMonthBtn">‹</button>
@@ -5097,24 +5211,40 @@ function renderCalendar() {
     const dateKey = `${year}-${String(month +
       1).padStart(2, "0")}-${String(day).padStart(2, "0")}`; const hasMeal = mealHistory[dateKey]; const
         todayKey = formatCafeteriaDate(new Date()); const isToday = dateKey === todayKey; html += ` <button
-                      class="calendar-day ${hasMeal ? " has-meal" : ""}" data-date="${dateKey}" ${hasMeal ? ""
-            : "disabled"}>
+class="calendar-day ${hasMeal ? " has-meal" : ""}"
+data-date="${dateKey}"
+${dateKey > todayKey ? "disabled" : ""}>
                       ${day}
 
-                      ${hasMeal ? "<div>🍽</div>" : ""}
+${hasMeal ? '<span class="meal-dot"></span>' : ""}
                       </button>
                       `;
   }
 
   html += `
-                  </div>
+    </div>
+
+    <div class="calendar-legend">
+      <span class="legend-dot"></span>
+      <span>食事記録あり</span>
+    </div>
+
   </div>
-  `;
+`;
 
   document.getElementById("calendarArea").innerHTML = html;
 
   document.querySelectorAll(".calendar-day").forEach(btn => {
     btn.addEventListener("click", () => {
+
+      // ほかの日付の選択状態を解除
+      document.querySelectorAll(".calendar-day").forEach(day => {
+        day.classList.remove("selected");
+      });
+
+      // 選択した日付を強調
+      btn.classList.add("selected");
+
       showHistoryDetail(btn.dataset.date);
     });
   });
@@ -5143,7 +5273,43 @@ function showHistoryDetail(date) {
 
   const data = mealHistory[date];
 
-  if (!data) return;
+  // 食事記録がない日の表示
+  if (!data) {
+    document.getElementById("historyDetail").innerHTML = `
+    <div class="history-detail-card">
+      <h3>${date} の食事記録</h3>
+
+      <div class="history-empty">
+        <p>この日の食事記録はまだありません。</p>
+
+        <button type="button" id="addHistoryMealBtn">
+          ＋ 食事を追加する
+        </button>
+      </div>
+    </div>
+  `;
+    // カレンダーから追加する日付を保持
+    document.getElementById("addHistoryMealBtn").onclick = () => {
+
+      // 選択した日付を保持
+      editingMealDate = date;
+
+      // マイページを非表示
+      document.getElementById("mypagePage").style.display = "none";
+
+      // メニュー一覧を表示
+      document.getElementById("selectMenuPage").style.display = "block";
+
+      // 画面上部へ移動
+      window.scrollTo({
+        top: 0,
+        behavior: "auto"
+      });
+
+      console.log("食事追加の対象日:", editingMealDate);
+    };
+    return;
+  }
 
   const ideal = getIdealNutrition();
   const advice = getNutritionAdvice(data.total, ideal);
@@ -5161,20 +5327,54 @@ function showHistoryDetail(date) {
   ).join("")}
       </ul>
 
-      <hr>
+           <hr>
 
-      <p>エネルギー：${data.total.energy_kcal.toFixed(1)}kcal</p>
-      <p>たんぱく質：${data.total.protein_g.toFixed(1)}g</p>
-      <p>脂質：${data.total.fat_g.toFixed(1)}g</p>
-      <p>炭水化物：${data.total.carb_g.toFixed(1)}g</p>
-      <p>食塩相当量：${data.total.salt_g.toFixed(1)}g</p>
+      <div class="history-nutrition-header">
+        <span>栄養素</span>
+        <span>摂取量</span>
+        <span>差分</span>
+        <span>目標値</span>
+      </div>
+
+      <div class="history-nutrition-grid">
+        ${[
+      { key: "energy_kcal", label: "エネルギー", unit: "kcal" },
+      { key: "protein_g", label: "たんぱく質", unit: "g" },
+      { key: "fat_g", label: "脂質", unit: "g" },
+      { key: "carb_g", label: "炭水化物", unit: "g" },
+      { key: "salt_g", label: "食塩相当量", unit: "g" }
+    ].map(f => {
+      const actual = data.total[f.key];
+      const target = ideal[f.key];
+      const diff = actual - target;
+
+      const diffText =
+        diff > 0 ? `↑${diff.toFixed(1)}${f.unit}` :
+          diff < 0 ? `↓${Math.abs(diff).toFixed(1)}${f.unit}` :
+            `±0.0${f.unit}`;
+
+      const diffClass =
+        diff > 0 ? "diff-plus" :
+          diff < 0 ? "diff-minus" : "diff-good";
+
+      return `
+            <div class="history-nutrition-item">
+              <span class="history-n-label">${f.label}</span>
+              <span class="history-n-value">${actual.toFixed(1)}${f.unit}</span>
+              <span class="${diffClass}">${diffText}</span>
+              <span class="history-n-standard">${target.toFixed(1)}${f.unit}</span>
+            </div>
+          `;
+    }).join("")}
+      </div>
+
       <div class="advice-box">
         <h3>📊 栄養コメント</h3>
-
         <ul>
           ${advice.map(a => `<li>${a}</li>`).join("")}
         </ul>
       </div>
+
     </div>
     `;
 }
@@ -5192,9 +5392,19 @@ document.getElementById("confirmRegisterBtn")
       storage.getItem(getUserKey("mealHistory")) || "{}"
     );
 
+    // 過去の日付を編集中かどうか
+    const isHistoryEditing = editingMealDate !== null;
+
+    // 今日の食事データを一時的に保持
+    const originalRegisteredFoods = registeredFoods;
+    const originalRegisteredTotalFood = registeredTotalFood;
+
     const todayDateKey = formatCafeteriaDate(new Date());
 
-    const savedFoods = savedHistory[todayDateKey]?.foods || [];
+    // カレンダーから追加する場合は選択した日付を使用
+    const targetDateKey = editingMealDate || todayDateKey;
+
+    const savedFoods = savedHistory[targetDateKey]?.foods || [];
 
     // 保存済みの料理を優先し、新しい料理を追加する
     registeredFoods = [
@@ -5213,15 +5423,17 @@ document.getElementById("confirmRegisterBtn")
     };
 
     selectedFood = registeredTotalFood;
-    sendMealDataToSheet();
-    const todayKey = formatCafeteriaDate(new Date());
 
+    // 通常の食事登録の場合のみ外部送信
+    if (!editingMealDate) {
+      sendMealDataToSheet();
+    }
     const mealHistory = JSON.parse(
       storage.getItem(getUserKey("mealHistory")) || "{}"
     );
 
-    mealHistory[todayKey] = {
-      date: todayKey,
+    mealHistory[targetDateKey] = {
+      date: targetDateKey,
       foods: registeredFoods,
       total: registeredTotalFood
     };
@@ -5231,6 +5443,11 @@ document.getElementById("confirmRegisterBtn")
       JSON.stringify(mealHistory)
     );
 
+    // 過去の日付への登録だった場合、今日の食事を復元
+    if (isHistoryEditing) {
+      loadTodayMealFromHistory();
+      selectedFood = registeredTotalFood;
+    }
     selectedFoods = [];
     renderMenuList();
     updateSelectedBar();
@@ -5238,8 +5455,16 @@ document.getElementById("confirmRegisterBtn")
     document.getElementById("confirmModal").style.display = "none";
     document.getElementById("selectMenuPage").style.display = "none";
     document.getElementById("detailPage").style.display = "none";
-    document.getElementById("todayPage").style.display = "block";
-    document.getElementById("mypagePage").style.display = "none";
+
+    if (isHistoryEditing) {
+      // 過去の日付を登録した場合はマイページへ
+      document.getElementById("todayPage").style.display = "none";
+      document.getElementById("mypagePage").style.display = "block";
+    } else {
+      // 通常登録の場合は本日の食事へ
+      document.getElementById("todayPage").style.display = "block";
+      document.getElementById("mypagePage").style.display = "none";
+    }
 
     document
       .getElementById("appContainer")
@@ -5248,7 +5473,19 @@ document.getElementById("confirmRegisterBtn")
     document.getElementById("bottomNav").style.display = "flex";
 
     renderTodayPage();
-    setActiveTab(todayTab);
+
+    if (isHistoryEditing) {
+      // カレンダーと選択日の履歴を更新
+      renderCalendar();
+      showHistoryDetail(editingMealDate);
+
+      // 編集モードを終了
+      editingMealDate = null;
+
+      setActiveTab(mypageTab);
+    } else {
+      setActiveTab(todayTab);
+    }
 
     window.scrollTo({
       top: 0,

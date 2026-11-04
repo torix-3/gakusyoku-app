@@ -325,17 +325,9 @@
 
         <div class="cafeteria-week-navigation">
 
-          <button type="button" id="prevCafeteriaWeek" class="cafeteria-week-arrow">
-            ❮
-          </button>
-
           <div id="cafeteriaWeekDays" class="cafeteria-week-days">
             <!-- JavaScriptで月〜金の日付を表示 -->
           </div>
-
-          <button type="button" id="nextCafeteriaWeek" class="cafeteria-week-arrow">
-            ❯
-          </button>
 
         </div>
       </div>
@@ -397,7 +389,7 @@
       <!-- 選択中の料理 -->
       <div id="selectedBar" class="selected-bar" style="display:none;">
         <span id="selectedCount">選択中 0品</span>
-        <button type="button" id="finishSelectBtn">まとめて登録</button>
+        <button type="button" id="finishSelectBtn">確認</button>
       </div>
 
     </div>
@@ -411,12 +403,21 @@
 
         <div class="detail-hero" id="detailHero"></div>
 
-        <h2 id="detailTitle"></h2>
+        <div class="detail-title-row">
+          <h2 id="detailTitle"></h2>
+          <span class="detail-price" id="detailPrice"></span>
+        </div>
+
         <div class="detail-category" id="detailCategory"></div>
 
         <div class="detail-meta">
-          <span class="detail-price" id="detailPrice"></span>
           <span class="detail-tags" id="detailTags"></span>
+        </div>
+        <div class="nutrition-column-header detail-nutrition-header">
+          <span>栄養素</span>
+          <span>摂取量</span>
+          <span>差分</span>
+          <span>目標値</span>
         </div>
 
         <div class="nutrition-grid" id="nutritionGrid"></div>

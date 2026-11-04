@@ -523,7 +523,7 @@ label {
 
 .gender-btn {
   flex: 1;
-  border: none;
+  border: 3px solid #C9CDD3;
   border-radius: 20px;
   padding: 20px;
   font-size: 22px;
@@ -539,6 +539,7 @@ label {
 
 .gender-btn.selected {
   background: #ff5722;
+  border-color: #ff5722;
   color: white;
 }
 
@@ -652,6 +653,22 @@ input[type="text"] {
 .tab-item.active {
   color: #ff5722;
   border-bottom-color: #ff5722;
+}
+
+/* カテゴリータブ間の区切り線 */
+.tab-item+.tab-item {
+  position: relative;
+}
+
+.tab-item+.tab-item::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 22px;
+  background: #D1D5DB;
 }
 
 /* =========================
@@ -1122,15 +1139,13 @@ input[type="text"] {
   z-index: 2;
 }
 
-/* 実際の数値 */
+/* カード裏面：栄養成分の数値 */
 .quick-nutrition-value {
-  margin-top: 3px;
-
+  margin-top: 4px;
   text-align: right;
-
-  color: #aaa;
-  font-size: 8px;
-  font-weight: 700;
+  color: #222;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 /* =========================
@@ -2306,7 +2321,7 @@ input[type="text"] {
 
 .calendar-day {
   min-height: 50px;
-  border: none;
+  border: 1px solid #D1D5DB;
   border-radius: 10px;
   background: #f5f5f5;
   font-size: 12px;
@@ -2491,6 +2506,22 @@ input[type="text"] {
 /* 一番右の線などを消す */
 .bottom-nav button:last-child {
   border-right: none;
+}
+
+/* 下部ナビのボタン間に区切り線を追加 */
+.bottom-nav button+button::after {
+  content: "";
+  position: absolute;
+
+  left: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 1px;
+  height: 32px;
+
+  background: #D1D5DB;
+  pointer-events: none;
 }
 
 /* =========================
@@ -3111,10 +3142,10 @@ input[type="text"] {
 .cafeteria-btn {
   flex: 1;
   padding: 14px 10px;
-  border: 2px solid #eeeeee;
+  border: 2px solid #C9CDD3;
   border-radius: 14px;
   background: #f5f5f5;
-  color: #666;
+  color: #444;
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
@@ -3380,4 +3411,1008 @@ input[type="text"] {
   .daily-menu-content {
     gap: 10px;
   }
+}
+
+/* =====================================
+   本日の食事：栄養成分を5行表示
+===================================== */
+
+/* 栄養成分の一覧を縦1列にする */
+#todayFood .nutrition-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+/* 栄養成分1項目を横並びにする */
+#todayFood .nutrition-item {
+  display: grid;
+  grid-template-columns: minmax(82px, 1.2fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 10px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+}
+
+/* 栄養素の名前 */
+#todayFood .nutrition-item .n-label {
+  margin: 0;
+  font-size: 12px;
+}
+
+/* 実際の摂取量と差分 */
+#todayFood .nutrition-item .nutrition-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* 基準値 */
+#todayFood .nutrition-item .n-standard {
+  margin: 0;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* 栄養成分の文字サイズ調整 */
+
+/* 栄養素名 */
+#todayFood .nutrition-item .n-label {
+  font-size: 16px;
+}
+
+/* 摂取量 */
+#todayFood .nutrition-item .n-value {
+  font-size: 19px;
+}
+
+/* 基準との差分 */
+#todayFood .nutrition-item .diff-plus,
+#todayFood .nutrition-item .diff-minus,
+#todayFood .nutrition-item .diff-good {
+  font-size: 16px;
+}
+
+/* 基準値 */
+#todayFood .nutrition-item .n-standard {
+  font-size: 16px;
+}
+
+/* 栄養成分を横一列に固定 */
+#todayFood .nutrition-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 12px 6px;
+}
+
+/* 栄養素名 */
+#todayFood .nutrition-item .n-label {
+  flex: 0 0 86px;
+  font-size: 15px;
+}
+
+/* 摂取量と差分を横並びにする */
+#todayFood .nutrition-item .nutrition-top {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* 摂取量 */
+#todayFood .nutrition-item .n-value {
+  font-size: 17px;
+  white-space: nowrap;
+}
+
+/* 差分 */
+#todayFood .nutrition-item .diff-plus,
+#todayFood .nutrition-item .diff-minus,
+#todayFood .nutrition-item .diff-good {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* 基準値 */
+#todayFood .nutrition-item .n-standard {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* 栄養成分の摂取量と差分を横一列にする */
+#todayFood .nutrition-item .nutrition-top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+/* 摂取量と差分の改行を防ぐ */
+#todayFood .nutrition-item .n-value,
+#todayFood .nutrition-item .diff-plus,
+#todayFood .nutrition-item .diff-minus,
+#todayFood .nutrition-item .diff-good {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* =====================================
+   栄養成分：文字色と横並びの調整
+===================================== */
+
+/* 4つの項目を横並びに配置 */
+#todayFood .nutrition-item {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 1fr;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+}
+
+/* 栄養素名 */
+#todayFood .nutrition-item .n-label {
+  width: auto;
+  flex: initial;
+  color: #333;
+}
+
+/* 真ん中の摂取量・差分 */
+#todayFood .nutrition-item .nutrition-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* 摂取量 */
+#todayFood .nutrition-item .n-value {
+  color: #222;
+  white-space: nowrap;
+}
+
+/* g・kcalなどの単位 */
+#todayFood .nutrition-item .n-unit {
+  color: #333;
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* 差分 */
+#todayFood .nutrition-item .diff-plus,
+#todayFood .nutrition-item .diff-minus,
+#todayFood .nutrition-item .diff-good {
+  white-space: nowrap;
+}
+
+/* 目標値 */
+#todayFood .nutrition-item .n-standard {
+  color: #333;
+  opacity: 1;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* 栄養成分の列見出し */
+#todayFood .nutrition-column-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  align-items: center;
+  gap: 6px;
+
+  padding: 10px 8px;
+  border-bottom: 2px solid #D1D5DB;
+
+  color: #555;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* 見出しと数値の列幅を統一 */
+#todayFood .nutrition-item {
+  grid-template-columns: 1.2fr 2fr 1fr;
+}
+
+/* 栄養成分：見出しと数値の列幅を統一 */
+#todayFood .nutrition-column-header,
+#todayFood .nutrition-item {
+  display: grid;
+  grid-template-columns: 29% 19% 27% 25%;
+  align-items: center;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+/* 栄養成分のカード */
+#todayFood .nutrition-item {
+  padding: 12px 4px;
+}
+
+/* 摂取量と差分を独立した列として扱う */
+#todayFood .nutrition-item .nutrition-top {
+  display: contents;
+}
+
+/* 各列の文字配置 */
+#todayFood .nutrition-item .n-label,
+#todayFood .nutrition-item .n-value,
+#todayFood .nutrition-item .n-standard {
+  text-align: center;
+  min-width: 0;
+}
+
+/* 栄養素名 */
+#todayFood .nutrition-item .n-label {
+  font-size: 14px;
+}
+
+/* 摂取量 */
+#todayFood .nutrition-item .n-value {
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+/* 差分 */
+#todayFood .nutrition-item .diff-plus,
+#todayFood .nutrition-item .diff-minus,
+#todayFood .nutrition-item .diff-good {
+  font-size: 12px;
+  white-space: nowrap;
+  justify-self: center;
+}
+
+/* 目標値 */
+#todayFood .nutrition-item .n-standard {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* 見出しも中央揃え */
+#todayFood .nutrition-column-header span {
+  text-align: center;
+}
+
+/* =====================================
+   料理詳細画面：栄養成分を4列×5行に統一
+===================================== */
+
+/* 栄養情報全体を縦5行にする */
+#detailPage #nutritionGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+/* 見出しと栄養成分の列幅を統一 */
+#detailPage .detail-nutrition-header,
+#detailPage #nutritionGrid .nutrition-item {
+  display: grid;
+  grid-template-columns: 29% 19% 27% 25%;
+  align-items: center;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+/* 見出し */
+#detailPage .detail-nutrition-header {
+  padding: 10px 4px;
+  border-bottom: 2px solid #D1D5DB;
+  color: #555;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+#detailPage .detail-nutrition-header span {
+  text-align: center;
+}
+
+/* 栄養成分の各行 */
+#detailPage #nutritionGrid .nutrition-item {
+  grid-column: auto;
+  padding: 12px 4px;
+}
+
+/* 摂取量と差分を別々の列に配置 */
+#detailPage #nutritionGrid .nutrition-top {
+  display: contents;
+}
+
+/* 栄養素名 */
+#detailPage #nutritionGrid .n-label {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+}
+
+/* 摂取量 */
+#detailPage #nutritionGrid .n-value {
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+/* g・kcalの文字を濃くする */
+#detailPage #nutritionGrid .n-unit {
+  color: #333;
+  opacity: 1;
+  font-weight: 700;
+}
+
+/* 差分 */
+#detailPage #nutritionGrid .diff-plus,
+#detailPage #nutritionGrid .diff-minus,
+#detailPage #nutritionGrid .diff-good {
+  font-size: 12px;
+  white-space: nowrap;
+  justify-self: center;
+}
+
+/* 目標値 */
+#detailPage #nutritionGrid .n-standard {
+  margin: 0;
+  color: #333;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 各列の中央揃え */
+#detailPage #nutritionGrid .n-label,
+#detailPage #nutritionGrid .n-value,
+#detailPage #nutritionGrid .n-standard {
+  text-align: center;
+  min-width: 0;
+}
+
+/* 料理詳細：料理名と値段を横並びにする */
+#detailPage .detail-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+#detailPage #detailTitle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 24px;
+}
+
+#detailPage .detail-price {
+  flex-shrink: 0;
+  font-size: 24px;
+  color: #ff5722;
+  font-weight: 800;
+}
+
+/* =====================================
+   確認画面：栄養成分を4列×5行に統一
+===================================== */
+
+/* 栄養成分を縦5行にする */
+#confirmModal .nutrition-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+/* 見出しと各行の列幅を統一 */
+#confirmModal .nutrition-column-header,
+#confirmModal .nutrition-item {
+  display: grid;
+  grid-template-columns: 29% 19% 27% 25%;
+  align-items: center;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+/* 見出し */
+#confirmModal .nutrition-column-header {
+  padding: 10px 4px;
+  border-bottom: 2px solid #D1D5DB;
+  color: #555;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+#confirmModal .nutrition-column-header span {
+  text-align: center;
+}
+
+/* 栄養成分の各行 */
+#confirmModal .nutrition-item {
+  padding: 12px 4px;
+}
+
+/* 摂取量と差分を別々の列に配置 */
+#confirmModal .nutrition-top {
+  display: contents;
+}
+
+/* 栄養素名 */
+#confirmModal .n-label {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+  text-align: center;
+  min-width: 0;
+}
+
+/* 摂取量 */
+#confirmModal .n-value {
+  color: #222;
+  font-size: 16px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* 単位 */
+#confirmModal .n-unit {
+  color: #333;
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* 差分 */
+#confirmModal .diff-plus,
+#confirmModal .diff-minus,
+#confirmModal .diff-good {
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  justify-self: center;
+}
+
+/* 目標値 */
+#confirmModal .n-standard {
+  margin: 0;
+  color: #333;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* 確認画面：戻るボタンを見やすくする */
+#confirmModal #reselectBtn {
+  background: #f5f5f5;
+  color: #333;
+  border: 2px solid #777;
+  font-weight: 800;
+}
+
+/* =====================================
+   マイページ：食事履歴の栄養表示
+===================================== */
+
+.history-detail-card .history-nutrition-header,
+.history-detail-card .history-nutrition-item {
+  display: grid;
+  grid-template-columns: 29% 19% 27% 25%;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* 見出し */
+.history-detail-card .history-nutrition-header {
+  padding: 10px 2px;
+  border-bottom: 2px solid #d1d5db;
+  font-size: 12px;
+  font-weight: 800;
+  color: #555;
+}
+
+/* 各栄養素を縦5行にする */
+.history-detail-card .history-nutrition-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 12px 0 20px;
+}
+
+.history-detail-card .history-nutrition-item {
+  padding: 10px 2px;
+  border-bottom: 1px solid #eee;
+}
+
+/* 各列の文字 */
+.history-detail-card .history-nutrition-header span,
+.history-detail-card .history-nutrition-item span {
+  text-align: center;
+  min-width: 0;
+}
+
+/* 栄養素名 */
+.history-detail-card .history-n-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* 摂取量 */
+.history-detail-card .history-n-value {
+  font-size: 13px;
+  font-weight: 800;
+  color: #222;
+  white-space: nowrap;
+}
+
+/* 差分 */
+.history-detail-card .diff-plus,
+.history-detail-card .diff-minus,
+.history-detail-card .diff-good {
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* 目標値 */
+.history-detail-card .history-n-standard {
+  font-size: 11px;
+  font-weight: 700;
+  color: #444;
+  white-space: nowrap;
+}
+
+/* マイページ：選択中の日付 */
+.calendar-day.selected {
+  background: #ff8c42;
+  color: #fff;
+  border: 2px solid #e66b1e;
+  font-weight: 800;
+}
+
+/* 選択中の日付の料理アイコン */
+.calendar-day.selected div {
+  color: #fff;
+}
+
+/* ================================
+   マイページ：月間学食レポート
+================================ */
+
+.monthly-report {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.monthly-report h3 {
+  font-size: 18px;
+  margin: 0 0 16px;
+  color: #333;
+}
+
+.monthly-total {
+  background: #fff3e8;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.monthly-total span,
+.monthly-stat span {
+  color: #666;
+  font-size: 13px;
+}
+
+.monthly-total strong {
+  color: #e87520;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.monthly-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.monthly-stat {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.monthly-stat strong {
+  font-size: 20px;
+  color: #333;
+}
+
+/* =====================================
+   マイページ：カレンダーデザイン改善
+===================================== */
+
+/* カレンダー全体 */
+.calendar-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.06);
+}
+
+/* 日付の配置 */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  text-align: center;
+}
+
+/* 通常の日付 */
+.calendar-day {
+  min-width: 0;
+  min-height: 48px;
+  padding: 6px 2px;
+  border: 1px solid #eeeeee;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #555555;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* 食事記録がある日 */
+.calendar-day.has-meal {
+  background: #fff3e8;
+  border: 1px solid #ffca9b;
+  color: #d96b16;
+  font-weight: 800;
+}
+
+/* 記録日の料理アイコン */
+.calendar-day.has-meal div {
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+/* 選択中の日付 */
+.calendar-day.selected,
+.calendar-day.has-meal.selected {
+  background: #ff8c42;
+  border: 2px solid #e66b1e;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+/* 記録のない日 */
+.calendar-day:disabled {
+  opacity: 0.65;
+}
+
+/* 日付を押したとき */
+.calendar-day:not(:disabled) {
+  cursor: pointer;
+}
+
+.calendar-day:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+/* 食事記録がある日のオレンジの点 */
+.calendar-day .meal-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  margin: 5px auto 0;
+  border-radius: 50%;
+  background: #f58b2a;
+}
+
+/* 選択中は白い点にする */
+.calendar-day.selected .meal-dot {
+  background: #ffffff;
+}
+
+/* =====================================
+   カレンダー：曜日と月切り替えボタン
+===================================== */
+
+/* 曜日の見出し */
+.calendar-grid>div:nth-child(-n+7) {
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: #666;
+}
+
+/* 日曜日 */
+.calendar-grid>div:first-child {
+  color: #e35d5d;
+}
+
+/* 土曜日 */
+.calendar-grid>div:nth-child(7) {
+  color: #4b8ed8;
+}
+
+/* カレンダー上部 */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+/* 年月の表示 */
+.calendar-header h3 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  color: #333;
+}
+
+/* 前月・翌月ボタン */
+.calendar-header button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  background: #f7f7f7;
+  color: #444;
+  font-size: 25px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ボタンを押したとき */
+.calendar-header button:active {
+  background: #ffe6d1;
+  transform: scale(0.95);
+}
+
+/* カレンダー下部の凡例 */
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 14px;
+  padding-right: 4px;
+  color: #777;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 凡例のオレンジの点 */
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f58b2a;
+}
+
+/* =====================================
+   マイページ：基本情報カードの改善
+===================================== */
+
+/* 基本情報カード */
+.profile-card {
+  padding: 20px 16px;
+}
+
+/* 見出し */
+.profile-card h3 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* 学籍番号 */
+.profile-student {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.profile-student span,
+.profile-info-item span {
+  font-size: 12px;
+  color: #777;
+  font-weight: 600;
+}
+
+.profile-student strong {
+  font-size: 16px;
+  color: #333;
+}
+
+/* 性別・年齢・身長・体重を2列に */
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* 各情報のカード */
+.profile-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 12px;
+  border-radius: 12px;
+  background: #f5f5f5;
+}
+
+.profile-info-item strong {
+  font-size: 17px;
+  font-weight: 800;
+  color: #333;
+}
+
+/* =====================================
+   基本情報：コンパクト版
+===================================== */
+
+.profile-card {
+  padding: 14px 16px;
+}
+
+.profile-card h3 {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+
+/* 学籍番号 */
+.profile-student {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+
+/* 2列配置 */
+.profile-info-grid {
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* 各項目を横並びに */
+.profile-info-item {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* ラベル */
+.profile-info-item span,
+.profile-student span {
+  font-size: 12px;
+}
+
+/* 数値 */
+.profile-info-item strong,
+.profile-student strong {
+  font-size: 14px;
+}
+
+/* 変更ボタン */
+.profile-card .edit-profile-btn {
+  margin-top: 0;
+  padding: 10px 12px;
+  min-height: 40px;
+}
+
+/* カレンダー：記録のない日も見やすくする */
+.calendar-day:disabled {
+  opacity: 1;
+  color: #888;
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+}
+
+/* 食事記録がある日を強調 */
+.calendar-day.has-meal {
+  color: #d96b16;
+  font-weight: 800;
+}
+
+/* =====================================
+   月間学食レポート：コンパクト版
+===================================== */
+
+/* レポート全体 */
+.monthly-report {
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+/* タイトル */
+.monthly-report h3 {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+/* 合計金額 */
+.monthly-total {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.monthly-total strong {
+  font-size: 23px;
+}
+
+/* 利用日数・平均金額 */
+.monthly-stats {
+  gap: 8px;
+}
+
+.monthly-stat {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 10px 8px;
+}
+
+.monthly-stat span {
+  font-size: 11px;
+}
+
+.monthly-stat strong {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* 食事履歴：未登録日の表示 */
+.history-empty {
+  padding: 18px 10px;
+  text-align: center;
+}
+
+.history-empty p {
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+#addHistoryMealBtn {
+  background: #ff8c42;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 800;
 }
