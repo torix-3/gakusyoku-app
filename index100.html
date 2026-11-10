@@ -335,8 +335,8 @@
       <!-- 学食切り替え -->
       <div class="cafeteria-switch">
 
-        <button type="button" class="cafeteria-btn active" data-building="3">
-          🏫 3号館
+        <button type="button" class="cafeteria-btn active" data-building="2">
+          🏫 2号館
         </button>
 
         <button type="button" class="cafeteria-btn" data-building="13">
@@ -345,7 +345,7 @@
 
       </div>
 
-      <!-- 3号館 日替わりメニュー -->
+      <!-- 2号館 日替わりメニュー -->
       <div id="dailyMenuCard" class="daily-menu-card">
 
         <div class="daily-menu-header">
@@ -381,7 +381,30 @@
       <div id="weeklyMenuInfo" class="weekly-menu-info" style="display:none;"></div>
 
       <!-- メニューカテゴリ -->
-      <div class="tab-bar" id="tabBar"></div>
+      <div class="tab-navigation">
+
+        <button type="button" id="tabScrollLeft" class="tab-scroll-btn" aria-label="左へ">
+          &#10094;
+        </button>
+
+        <div class="tab-bar" id="tabBar"></div>
+
+        <button type="button" id="tabScrollRight" class="tab-scroll-btn" aria-label="右へ">
+          &#10095;
+        </button>
+
+      </div>
+
+      <!-- 過去の食事を編集中のみ表示 -->
+      <button type="button" id="cancelHistoryEditBtn" class="cancel-history-edit-btn" style="display:none;">
+        <span class="cancel-edit-icon">←</span>
+
+        <span class="cancel-edit-text">
+          <strong>編集を終了する</strong>
+          <small>今日の食事登録に戻る</small>
+        </span>
+
+      </button>
 
       <!-- メニュー一覧 -->
       <div id="menuList"></div>
@@ -442,9 +465,10 @@
           </label>
         </div>
 
-        <button type="button" class="next-btn enabled" id="registerBtn">
-          選択リストに追加
-        </button>
+        <div id="detailActionRow" class="detail-action-row">
+          <button type="button" class="next-btn enabled" id="registerBtn">選択リストに追加</button>
+          <button type="button" class="next-btn enabled" id="removeDetailBtn" style="display:none;">リストから消去</button>
+        </div>
 
         <button type="button" class="back-link" id="backToMenuBtnBottom">
           ← 一覧へ戻る
@@ -492,6 +516,18 @@
         <div id="calendarArea"></div>
 
         <div id="historyDetail"></div>
+        <!-- 月別栄養グラフ -->
+        <section id="monthlyNutritionSection">
+
+          <h3>📊 月別の栄養摂取状況</h3>
+
+          <div id="monthlyNutritionControls"></div>
+
+          <div class="monthly-chart-area">
+            <canvas id="monthlyNutritionChart"></canvas>
+          </div>
+
+        </section>
       </div>
 
     </div>

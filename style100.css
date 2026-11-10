@@ -3300,7 +3300,7 @@ input[type="text"] {
 }
 
 /* =========================
-   3号館 日替わりメニューカード
+   2号館 日替わりメニューカード
 ========================= */
 
 .daily-menu-card {
@@ -4415,4 +4415,541 @@ input[type="text"] {
   padding: 12px 20px;
   font-size: 14px;
   font-weight: 800;
+}
+
+/* 過去の食事記録：食事追加ボタン */
+#addHistoryMealBtn {
+  display: block;
+  width: calc(100% - 40px);
+  margin: 20px auto;
+  padding: 14px 16px;
+
+  background: #ff5722;
+  color: white;
+  border: none;
+  border-radius: 14px;
+
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* =========================
+   マイページ：月別栄養グラフ
+========================= */
+
+#monthlyNutritionSection {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+#monthlyNutritionSection h3 {
+  font-size: 18px;
+  margin: 0 0 18px;
+  color: #333;
+}
+
+#monthlyNutritionControls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.monthly-chart-area {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+
+#monthlyNutritionChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* =========================
+   履歴編集終了ボタン
+========================= */
+
+.cancel-history-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 13px 15px;
+
+  background: #fff3e7;
+  border: 1px solid #ffd4b1;
+  border-radius: 14px;
+
+  text-align: left;
+  cursor: pointer;
+
+  transition: background 0.2s, transform 0.2s;
+}
+
+.cancel-history-edit-btn:hover {
+  background: #ffe7d2;
+  transform: translateY(-1px);
+}
+
+.cancel-history-edit-btn:active {
+  transform: scale(0.98);
+}
+
+.cancel-edit-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  background: white;
+  color: #e77928;
+  border-radius: 50%;
+
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.cancel-edit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.cancel-edit-text strong {
+  color: #a34b13;
+  font-size: 14px;
+}
+
+.cancel-edit-text small {
+  color: #a8673b;
+  font-size: 12px;
+}
+
+.cancel-edit-arrow {
+  color: #d28b56;
+  font-size: 25px;
+}
+
+/* =========================
+   月別グラフ：栄養素切り替えボタン
+========================= */
+
+#monthlyNutritionControls {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 2px 12px;
+  margin-bottom: 12px;
+  scrollbar-width: none;
+}
+
+#monthlyNutritionControls::-webkit-scrollbar {
+  display: none;
+}
+
+.monthly-nutrient-btn {
+  flex-shrink: 0;
+  padding: 9px 14px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* 選択中のボタン */
+.monthly-nutrient-btn.active {
+  background: #ff9800;
+  color: #fff;
+  border-color: #ff9800;
+  font-weight: bold;
+}
+
+/* =========================
+   カテゴリタブ 左右スクロール
+========================= */
+
+.tab-navigation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 16px;
+}
+
+.tab-navigation .tab-bar {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  margin: 0;
+  padding: 0 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tab-scroll-btn {
+  flex: 0 0 30px;
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  background: #fff0e8;
+  color: #ff5722;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.tab-scroll-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+/* 栄養豆知識カード */
+.nutrition-tip-box { margin-top:16px; padding:18px; border-radius:16px; background:#fff8e8; border:1px solid #ffe1b0; line-height:1.7; }
+.nutrition-tip-box h3 { margin:0 0 10px; font-size:16px; }
+.nutrition-tip-category { color:#c25b23; font-size:12px; font-weight:700; margin-bottom:8px; }
+.nutrition-tip-title { font-weight:800; font-size:15px; color:#3c342c; }
+.nutrition-tip-body { margin:10px 0 0; font-size:14px; color:#51463c; }
+.nutrition-tip-next { display:block; width:100%; margin-top:14px; padding:12px; border:none; border-radius:12px; background:#ff7043; color:white; font-size:14px; font-weight:700; cursor:pointer; }
+.nutrition-tip-next:active { opacity:.8; }
+.nutrition-tip-empty { color:#777; font-size:13px; }
+
+/* おすすめ追加メニュー下のサイドメニュー遷移 */
+.side-menu-link-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px 16px;
+  border: 1px solid #ffb49e;
+  border-radius: 14px;
+  background: #fff7f3;
+  color: #e95325;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.side-menu-link-btn:active { transform: scale(0.99); }
+
+
+/* 数量ステッパー：本日の食事・履歴で共通の丸型ボタン */
+.today-quantity-controls {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.today-quantity-controls .today-quantity-minus,
+.today-quantity-controls .today-quantity-plus,
+.today-quantity-controls .history-quantity-minus,
+.today-quantity-controls .history-quantity-plus {
+  appearance: none;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+  border: 1px solid #ffd7c9;
+  border-radius: 50%;
+  background: #fff2ec;
+  color: #f0643a;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.today-quantity-controls button:not(:disabled):active { transform: scale(.93); }
+.today-quantity-controls button:disabled { opacity: .35; cursor: not-allowed; }
+.today-quantity-controls strong { min-width: 16px; text-align: center; }
+
+/* 200番：詳細画面の丸型チェックUI */
+#detailPage .option-check input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border: 2px solid #ffab91;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+#detailPage .option-check input[type="checkbox"]:checked {
+  background: #ff7043;
+  border-color: #ff7043;
+}
+#detailPage .option-check input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: white;
+  font-size: 15px;
+  font-weight: 900;
+}
+#detailPage .option-check input[type="checkbox"]:focus-visible {
+  outline: 3px solid #ffd0c0;
+  outline-offset: 2px;
+}
+#detailPage #registerBtn.remove-mode {
+  background: #fff0ed;
+  color: #c84b38;
+  border: 1px solid #ffc6b8;
+}
+/* 選択済みカードも詳細を開けることを明示 */
+#menuList .menu-item.selected-menu { cursor: pointer; }
+
+/* 詳細画面：選択済みの変更・削除を並列表示 */
+#detailPage .detail-action-row { display:flex; gap:10px; margin-top:12px; width:100%; }
+#detailPage .detail-action-row .next-btn { flex:1; min-width:0; width:auto; margin:0; border-radius:16px; padding:13px 8px; font-size:14px; }
+#detailPage #removeDetailBtn { background:#fff0ed; color:#bd4935; border:1px solid #f4b4a6; }
+#detailPage #removeDetailBtn:hover { background:#ffe5dd; }
+
+/* 確認画面：スープの飲む・飲まない切替 */
+.modal-toggle-soup-btn {
+  border: none;
+  border-radius: 999px;
+  background: #fff0e7;
+  color: #bf562c;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.modal-toggle-soup-btn[aria-pressed="true"] {
+  background: #fce0d4;
+  color: #a54324;
+}
+
+/* 200番：確認画面の操作ボタンを視認しやすく */
+#confirmModal .confirm-food-actions .modal-add-large-btn,
+#confirmModal .confirm-food-actions .modal-cancel-large-btn,
+#confirmModal .confirm-food-actions .modal-toggle-soup-btn {
+  border: 1.5px solid #343434;
+  border-radius: 999px;
+  padding: 7px 12px;
+  min-height: 32px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  transition: background-color .15s, transform .15s;
+}
+#confirmModal .confirm-food-actions button:active { transform: scale(.97); }
+#confirmModal .confirm-food-actions button:focus-visible { outline: 3px solid #ffb58f; outline-offset: 2px; }
+
+/* 確認画面：栄養レーダーを独立した淡い背景のカードに */
+#confirmModal .modal-chart-area {
+  background: #fff5ed;
+  border: 1px solid #f4dfd1;
+  border-radius: 18px;
+  padding: 16px 10px;
+  margin-top: 18px;
+  height: 272px;
+  box-sizing: border-box;
+}
+
+
+/* ===== 200番：全画面の視覚的な統一（2026-11） ===== */
+/* 本日の食事：確認画面と同じく、丸い操作ボタンの境界を明確に */
+#todayPage .today-food-actions .today-add-large-btn,
+#todayPage .today-food-actions .today-cancel-large-btn,
+#todayPage .today-food-actions .today-soup-btn,
+#todayPage .today-food-actions .today-cancel-soup-btn {
+  border: 1.5px solid #343434;
+  border-radius: 999px;
+  min-height: 33px;
+  padding: 6px 11px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.07);
+}
+#todayPage .today-food-actions button:focus-visible {
+  outline: 3px solid #ffb58f;
+  outline-offset: 2px;
+}
+
+/* 数量：オレンジを抑えた、濃淡のあるモノトーン */
+.today-quantity-controls .today-quantity-minus,
+.today-quantity-controls .today-quantity-plus,
+.today-quantity-controls .history-quantity-minus,
+.today-quantity-controls .history-quantity-plus {
+  background: #e9eaec;
+  color: #292b2f;
+  border: 1.5px solid #8c9096;
+  box-shadow: 0 1px 2px rgba(0,0,0,.09);
+}
+.today-quantity-controls button:not(:disabled):hover {
+  background: #d9dbde;
+  border-color: #555960;
+}
+.today-quantity-controls button:focus-visible {
+  outline: 3px solid #aeb3ba;
+  outline-offset: 2px;
+}
+.today-quantity-controls strong {
+  color: #36383d;
+  font-weight: 800;
+}
+
+/* 本日の食事：各セクションを淡い色のカードにして区切りを強調 */
+#todayPage .today-section {
+  background: #fffaf6;
+  border: 1px solid #f1e2d7;
+  box-shadow: 0 4px 14px rgba(86,58,37,.045);
+}
+#todayPage .today-food-item {
+  background: #ffffff;
+  border-color: #ece3dd;
+}
+/* レーダーは少しだけ濃い色で、他の情報と視覚的に分離 */
+#todayPage .chart-area,
+#detailPage .chart-area,
+#confirmModal .modal-chart-area,
+#recommendModal .modal-chart-area,
+#mypagePage .monthly-chart-area {
+  background: #fff5ed;
+  border: 1px solid #f4dfd1;
+  border-radius: 18px;
+  padding: 14px 10px;
+  box-sizing: border-box;
+}
+#todayPage .chart-area { height: 285px; }
+#detailPage .chart-area { min-height: 270px; }
+#recommendModal .modal-chart-area { height: 260px; }
+#mypagePage .monthly-chart-area { height: 300px; }
+/* 詳細画面・モーダルの周辺カードも暖色の淡い背景で統一 */
+#detailPage > .card,
+#confirmModal .modal-box,
+#recommendModal .modal-box {
+  background: #fffdfb;
+}
+@media (max-width: 380px) {
+  #todayPage .today-food-actions button { font-size: 10px; padding: 6px 9px; }
+  .today-quantity-controls { gap: 6px; }
+}
+
+
+/* ===== 200番：操作ボタンの枠線をやさしいグレーに統一 ===== */
+/* 淡いボタン背景に対して黒が強すぎないよう、輪郭は中間グレーに */
+#confirmModal .confirm-food-actions .modal-add-large-btn,
+#confirmModal .confirm-food-actions .modal-cancel-large-btn,
+#confirmModal .confirm-food-actions .modal-toggle-soup-btn,
+#confirmModal .confirm-food-actions .remove-food-btn,
+#todayPage .today-food-actions .today-add-large-btn,
+#todayPage .today-food-actions .today-cancel-large-btn,
+#todayPage .today-food-actions .today-soup-btn,
+#todayPage .today-food-actions .today-cancel-soup-btn,
+#todayPage .today-food-actions .today-remove-btn {
+  border: 1.5px solid #858585;
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.045);
+}
+/* 削除も同じ輪郭で押せることが分かるように */
+#confirmModal .confirm-food-actions .remove-food-btn,
+#todayPage .today-food-actions .today-remove-btn {
+  background: #eeeeee;
+  color: #4b4b4b;
+  padding: 7px 12px;
+  min-height: 32px;
+  font-weight: 700;
+}
+/* 詳細画面の削除ボタンも同じトーンに */
+#detailPage #removeDetailBtn {
+  border: 1.5px solid #858585;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.045);
+}
+
+
+/* おすすめ追加メニュー：栄養表示を他画面と同じ行形式に */
+#recommendModal .recommend-nutrition-table {
+  background: #fff9f4;
+  border: 1px solid #f0e2d8;
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+#recommendModal .recommend-nutrition-header,
+#recommendModal .recommend-nutrition-row {
+  display: grid;
+  grid-template-columns: 34% 33% 33%;
+  align-items: center;
+  text-align: center;
+}
+#recommendModal .recommend-nutrition-header {
+  color: #555;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 9px 0;
+  border-bottom: 2px solid #d1d5db;
+}
+#recommendModal .recommend-nutrition-row {
+  min-height: 47px;
+  padding: 7px 0;
+  border-bottom: 1px solid #e9e1db;
+  box-sizing: border-box;
+}
+#recommendModal .recommend-nutrition-row:last-child { border-bottom: 0; }
+#recommendModal .recommend-nutrition-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444;
+}
+#recommendModal .recommend-nutrition-value {
+  font-size: 15px;
+  font-weight: 800;
+  color: #333;
+  white-space: nowrap;
+}
+#recommendModal .recommend-nutrition-value small {
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 2px;
+  color: #777;
+}
+#recommendModal .recommend-nutrition-after { color: #d76737; }
+
+/* マイページの月別棒グラフ：淡い暖色背景で周囲となじませる */
+#mypagePage .monthly-chart-area {
+  background: #fff3e9;
+  border: 1px solid #e5e1dc;
+  border-radius: 18px;
+  box-shadow: 0 3px 12px rgba(70, 60, 50, 0.06);
+  padding: 16px 12px;
+  box-sizing: border-box;
+}
+
+/* 月別栄養摂取状況：見出し・切替ボタン・棒グラフをまとめて淡色カードに */
+#mypagePage #monthlyNutritionSection {
+  margin-top: 24px;
+  padding: 18px 14px 20px;
+  background: #fff3e9;
+  border: 1px solid #ecd9cc;
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(86, 58, 37, 0.05);
+}
+#mypagePage #monthlyNutritionSection .monthly-chart-area {
+  background: #fff8f2;
+  border: 1px solid #eadbd0;
+  border-radius: 16px;
+  padding: 12px 8px;
+  box-sizing: border-box;
+  height: 300px;
 }

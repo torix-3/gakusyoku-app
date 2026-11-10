@@ -762,14 +762,35 @@ const MENU_13_DATA = {
     },
 
 
+    // 200番で追加：週間献立画像に基づく週替わりメニュー。栄養情報は企業確認までnull。
+    {"id": "b13-weekly-teishoku-20261109", "name": "メンチカツ定食", "category": "weekly-teishoku", "category_label": "週替わり定食", "tags": [], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
+    {"id": "b13-weekly-don-20261109", "name": "ソースチキンカツ丼", "category": "weekly-don", "category_label": "週替わり丼", "tags": [], "price": 500, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
+    {"id": "b13-weekly-udon-20261109", "name": "はいからうどん＋ミニソースチキンカツ丼", "category": "weekly-udon", "category_label": "う～どん・プチ丼", "tags": [], "price": 480, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
+    {"id": "b13-weekly-don-20261102", "name": "天ぷら丼", "category": "weekly-don", "category_label": "週替わり丼", "tags": [], "price": 500, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
+    {"id": "b13-weekly-udon-20261102", "name": "はいからうどん＋ミニ天ぷら丼", "category": "weekly-udon", "category_label": "う～どん・プチ丼", "tags": [], "price": 480, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
+    {"id": "b13-weekly-teishoku-20261019", "name": "とんかつ定食", "category": "weekly-teishoku", "category_label": "週替わり定食", "tags": [], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
+
   ]
 
 
 };
 
 // =====================================
-// 3号館・13号館 共通メニュー画像の管理
+// 2号館・13号館 共通メニュー画像の管理
 // =====================================
+// 13号館の大盛りは2号館の増量データを暫定利用（実際の価格・栄養価は未確認）。
+// 元の料理の栄養情報が欠けている場合は推測で補完しない。
+function findBaseMenuById(id) {
+  return MENU_DATA.items.find(item => item.id === id) ||
+    MENU_13_DATA.items.find(item => item.id === id);
+}
+function getLargeOptionForFood(food) {
+  if (!food || !["udon", "ramen", "curry"].includes(food.category)) return null;
+  return MENU_DATA.items.find(item =>
+    item.category === food.category && item.tags.includes("option")
+  ) || null;
+}
+
 const SHARED_MENU_IMAGES = {
   "b13-udon-03": "udon-03",
   "b13-udon-05": "udon-05",
@@ -857,7 +878,10 @@ const MENU_13_WEEKLY_SCHEDULE = {
     "b13-t-20261026",
     "b13-d-20261026",
     "b13-u-20261026"
-  ]
+  ],
+  "2026-10-19": ["b13-weekly-teishoku-20261019", "b13-d2", "b13-u2"],
+  "2026-11-02": ["b13-t1", "b13-weekly-don-20261102", "b13-weekly-udon-20261102"],
+  "2026-11-09": ["b13-weekly-teishoku-20261109", "b13-weekly-don-20261109", "b13-weekly-udon-20261109"],
 };
 
 // =====================================
@@ -885,7 +909,7 @@ function getMenu13AvailableIds(date) {
 }
 
 /* =========================
-   3号館 日替わりメニュー
+   2号館 日替わりメニュー
 ========================= */
 
 const MENU_3_DAILY_SCHEDULE = {
@@ -1266,7 +1290,7 @@ let activeCategory = MENU_DATA.categories[0].id;
    学食切り替え機能
 ========================= */
 
-let activeBuilding = "3";
+let activeBuilding = "2";
 
 /* =========================
    13号館 日付切り替え
@@ -1305,7 +1329,7 @@ function formatCafeteriaDate(date) {
 }
 
 // ========================================
-// 3号館の日替わりメニューを表示
+// 2号館の日替わりメニューを表示
 // ========================================
 function renderDailyMenuCard() {
   const card = document.getElementById("dailyMenuCard");
@@ -1315,10 +1339,10 @@ function renderDailyMenuCard() {
 
   if (!card || !name || !description || !button) return;
 
-  // 3号館のみ表示
-  card.style.display = activeBuilding === "3" ? "block" : "none";
+  // 2号館のみ表示
+  card.style.display = activeBuilding === "2" ? "block" : "none";
 
-  if (activeBuilding !== "3") return;
+  if (activeBuilding !== "2") return;
 
   // 選択中の日付
   const dateText = formatCafeteriaDate(selectedCafeteriaDate);
@@ -1326,7 +1350,7 @@ function renderDailyMenuCard() {
   // その日に提供される日替わり料理ID
   const dailyIds = MENU_3_DAILY_SCHEDULE[dateText] || [];
 
-  // 3号館の料理データから検索
+  // 2号館の料理データから検索
   const dailyFoods = dailyIds
     .map(id => MENU_DATA.items.find(item => item.id === id))
     .filter(Boolean);
@@ -1368,12 +1392,12 @@ function renderCafeteriaDateSelector() {
   const monthTitle = document.getElementById("cafeteriaMonthTitle");
   const weekDays = document.getElementById("cafeteriaWeekDays");
 
-  // 3号館の日替わりカードを更新
+  // 2号館の日替わりカードを更新
   renderDailyMenuCard();
 
   if (!selector || !monthTitle || !weekDays) return;
 
-  // 3号館・13号館共通で日付バーを表示
+  // 2号館・13号館共通で日付バーを表示
   selector.style.display = "block";
 
   const weekdays = ["月", "火", "水", "木", "金"];
@@ -1440,7 +1464,7 @@ document.getElementById("nextCafeteriaWeek")?.addEventListener("click", () => {
 });
 
 function getActiveMenuData() {
-  return activeBuilding === "3" ? MENU_DATA : MENU_13_DATA;
+  return activeBuilding === "2" ? MENU_DATA : MENU_13_DATA;
 }
 
 document.querySelectorAll(".cafeteria-btn").forEach(btn => {
@@ -1472,6 +1496,7 @@ document.querySelectorAll(".cafeteria-btn").forEach(btn => {
 
 let menuMode = "select"; // select=登録用 / browse=見るだけ用
 let selectedFoods = [];
+let editingMealDate = null;
 let radarChart = null;
 let confirmRadarChart = null;
 let todayRadarChart = null;
@@ -1479,6 +1504,10 @@ let recommendRadarChart = null;
 let pendingRecommendFood = null;
 let registeredFoods = [];
 let registeredTotalFood = null;
+// カレンダーで最後に選択した日付
+let selectedCalendarDate = null;
+
+// カレンダーの表示年月
 let calendarYear = new Date().getFullYear();
 let calendarMonth = new Date().getMonth();
 const questions = document.querySelectorAll(".question");
@@ -2081,6 +2110,52 @@ SmartNews風タブ + 学食一覧
 const tabBar = document.getElementById("tabBar");
 const menuList = document.getElementById("menuList");
 
+/* =========================
+   カテゴリタブ 左右スクロール
+========================= */
+
+const tabScrollLeft = document.getElementById("tabScrollLeft");
+const tabScrollRight = document.getElementById("tabScrollRight");
+
+function updateTabScrollButtons() {
+  if (!tabScrollLeft || !tabScrollRight || !tabBar) return;
+
+  // タブが非表示の間は、幅を判定しない
+  if (tabBar.getClientRects().length === 0) return;
+
+  const maxScroll = Math.max(
+    0,
+    tabBar.scrollWidth - tabBar.clientWidth
+  );
+
+  tabScrollLeft.disabled = tabBar.scrollLeft <= 1;
+  tabScrollRight.disabled = tabBar.scrollLeft >= maxScroll - 1;
+}
+
+// タブの表示サイズが変化したら、矢印の状態を更新
+const tabResizeObserver = new ResizeObserver(() => {
+  updateTabScrollButtons();
+});
+
+tabResizeObserver.observe(tabBar);
+
+tabScrollLeft?.addEventListener("click", () => {
+  tabBar.scrollBy({
+    left: -180,
+    behavior: "smooth"
+  });
+});
+
+tabScrollRight?.addEventListener("click", () => {
+  tabBar.scrollBy({
+    left: 180,
+    behavior: "smooth"
+  });
+});
+
+tabBar.addEventListener("scroll", updateTabScrollButtons);
+window.addEventListener("resize", updateTabScrollButtons);
+
 function renderTabs() {
   tabBar.innerHTML = getActiveMenuData().categories.map(cat => `
               <button type="button" class="tab-item${cat.id === activeCategory ? " active" : ""}"
@@ -2096,6 +2171,9 @@ function renderTabs() {
       renderMenuList();
       tab.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     });
+  });
+  requestAnimationFrame(() => {
+    requestAnimationFrame(updateTabScrollButtons);
   });
 }
 
@@ -2223,8 +2301,8 @@ function renderMenuList() {
     if (item.category !== activeCategory) return false;
     if (item.tags.includes("option")) return false;
 
-    // 3号館は従来どおり
-    if (activeBuilding === "3") return true;
+    // 2号館は従来どおり
+    if (activeBuilding === "2") return true;
 
     // 13号館の固定メニューは常時表示
     // 13号館：10/26週のラーメン提供内容
@@ -2662,13 +2740,7 @@ ${nutritionPending ? `
         return;
       }
 
-      /* 表面を押した場合は詳細画面へ */
-      const isSelected = card.dataset.selected === "true";
-
-      if (menuMode === "select" && isSelected) {
-        return;
-      }
-
+      /* 選択済みでも詳細を開ける */
       showDetail(card.dataset.id);
 
     });
@@ -2762,9 +2834,7 @@ ${nutritionPending ? `
       if (index === -1) return;
 
 
-      const baseFood = MENU_DATA.items.find(item =>
-        item.id === id
-      );
+      const baseFood = findBaseMenuById(id);
 
       if (!baseFood) return;
 
@@ -2805,17 +2875,12 @@ ${nutritionPending ? `
       if (index === -1) return;
 
 
-      const baseFood = MENU_DATA.items.find(item =>
-        item.id === id
-      );
+      const baseFood = findBaseMenuById(id);
 
       if (!baseFood) return;
 
 
-      const largeOption = MENU_DATA.items.find(item =>
-        item.category === baseFood.category &&
-        item.tags.includes("option")
-      );
+      const largeOption = getLargeOptionForFood(baseFood);
 
       if (!largeOption) return;
 
@@ -2946,9 +3011,7 @@ menuList.querySelectorAll(".cancel-large-btn").forEach(btn => {
 
     if (index === -1) return;
 
-    const baseFood = MENU_DATA.items.find(item =>
-      item.id === id
-    );
+    const baseFood = findBaseMenuById(id);
 
     if (!baseFood) return;
 
@@ -2983,16 +3046,11 @@ menuList.querySelectorAll(".add-large-btn").forEach(btn => {
 
     if (index === -1) return;
 
-    const baseFood = MENU_DATA.items.find(item =>
-      item.id === id
-    );
+    const baseFood = findBaseMenuById(id);
 
     if (!baseFood) return;
 
-    const largeOption = MENU_DATA.items.find(item =>
-      item.category === baseFood.category &&
-      item.tags.includes("option")
-    );
+    const largeOption = getLargeOptionForFood(baseFood);
 
     if (!largeOption) return;
 
@@ -3044,11 +3102,13 @@ function updateSelectedBar() {
   const selectedBar = document.getElementById("selectedBar");
   const selectedCount = document.getElementById("selectedCount");
 
-  if (selectedFoods.length === 0 || menuMode !== "select") {
+  if (
+    (selectedFoods.length === 0 && editingMealDate === null) ||
+    menuMode !== "select"
+  ) {
     selectedBar.style.display = "none";
     return;
   }
-
   selectedCount.textContent = `選択中 ${selectedFoods.length}品`;
   selectedBar.style.display = "flex";
 }
@@ -3062,25 +3122,19 @@ updateSelectedBar();
 メニュー詳細画面
 ========================================================= */
 const NUTRITION_FIELDS = [
-  { key: "carb_g", label: "炭水化物", unit: "g" },
+  { key: "energy_kcal", label: "エネルギー", unit: "kcal" },
   { key: "protein_g", label: "たんぱく質", unit: "g" },
-
   { key: "fat_g", label: "脂質", unit: "g" },
-  { key: "salt_g", label: "食塩相当量", unit: "g" },
-
-  { key: "energy_kcal", label: "エネルギー", unit: "kcal" }
+  { key: "carb_g", label: "炭水化物", unit: "g" },
+  { key: "salt_g", label: "食塩相当量", unit: "g" }
 ];
-
 function getDisplayFood() {
   let displayFood = { ...selectedFood };
 
   const largeOptionCheck = document.getElementById("largeOptionCheck");
 
   if (largeOptionCheck && largeOptionCheck.checked) {
-    const largeOption = MENU_DATA.items.find(item =>
-      item.category === selectedFood.category &&
-      item.tags.includes("option")
-    );
+    const largeOption = getLargeOptionForFood(selectedFood);
 
     if (largeOption) {
       displayFood = {
@@ -3249,7 +3303,10 @@ function showDetail(itemId) {
   selectedFood = getActiveMenuData().items.find(i => i.id === itemId);
   if (!selectedFood) return;
 
-  const alreadySelected = selectedFoods.some(f => f.id === selectedFood.id);
+  const existingSelectedFood = selectedFoods.find(f =>
+    f.baseId === selectedFood.id || f.id === selectedFood.id
+  );
+  const alreadySelected = Boolean(existingSelectedFood);
 
   // 13号館：価格と栄養価がそろっているか確認
   const canRegisterFood =
@@ -3261,13 +3318,16 @@ function showDetail(itemId) {
       selectedFood.price >= 0
     );
 
-  // 登録できるメニューだけボタンを表示
-  document.getElementById("registerBtn").style.display =
-    menuMode === "select" &&
-      !alreadySelected &&
-      canRegisterFood
-      ? "block"
-      : "none";
+  // 選択済みなら変更と削除を横並びで表示する。
+  const detailActionBtn = document.getElementById("registerBtn");
+  const removeDetailBtn = document.getElementById("removeDetailBtn");
+  const detailActionRow = document.getElementById("detailActionRow");
+  detailActionBtn.textContent = alreadySelected ? "変更する" : "選択リストに追加";
+  detailActionBtn.classList.remove("remove-mode");
+  detailActionRow.classList.toggle("is-selected", alreadySelected);
+  detailActionRow.style.display = menuMode === "select" && (alreadySelected || canRegisterFood) ? "flex" : "none";
+  detailActionBtn.style.display = "block";
+  removeDetailBtn.style.display = alreadySelected ? "block" : "none";
 
   // 13号館：未登録メニューの案内表示
   const registerNoticeId = "registerUnavailableNotice";
@@ -3315,12 +3375,9 @@ function showDetail(itemId) {
   const soupOptionCheck = document.getElementById("soupOptionCheck");
   const largeOptionText = document.getElementById("largeOptionText");
 
-  largeOptionCheck.checked = false;
+  largeOptionCheck.checked = Boolean(existingSelectedFood?.isLarge);
 
-  const largeOption = MENU_DATA.items.find(item =>
-    item.category === selectedFood.category &&
-    item.tags.includes("option")
-  );
+  const largeOption = getLargeOptionForFood(selectedFood);
 
   if (
     menuMode === "select" &&
@@ -3328,14 +3385,18 @@ function showDetail(itemId) {
     ["udon", "ramen", "curry"].includes(selectedFood.category)
   ) {
     largeOptionArea.style.display = "block";
-    largeOptionText.textContent = `+${largeOption.price}円 / +${largeOption.energy_kcal}kcal`;
+    largeOptionText.textContent = `+${largeOption.price}円 / +${largeOption.energy_kcal}kcal${activeBuilding === "13" ? "（2号館の値を仮使用）" : ""}`;
   } else {
     largeOptionArea.style.display = "none";
   }
   const canSoupMenu = ["udon", "ramen"].includes(selectedFood.category);
 
   soupOptionArea.style.display = canSoupMenu ? "block" : "none";
-  soupOptionCheck.checked = false;
+  soupOptionCheck.checked = Boolean(existingSelectedFood?.isSoupLess);
+  document.getElementById("soupOptionText").textContent =
+    activeBuilding === "13"
+      ? "※塩分約50%減（2号館と同じと仮定した推定値）"
+      : "※塩分を約50%減として計算";
 
   document.getElementById("selectMenuPage").style.display = "none";
   document.getElementById("detailPage").style.display = "block";
@@ -3384,6 +3445,18 @@ function makeTotalFood() {
   };
 }
 
+// 数量を変更しても単価・栄養価の整合性を保つ
+const FOOD_NUMERIC_FIELDS = ["price", "energy_kcal", "protein_g", "fat_g", "carb_g", "salt_g"];
+function withFoodQuantity(food, nextQuantity) {
+  const currentQuantity = Number.isInteger(food.quantity) && food.quantity > 0 ? food.quantity : 1;
+  const quantity = Math.max(1, Math.min(10, nextQuantity));
+  const updated = { ...food, quantity };
+  FOOD_NUMERIC_FIELDS.forEach(key => {
+    updated[key] = (Number(food[key]) || 0) / currentQuantity * quantity;
+  });
+  return updated;
+}
+
 function calcTotalFood(foodList) {
   return {
     name: foodList.map(f => f.name).join(" + "),
@@ -3430,6 +3503,20 @@ function renderConfirmModal() {
   document.getElementById("confirmModalContent").innerHTML = `
                 <h3>選択したメニュー</h3>
 
+
+${selectedFoods.length === 0 ? `
+  <p style="
+    padding: 14px;
+    background: #fff3e7;
+    border-radius: 10px;
+    color: #a34b13;
+    font-size: 14px;
+  ">
+    この日の食事をすべて削除します。<br>
+    「変更を保存」を押すと、食事記録が0品になります。
+  </p>
+` : ""}
+
                 <ul class="today-menu-list">
                   ${selectedFoods.map((f, index) => `
                   <li class="confirm-food-item">
@@ -3447,6 +3534,14 @@ function renderConfirmModal() {
                         大盛り追加
                       </button>
                       `}
+
+                      ${(() => {
+                        const baseFood = findBaseMenuById(f.baseId || f.id);
+                        return baseFood && ["udon", "ramen"].includes(baseFood.category) ? `
+                        <button type="button" class="modal-toggle-soup-btn" data-index="${index}" aria-pressed="${Boolean(f.isSoupLess)}">
+                          ${f.isSoupLess ? "スープを飲む" : "スープを飲まない"}
+                        </button>` : "";
+                      })()}
 
                       <button type="button" class="remove-food-btn" data-index="${index}">
                         削除
@@ -3515,7 +3610,7 @@ ${NUTRITION_FIELDS.map(f => {
 
       selectedFoods.splice(index, 1);
 
-      if (selectedFoods.length === 0) {
+      if (selectedFoods.length === 0 && editingMealDate === null) {
         document.getElementById("confirmModal").style.display = "none";
         renderMenuList();
         updateSelectedBar();
@@ -3529,65 +3624,57 @@ ${NUTRITION_FIELDS.map(f => {
     });
   });
 
-  document.querySelectorAll(".modal-cancel-large-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const index = Number(btn.dataset.index);
-      const food = selectedFoods[index];
-
-      if (!food) return;
-
-      const baseId = food.baseId || food.id;
-      const baseFood = MENU_DATA.items.find(item => item.id === baseId);
-      if (!baseFood) return;
-
-      selectedFoods[index] = {
-        ...baseFood,
-        baseId: baseFood.id,
-        isLarge: false
+  // 確認画面でオプションを切り替える際は、必ず元メニューから再計算する。
+  // これにより大盛りとスープなしの状態が互いに消えず、塩分も重複減算されない。
+  function updateConfirmFoodOption(index, changes) {
+    const current = selectedFoods[index];
+    if (!current) return;
+    const baseFood = findBaseMenuById(current.baseId || current.id);
+    if (!baseFood) return;
+    const isLarge = changes.isLarge ?? Boolean(current.isLarge);
+    const isSoupLess = changes.isSoupLess ?? Boolean(current.isSoupLess);
+    let updated = { ...baseFood, baseId: baseFood.id, isLarge: false, isSoupLess: false };
+    if (isLarge) {
+      const option = getLargeOptionForFood(baseFood);
+      if (option) {
+        updated = {
+          ...updated, isLarge: true, name: `${baseFood.name} 大盛り`,
+          price: baseFood.price + option.price,
+          energy_kcal: baseFood.energy_kcal + option.energy_kcal,
+          protein_g: baseFood.protein_g + option.protein_g,
+          fat_g: baseFood.fat_g + option.fat_g,
+          carb_g: baseFood.carb_g + option.carb_g,
+          salt_g: baseFood.salt_g + option.salt_g
+        };
+      }
+    }
+    if (isSoupLess && ["udon", "ramen"].includes(baseFood.category)) {
+      updated = {
+        ...updated, isSoupLess: true,
+        name: `${updated.name}（スープなし）`,
+        salt_g: updated.salt_g * 0.5
       };
+    }
+    selectedFoods[index] = updated;
+    renderConfirmModal();
+    renderConfirmRadarChart();
+    renderMenuList();
+    updateSelectedBar();
+  }
 
-      renderConfirmModal();
-      renderConfirmRadarChart();
-      renderMenuList();
-      updateSelectedBar();
+  document.querySelectorAll(".modal-cancel-large-btn, .modal-add-large-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      updateConfirmFoodOption(Number(btn.dataset.index), {
+        isLarge: btn.classList.contains("modal-add-large-btn")
+      });
     });
   });
 
-  document.querySelectorAll(".modal-add-large-btn").forEach(btn => {
+  document.querySelectorAll(".modal-toggle-soup-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const index = Number(btn.dataset.index);
       const food = selectedFoods[index];
-
-      if (!food) return;
-
-      const baseId = food.baseId || food.id;
-      const baseFood = MENU_DATA.items.find(item => item.id === baseId);
-      if (!baseFood) return;
-
-      const largeOption = MENU_DATA.items.find(item =>
-        item.category === baseFood.category &&
-        item.tags.includes("option")
-      );
-
-      if (!largeOption) return;
-
-      selectedFoods[index] = {
-        ...baseFood,
-        baseId: baseFood.id,
-        isLarge: true,
-        name: `${baseFood.name} 大盛り`,
-        price: baseFood.price + largeOption.price,
-        energy_kcal: baseFood.energy_kcal + largeOption.energy_kcal,
-        protein_g: baseFood.protein_g + largeOption.protein_g,
-        fat_g: baseFood.fat_g + largeOption.fat_g,
-        carb_g: baseFood.carb_g + largeOption.carb_g,
-        salt_g: baseFood.salt_g + largeOption.salt_g
-      };
-
-      renderConfirmModal();
-      renderConfirmRadarChart();
-      renderMenuList();
-      updateSelectedBar();
+      if (food) updateConfirmFoodOption(index, { isSoupLess: !food.isSoupLess });
     });
   });
 }
@@ -3664,7 +3751,8 @@ function saveTodayMealToHistory() {
     mealHistory[todayKey] = {
       date: todayKey,
       foods: registeredFoods,
-      total: registeredTotalFood
+      total: registeredTotalFood,
+      nutritionTipId: mealHistory[todayKey]?.nutritionTipId || null
     };
   }
 
@@ -3684,70 +3772,85 @@ function getLackingNutrients(totalFood, ideal) {
     } return lacking;
 }
 function getRecommendFoods(lackingNutrients) {
-  if (!registeredTotalFood) return [];
+  // 13号館の追加提案は栄養データ整備まで停止する。
+  if (!registeredTotalFood || activeBuilding !== "2") return [];
 
   const ideal = getIdealNutrition();
-
-  const registeredNames = new Set(
-    registeredFoods.map(food => food.name)
+  const selected = registeredFoods;
+  const registeredNames = new Set(selected.map(food => food.name));
+  const mainCategories = new Set(["udon", "ramen", "teishoku", "don", "curry"]);
+  const selectedMain = selected.filter(food => mainCategories.has(food.category));
+  const hasRiceMain = selectedMain.some(food =>
+    ["don", "curry", "teishoku"].includes(food.category) ||
+    /ごはん|ライス|丼|定食|カレー|ハヤシ/.test(food.name)
+  );
+  const hasNoodleMain = selectedMain.some(food =>
+    ["udon", "ramen"].includes(food.category)
+  );
+  const hasFriedMain = selectedMain.some(food =>
+    /唐揚げ|から揚げ|カツ|かつ|とんかつ|天ぷら|天/.test(food.name)
   );
 
   const candidates = MENU_DATA.items.filter(item =>
     item.category === "side" &&
-    !item.tags.includes("option") &&
-    !registeredNames.has(item.name)
+    !(item.tags || []).includes("option") &&
+    !["side-04", "side-07"].includes(item.id) &&
+    !registeredNames.has(item.name) &&
+    ["energy_kcal", "protein_g", "fat_g", "carb_g", "salt_g"]
+      .every(key => Number.isFinite(Number(item[key])))
   );
 
-  const nutrientKeys = [
-    "energy_kcal",
-    "protein_g",
-    "fat_g",
-    "carb_g"
-  ];
-
-  function calculateScore(food) {
+  function nutritionScore(food) {
+    // 不足の改善は評価し、目標超過はより強く減点する。
+    const weights = { energy_kcal: 0.9, protein_g: 1.35, fat_g: 0.75, carb_g: 0.85 };
     let score = 0;
-
-    for (const key of nutrientKeys) {
-      const target = Number(ideal[key]) || 0;
-      if (target <= 0) continue;
-
+    for (const [key, weight] of Object.entries(weights)) {
+      const target = Number(ideal[key]);
+      if (!(target > 0)) continue;
       const before = Number(registeredTotalFood[key]) || 0;
-      const after = before + (Number(food[key]) || 0);
-
-      const beforeGap = Math.abs(1 - before / target);
-      const afterGap = Math.abs(1 - after / target);
-
-      score += beforeGap - afterGap;
+      const after = before + Number(food[key]);
+      const penalty = value => {
+        const ratio = value / target;
+        return Math.max(0, 1 - ratio) + 1.5 * Math.max(0, ratio - 1);
+      };
+      score += weight * (penalty(before) - penalty(after));
     }
-
-    const saltLimit = Number(ideal.salt_g) || 0;
-
+    const saltLimit = Number(ideal.salt_g);
     if (saltLimit > 0) {
-      const beforeSalt = Number(registeredTotalFood.salt_g) || 0;
-      const afterSalt = beforeSalt + (Number(food.salt_g) || 0);
-
-      const beforeExcess = Math.max(
-        0, beforeSalt / saltLimit - 1
-      );
-
-      const afterExcess = Math.max(
-        0, afterSalt / saltLimit - 1
-      );
-
-      score -= (afterExcess - beforeExcess) * 2;
+      const before = Number(registeredTotalFood.salt_g) || 0;
+      const after = before + Number(food.salt_g);
+      score -= 1.8 * (Math.max(0, after / saltLimit - 1) - Math.max(0, before / saltLimit - 1));
     }
-
     return score;
   }
 
+  function pairingScore(food) {
+    // 禁止ではなく相性による加減点。麺＋少量のご飯は許容する。
+    const id = food.id;
+    const rice = id === "side-04" || id === "side-07";
+    if (rice) {
+      let score = hasRiceMain ? -0.55 : hasNoodleMain ? -0.12 : -0.06;
+      if (id === "side-04") score -= 0.12; // Mサイズは追加量が多い
+      return score;
+    }
+    if (id === "side-06") return hasFriedMain ? -0.35 : 0.04;
+    if (id === "side-03") return hasRiceMain ? 0.01 : -0.08;
+    if (id === "side-05") return 0.10; // 主菜に合わせやすいサラダ
+    if (id === "side-01") return hasNoodleMain ? -0.16 : 0.02; // 麺＋汁物の重複
+    if (id === "side-02") return 0.05;
+    return 0;
+  }
+
   return candidates
-    .map(food => ({
-      food,
-      score: calculateScore(food)
-    }))
-    .filter(result => result.score > 0)
-    .sort((a, b) => b.score - a.score)
+    .map(food => {
+      const nutrition = nutritionScore(food);
+      const pairing = pairingScore(food);
+      const pricePenalty = Math.max(0, Number(food.price) || 0) / 1000 * 0.10;
+      return { food, nutrition, score: nutrition + pairing - pricePenalty };
+    })
+    // 栄養面が悪化する料理を、相性や安さだけで推薦しない。
+    .filter(result => result.nutrition > 0 && result.score > 0)
+    .sort((a, b) => b.score - a.score || a.food.price - b.food.price)
     .slice(0, 3)
     .map(result => result.food);
 }
@@ -3777,22 +3880,23 @@ function showRecommendModal(recommendFood, afterFood) {
 
   title.textContent = `${recommendFood.name}を追加すると`;
 
+  // 本日の食事・確認画面と同じ、見出し付きの行表示に統一
   compareText.innerHTML = `
-                  <div class="nutrition-grid">
-                    ${NUTRITION_FIELDS.map(f => `
-                    <div class="nutrition-item">
-                      <div class="n-label">${f.label}</div>
-                      <div class="n-value">
-                        ${registeredTotalFood[f.key].toFixed(1)}
-                        <span class="n-unit">${f.unit}</span>
-                        →
-                        ${afterFood[f.key].toFixed(1)}
-                        <span class="n-unit">${f.unit}</span>
-                      </div>
-                    </div>
-                    `).join("")}
-                  </div>
-                  `;
+    <div class="recommend-nutrition-table">
+      <div class="recommend-nutrition-header">
+        <span>栄養素</span><span>追加前</span><span>追加後</span>
+      </div>
+      <div class="recommend-nutrition-rows">
+        ${NUTRITION_FIELDS.map(f => `
+          <div class="recommend-nutrition-row">
+            <span class="recommend-nutrition-label">${f.label}</span>
+            <span class="recommend-nutrition-value">${registeredTotalFood[f.key].toFixed(1)}<small>${f.unit}</small></span>
+            <span class="recommend-nutrition-value recommend-nutrition-after">${afterFood[f.key].toFixed(1)}<small>${f.unit}</small></span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
 
   modal.style.display = "flex";
 
@@ -3879,11 +3983,233 @@ document.getElementById("addRecommendBtn").addEventListener("click", () => {
   });
 
   saveTodayMealToHistory();
+  const tip = advanceNutritionTip();
+  const tipHistory = JSON.parse(storage.getItem(getUserKey("mealHistory")) || "{}");
+  const tipDate = formatCafeteriaDate(new Date());
+  if (tipHistory[tipDate]) {
+    tipHistory[tipDate].nutritionTipId = tip.id;
+    storage.setItem(getUserKey("mealHistory"), JSON.stringify(tipHistory));
+  }
   renderTodayPage();
 
   document.getElementById("recommendModal").style.display = "none";
   pendingRecommendFood = null;
 });
+
+
+/* =========================
+   栄養豆知識（25件・重複なし）
+   出典の管理は元Excelで行う
+========================= */
+const NUTRITION_TIPS = [
+  {
+    "id": "ENE-001",
+    "category": "エネルギー",
+    "title": "脂質1gは約9kcal！",
+    "body": "脂質は1gあたり約9kcal。たんぱく質と炭水化物は、それぞれ約4kcalなんだ。"
+  },
+  {
+    "id": "ENE-002",
+    "category": "エネルギー",
+    "title": "3つの栄養素がエネルギー源",
+    "body": "たんぱく質・脂質・炭水化物は、食事からエネルギーを得るうえで中心となる栄養素なんだ。"
+  },
+  {
+    "id": "ENE-003",
+    "category": "エネルギー",
+    "title": "食物繊維にもエネルギーがある？",
+    "body": "食物繊維は、エネルギー計算で1gあたり約2kcalとして扱われることがあるんだ。"
+  },
+  {
+    "id": "ENE-004",
+    "category": "エネルギー",
+    "title": "じっとしていてもエネルギーを使う",
+    "body": "身体は安静にしているときもエネルギーを消費するよ。これを基礎代謝というんだ。"
+  },
+  {
+    "id": "ENE-005",
+    "category": "エネルギー",
+    "title": "食べるだけでもエネルギーを消費する！？",
+    "body": "食事をすると、消化・吸収などのためにもエネルギーが使われるんだ。これを「食事誘発性熱産生」というよ！"
+  },
+  {
+    "id": "PRO-001",
+    "category": "タンパク質",
+    "title": "筋肉だけじゃない！",
+    "body": "たんぱく質は筋肉だけでなく、皮膚・臓器・髪など、身体のさまざまな部分の材料になるんだ。"
+  },
+  {
+    "id": "PRO-002",
+    "category": "タンパク質",
+    "title": "酵素やホルモンにも関係！",
+    "body": "たんぱく質は、身体の働きを調整する酵素やホルモンなどの成分にもなるんだ。"
+  },
+  {
+    "id": "PRO-003",
+    "category": "タンパク質",
+    "title": "アミノ酸がつながってできる",
+    "body": "たんぱく質は、アミノ酸がたくさん結びついてできているんだ。"
+  },
+  {
+    "id": "PRO-004",
+    "category": "タンパク質",
+    "title": "タンパク質は、量が同じでも中身が違う！？",
+    "body": "食品によってアミノ酸の種類や割合が違うため、身体での利用されやすさにも違いがあるんだ！"
+  },
+  {
+    "id": "PRO-005",
+    "category": "タンパク質",
+    "title": "身体で作れないアミノ酸がある！？",
+    "body": "タンパク質の材料になるアミノ酸のうち、9種類は身体で十分に作れないため、食事から摂る必要があるんだ。これを「必須アミノ酸」というよ！"
+  },
+  {
+    "id": "FAT-001",
+    "category": "脂質",
+    "title": "脂質は細胞膜の材料！",
+    "body": "脂質はエネルギー源になるだけでなく、細胞膜を構成する材料にもなるんだ。"
+  },
+  {
+    "id": "FAT-002",
+    "category": "脂質",
+    "title": "脂質には種類がある",
+    "body": "脂肪酸には、飽和脂肪酸や不飽和脂肪酸など、構造の違う種類があるんだ。"
+  },
+  {
+    "id": "FAT-003",
+    "category": "脂質",
+    "title": "脂質は炭水化物の2倍以上のエネルギーを持っている！？",
+    "body": "脂質1gは約9kcal、炭水化物1gは約4kcal。同じ重さでも、脂質には約2.25倍のエネルギーがあるんだ！"
+  },
+  {
+    "id": "FAT-004",
+    "category": "脂質",
+    "title": "体内で作れない脂肪酸がある",
+    "body": "脂肪酸の中には、体内で十分に作れず、食事から摂る必要がある「必須脂肪酸」があるんだ。"
+  },
+  {
+    "id": "FAT-005",
+    "category": "脂質",
+    "title": "脂質は量だけでなく質も大切",
+    "body": "脂質を考えるときは、合計量だけでなく、どんな脂肪酸が含まれるかにも注目するんだ。"
+  },
+  {
+    "id": "CAR-001",
+    "category": "炭水化物",
+    "title": "炭水化物と糖質は同じ？",
+    "body": "炭水化物は、大きく分けると糖質と食物繊維に分けられるんだ。"
+  },
+  {
+    "id": "CAR-002",
+    "category": "炭水化物",
+    "title": "脳はブドウ糖を使って働いている！？",
+    "body": "脳はブドウ糖を重要なエネルギー源として利用しているんだ。ただし、状況によってはケトン体なども利用するよ。"
+  },
+  {
+    "id": "CAR-003",
+    "category": "炭水化物",
+    "title": "食物繊維は消化されにくい",
+    "body": "食物繊維は、人の消化酵素では分解されにくい成分なんだ。"
+  },
+  {
+    "id": "CAR-004",
+    "category": "炭水化物",
+    "title": "でんぷんも糖質の仲間",
+    "body": "ごはんなどに含まれるでんぷんは、糖質のうち「多糖類」に分類されるんだ。"
+  },
+  {
+    "id": "CAR-005",
+    "category": "炭水化物",
+    "title": "炭水化物の目標は割合で示される",
+    "body": "食事摂取基準では、炭水化物の目標量は1日の総エネルギーに占める割合で示されているんだ。"
+  },
+  {
+    "id": "SAL-001",
+    "category": "食塩相当量",
+    "title": "ナトリウムは必要なミネラル",
+    "body": "ナトリウムは、身体の水分バランスなどを調整する働きがあるミネラルなんだ。"
+  },
+  {
+    "id": "SAL-002",
+    "category": "食塩相当量",
+    "title": "酸味を利用すると、塩が少なくてもおいしく感じる！？",
+    "body": "レモンやお酢などの酸味を活用すると、食塩を減らしても味の物足りなさを補えることがあるんだ。減塩は、ただ味を薄くするだけじゃないんだね！"
+  },
+  {
+    "id": "SAL-003",
+    "category": "食塩相当量",
+    "title": "ナトリウム1gは、食塩1gじゃない！？",
+    "body": "ナトリウム1gを食塩相当量に換算すると、約2.54gになるんだ。名前は似ていても、数値は同じじゃないんだね！"
+  },
+  {
+    "id": "SAL-004",
+    "category": "食塩相当量",
+    "title": "カリウムは、ナトリウムの排出に関係している！？",
+    "body": "野菜や果物などに含まれるカリウムには、腎臓からのナトリウム排出を促す働きがあるんだ。ただし、塩分の摂りすぎを帳消しにできるわけではないよ。"
+  },
+  {
+    "id": "SAL-005",
+    "category": "食塩相当量",
+    "title": "食塩の目標量は1日単位",
+    "body": "食事摂取基準の食塩相当量の目標量は、成人男性7.5g未満・成人女性6.5g未満の1日当たりの値なんだ。"
+  }
+];
+function getTipState() {
+  try {
+    const value = JSON.parse(storage.getItem(getUserKey("nutritionTipState")) || "{}");
+    return {
+      remaining: Array.isArray(value.remaining) ? value.remaining.filter(id => NUTRITION_TIPS.some(t => t.id === id)) : [],
+      current: NUTRITION_TIPS.some(t => t.id === value.current) ? value.current : null
+    };
+  } catch (_) {
+    return { remaining: [], current: null };
+  }
+}
+function getCurrentNutritionTip() {
+  const state = getTipState();
+  return NUTRITION_TIPS.find(t => t.id === state.current) || null;
+}
+function advanceNutritionTip() {
+  const state = getTipState();
+  let remaining = state.remaining.slice();
+  if (remaining.length === 0) {
+    remaining = NUTRITION_TIPS.map(t => t.id);
+    // Fisher-Yates shuffle
+    for (let i = remaining.length - 1; i > 0; i--) {
+      const k = Math.floor(Math.random() * (i + 1));
+      [remaining[i], remaining[k]] = [remaining[k], remaining[i]];
+    }
+    // 次の一巡の最初が、前の一巡の最後と重ならないようにする
+    if (remaining.length > 1 && remaining[0] === state.current) {
+      [remaining[0], remaining[1]] = [remaining[1], remaining[0]];
+    }
+  }
+  const current = remaining.shift();
+  storage.setItem(getUserKey("nutritionTipState"), JSON.stringify({remaining, current}));
+  return NUTRITION_TIPS.find(t => t.id === current);
+}
+function nutritionTipMarkup(tip, history = false) {
+  if (!tip) return '<p class="nutrition-tip-empty">次の食事登録から豆知識が表示されます。</p>';
+  return `
+    <div class="nutrition-tip-category">${tip.category}</div>
+    <div class="nutrition-tip-title">${tip.title}</div>
+    <p class="nutrition-tip-body">${tip.body}</p>
+    ${history ? '' : '<button type="button" id="nextNutritionTipBtn" class="nutrition-tip-next">🔄 別の豆知識を見る</button>'}
+  `;
+}
+function attachNutritionTipButton() {
+  const btn = document.getElementById("nextNutritionTipBtn");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const tip = advanceNutritionTip();
+    const todayKey = formatCafeteriaDate(new Date());
+    const history = JSON.parse(storage.getItem(getUserKey("mealHistory")) || "{}");
+    if (history[todayKey]) {
+      history[todayKey].nutritionTipId = tip.id;
+      storage.setItem(getUserKey("mealHistory"), JSON.stringify(history));
+    }
+    renderTodayPage();
+  });
+}
 
 function renderTodayPage() {
   const todayFood = document.getElementById("todayFood");
@@ -3913,9 +4239,9 @@ function renderTodayPage() {
 
   const totalFood = registeredTotalFood;
   const ideal = getIdealNutrition();
-  const advice = getNutritionAdvice(totalFood, ideal);
   const lackingNutrients = getLackingNutrients(totalFood, ideal);
   const recommendFoods = getRecommendFoods(lackingNutrients);
+  const showExtraRecommendations = activeBuilding === "2";
 
   todayFood.innerHTML = `
                   <div class="today-card">
@@ -3933,7 +4259,7 @@ function renderTodayPage() {
                         </div>
 
                         <span class="today-food-count">
-                          ${registeredFoods.length}品
+                          ${registeredFoods.reduce((sum, f) => sum + (f.quantity || 1), 0)}品
                         </span>
 
                       </div>
@@ -3943,9 +4269,7 @@ function renderTodayPage() {
                         ${registeredFoods.map((food, index) => {
     const baseId = food.baseId || food.id;
 
-    const baseFood = MENU_DATA.items.find(item =>
-      item.id === baseId
-    );
+    const baseFood = findBaseMenuById(baseId);
 
     const category = baseFood
       ? baseFood.category
@@ -3979,6 +4303,13 @@ function renderTodayPage() {
 
                             <div class="today-food-name">
                               ${food.name}
+                            </div>
+
+                            <div class="today-quantity-controls" aria-label="数量変更">
+                              <span class="today-quantity-label">数量</span>
+                              <button type="button" class="today-quantity-minus" data-index="${index}" aria-label="数量を減らす" ${(food.quantity || 1) <= 1 ? "disabled" : ""}>−</button>
+                              <strong>${food.quantity || 1}</strong>
+                              <button type="button" class="today-quantity-plus" data-index="${index}" aria-label="数量を増やす" ${(food.quantity || 1) >= 10 ? "disabled" : ""}>＋</button>
                             </div>
 
                             <div class="today-food-meta">
@@ -4424,6 +4755,7 @@ function renderTodayPage() {
                     <!-- =========================
          おすすめ追加メニュー
     ========================== -->
+                    ${showExtraRecommendations ? `
                     <section class="today-section">
 
                       <div class="today-section-title">
@@ -4466,7 +4798,11 @@ function renderTodayPage() {
 
                       </div>
 
+                      <button type="button" id="openSideMenuBtn" class="side-menu-link-btn">
+                        サイドメニュー一覧を見る <span aria-hidden="true">›</span>
+                      </button>
                     </section>
+                    ` : ""}
 
                     <!-- =========================
          栄養コメント
@@ -4477,24 +4813,20 @@ function renderTodayPage() {
 
                         <div>
                           <span class="today-section-icon">💡</span>
-                          <span>今日の食事コメント</span>
+                          <span>今日の栄養豆知識</span>
                         </div>
 
                       </div>
 
-                      <div class="advice-box">
-
-                        <ul>
-                          ${advice.map(comment => `
-                          <li>${comment}</li>
-                          `).join("")}
-                        </ul>
-
+                      <div class="nutrition-tip-box">
+                        ${nutritionTipMarkup(getCurrentNutritionTip() || advanceNutritionTip())}
                       </div>
 
                     </section>
                   </div>
                   `;
+
+  attachNutritionTipButton();
 
   if (todayRadarChart) {
     todayRadarChart.destroy();
@@ -4545,6 +4877,24 @@ function renderTodayPage() {
     todayRadarChart.resize();
   });
 
+  // 本日の食事画面だけで数量を変更。豆知識は更新しない。
+  ["minus", "plus"].forEach(direction => {
+    document.querySelectorAll(`.today-quantity-${direction}`).forEach(btn => {
+      btn.addEventListener("click", () => {
+        const index = Number(btn.dataset.index);
+        const food = registeredFoods[index];
+        if (!food) return;
+        const current = food.quantity || 1;
+        const next = current + (direction === "plus" ? 1 : -1);
+        if (next < 1 || next > 10) return;
+        registeredFoods[index] = withFoodQuantity(food, next);
+        registeredTotalFood = calcTotalFood(registeredFoods);
+        saveTodayMealToHistory();
+        renderTodayPage();
+      });
+    });
+  });
+
   document.querySelectorAll(".today-remove-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const index = Number(btn.dataset.index);
@@ -4573,28 +4923,21 @@ function renderTodayPage() {
       if (!food) return;
 
       const baseId = food.baseId || food.id;
-      const baseFood = MENU_DATA.items.find(item => item.id === baseId);
+      const baseFood = findBaseMenuById(baseId);
       if (!baseFood) return;
 
-      const largeOption = MENU_DATA.items.find(item =>
-        item.category === baseFood.category &&
-        item.tags.includes("option")
-      );
+      const largeOption = getLargeOptionForFood(baseFood);
 
       if (!largeOption) return;
 
-      registeredFoods[index] = {
-        ...baseFood,
-        baseId: baseFood.id,
-        isLarge: true,
-        name: `${baseFood.name} 大盛り`,
-        price: baseFood.price + largeOption.price,
-        energy_kcal: baseFood.energy_kcal + largeOption.energy_kcal,
-        protein_g: baseFood.protein_g + largeOption.protein_g,
-        fat_g: baseFood.fat_g + largeOption.fat_g,
-        carb_g: baseFood.carb_g + largeOption.carb_g,
-        salt_g: baseFood.salt_g + largeOption.salt_g
-      };
+      const quantity = food.quantity || 1;
+      const updated = { ...food, isLarge: true,
+        name: `${baseFood.name} 大盛り${food.isSoupLess ? "（スープなし）" : ""}` };
+      FOOD_NUMERIC_FIELDS.forEach(key => {
+        updated[key] = (Number(food[key]) || 0) + (Number(largeOption[key]) || 0) * quantity;
+      });
+      if (food.isSoupLess) updated.salt_g -= (Number(largeOption.salt_g) || 0) * quantity * 0.5;
+      registeredFoods[index] = updated;
 
       registeredTotalFood = calcTotalFood(registeredFoods);
       saveTodayMealToHistory();
@@ -4610,14 +4953,19 @@ function renderTodayPage() {
       if (!food) return;
 
       const baseId = food.baseId || food.id;
-      const baseFood = MENU_DATA.items.find(item => item.id === baseId);
+      const baseFood = findBaseMenuById(baseId);
       if (!baseFood) return;
 
-      registeredFoods[index] = {
-        ...baseFood,
-        baseId: baseFood.id,
-        isLarge: false
-      };
+      const largeOption = getLargeOptionForFood(baseFood);
+      if (!largeOption) return;
+      const quantity = food.quantity || 1;
+      const updated = { ...food, isLarge: false,
+        name: `${baseFood.name}${food.isSoupLess ? "（スープなし）" : ""}` };
+      FOOD_NUMERIC_FIELDS.forEach(key => {
+        updated[key] = (Number(food[key]) || 0) - (Number(largeOption[key]) || 0) * quantity;
+      });
+      if (food.isSoupLess) updated.salt_g += (Number(largeOption.salt_g) || 0) * quantity * 0.5;
+      registeredFoods[index] = updated;
 
       registeredTotalFood = calcTotalFood(registeredFoods);
       saveTodayMealToHistory();
@@ -4654,20 +5002,34 @@ function renderTodayPage() {
       if (!food) return;
 
       const baseId = food.baseId || food.id;
-      const baseFood = MENU_DATA.items.find(item => item.id === baseId);
+      const baseFood = findBaseMenuById(baseId);
       if (!baseFood) return;
 
       registeredFoods[index] = {
-        ...baseFood,
-        baseId: baseFood.id,
-        isLarge: food.isLarge || false,
-        isSoupLess: false
+        ...food,
+        isSoupLess: false,
+        name: `${baseFood.name}${food.isLarge ? " 大盛り" : ""}`,
+        salt_g: food.salt_g * 2
       };
 
       registeredTotalFood = calcTotalFood(registeredFoods);
       saveTodayMealToHistory();
       renderTodayPage();
     });
+  });
+  document.getElementById("openSideMenuBtn")?.addEventListener("click", () => {
+    activeBuilding = "2";
+    document.querySelectorAll(".cafeteria-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.building === "2");
+    });
+    activeCategory = "side";
+    menuMode = "select";
+    renderTabs();
+    renderMenuList();
+    renderCafeteriaDateSelector();
+    showPage(menuPage, menuTab);
+    updateSelectedBar();
+    updateHistoryEditButton();
   });
   document.querySelectorAll(".recommend-food-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -5109,6 +5471,11 @@ function renderMyPage() {
 
   renderCalendar();
 
+  // カレンダーで選択していた日の食事記録を再表示
+  if (selectedCalendarDate) {
+    showHistoryDetail(selectedCalendarDate);
+  }
+
   document.getElementById("editProfileBtn").onclick = () => {
     document.getElementById("mypagePage").style.display = "none";
     document.querySelector(".progress-container").style.display = "flex";
@@ -5211,7 +5578,7 @@ function renderCalendar() {
     const dateKey = `${year}-${String(month +
       1).padStart(2, "0")}-${String(day).padStart(2, "0")}`; const hasMeal = mealHistory[dateKey]; const
         todayKey = formatCafeteriaDate(new Date()); const isToday = dateKey === todayKey; html += ` <button
-class="calendar-day ${hasMeal ? " has-meal" : ""}"
+class="calendar-day ${hasMeal ? " has-meal" : ""} ${isToday ? "today" : ""} ${dateKey === selectedCalendarDate ? "selected" : ""}"
 data-date="${dateKey}"
 ${dateKey > todayKey ? "disabled" : ""}>
                       ${day}
@@ -5234,6 +5601,20 @@ ${hasMeal ? '<span class="meal-dot"></span>' : ""}
 
   document.getElementById("calendarArea").innerHTML = html;
 
+  // 選択日が表示中の月に含まれているか確認
+  if (selectedCalendarDate) {
+    const displayedMonth =
+      `${year}-${String(month + 1).padStart(2, "0")}`;
+
+    if (selectedCalendarDate.startsWith(displayedMonth + "-")) {
+      // 選択日の月に戻ったら食事記録を再表示
+      showHistoryDetail(selectedCalendarDate);
+    } else {
+      // 別の月では食事記録を非表示
+      document.getElementById("historyDetail").innerHTML = "";
+    }
+  }
+
   document.querySelectorAll(".calendar-day").forEach(btn => {
     btn.addEventListener("click", () => {
 
@@ -5241,6 +5622,9 @@ ${hasMeal ? '<span class="meal-dot"></span>' : ""}
       document.querySelectorAll(".calendar-day").forEach(day => {
         day.classList.remove("selected");
       });
+
+      // 選択した日付を記憶
+      selectedCalendarDate = btn.dataset.date;
 
       // 選択した日付を強調
       btn.classList.add("selected");
@@ -5264,6 +5648,186 @@ ${hasMeal ? '<span class="meal-dot"></span>' : ""}
 
     renderCalendar();
   };
+
+  // カレンダーと一緒に月別グラフを更新
+  renderMonthlyNutritionChart();
+
+}
+
+
+/* =========================
+   月別栄養グラフ：データ取得
+========================= */
+function getMonthlyNutritionData() {
+
+  const mealHistory = JSON.parse(
+    storage.getItem(getUserKey("mealHistory")) || "{}"
+  );
+
+  const year = calendarYear;
+  const month = calendarMonth;
+
+  const lastDay = new Date(year, month + 1, 0).getDate();
+
+  const labels = [];
+  const nutritionData = [];
+
+  for (let day = 1; day <= lastDay; day++) {
+
+    const dateKey =
+      `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+    const record = mealHistory[dateKey];
+
+    labels.push(`${day}日`);
+
+    nutritionData.push(
+      record?.foods?.length > 0 &&
+        typeof record.total?.[selectedMonthlyNutrient] === "number"
+        ? record.total[selectedMonthlyNutrient]
+        : null
+    );
+  }
+
+  return {
+    labels,
+    nutritionData
+  };
+}
+
+/* =========================
+   月別栄養グラフ：描画
+========================= */
+
+let monthlyNutritionChart = null;
+
+// 月別グラフで表示する栄養素
+let selectedMonthlyNutrient = "energy_kcal";
+
+const MONTHLY_NUTRIENTS = [
+  { key: "energy_kcal", label: "エネルギー", unit: "kcal" },
+  { key: "protein_g", label: "たんぱく質", unit: "g" },
+  { key: "fat_g", label: "脂質", unit: "g" },
+  { key: "carb_g", label: "炭水化物", unit: "g" },
+  { key: "salt_g", label: "食塩相当量", unit: "g" }
+];
+
+function renderMonthlyNutritionControls() {
+  const controls = document.getElementById("monthlyNutritionControls");
+  if (!controls) return;
+
+  controls.innerHTML = MONTHLY_NUTRIENTS.map(nutrient => `
+    <button
+      type="button"
+      class="monthly-nutrient-btn ${selectedMonthlyNutrient === nutrient.key ? "active" : ""}"
+      data-nutrient="${nutrient.key}"
+    >
+      ${nutrient.label}
+    </button>
+  `).join("");
+
+  controls.querySelectorAll(".monthly-nutrient-btn").forEach(button => {
+    button.onclick = () => {
+      selectedMonthlyNutrient = button.dataset.nutrient;
+      renderMonthlyNutritionControls();
+      renderMonthlyNutritionChart();
+    };
+  });
+}
+function renderMonthlyNutritionChart() {
+
+  renderMonthlyNutritionControls();
+
+  const canvas = document.getElementById("monthlyNutritionChart");
+  if (!canvas) return;
+
+  const { labels, nutritionData } = getMonthlyNutritionData();
+
+  const ideal = getIdealNutrition();
+
+  // 現在選択中の栄養素の情報を取得
+  const nutrient = MONTHLY_NUTRIENTS.find(
+    item => item.key === selectedMonthlyNutrient
+  );
+
+  // 前のグラフを削除
+  if (monthlyNutritionChart) {
+    monthlyNutritionChart.destroy();
+  }
+
+  monthlyNutritionChart = new Chart(canvas, {
+    type: "bar",
+
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          type: "bar",
+          label: `${nutrient.label}（${nutrient.unit}）`,
+          data: nutritionData,
+          backgroundColor: "#ff9800",
+          borderRadius: 4
+        },
+        {
+          type: "line",
+          label: "目標値",
+          data: labels.map(() => ideal[selectedMonthlyNutrient]),
+          borderColor: "#2196f3",
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          tension: 0
+        }
+      ]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+          labels: {
+            usePointStyle: true,
+            boxWidth: 12
+          }
+        },
+
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const value = context.parsed.y;
+
+              if (value === null || value === undefined) {
+                return "食事記録なし";
+              }
+
+              return `${context.dataset.label}: ${value.toFixed(1)} ${nutrient.unit}`;
+            }
+          }
+        }
+      },
+
+      scales: {
+        x: {
+          ticks: {
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 10
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: nutrient.unit
+          }
+        }
+      }
+    }
+  });
 }
 
 function showHistoryDetail(date) {
@@ -5282,29 +5846,34 @@ function showHistoryDetail(date) {
       <div class="history-empty">
         <p>この日の食事記録はまだありません。</p>
 
-        <button type="button" id="addHistoryMealBtn">
-          ＋ 食事を追加する
-        </button>
+<button type="button" id="addHistoryMealBtn">
+  ✏️ 食事を追加・変更する
+</button>
       </div>
     </div>
   `;
     // カレンダーから追加する日付を保持
     document.getElementById("addHistoryMealBtn").onclick = () => {
 
+      // 前回選択していた料理をリセット
+      selectedFoods = [];
+
       // 選択した日付を保持
       editingMealDate = date;
 
-      // マイページを非表示
-      document.getElementById("mypagePage").style.display = "none";
+      updateHistoryEditButton();
 
-      // メニュー一覧を表示
-      document.getElementById("selectMenuPage").style.display = "block";
+      // メニュー選択モードに変更
+      menuMode = "select";
 
-      // 画面上部へ移動
-      window.scrollTo({
-        top: 0,
-        behavior: "auto"
-      });
+      // メニュー一覧を再描画
+      renderMenuList();
+
+      // メニュー画面に切り替える
+      showPage(menuPage, menuTab);
+
+      // 選択中バーを更新
+      updateSelectedBar();
 
       console.log("食事追加の対象日:", editingMealDate);
     };
@@ -5312,7 +5881,7 @@ function showHistoryDetail(date) {
   }
 
   const ideal = getIdealNutrition();
-  const advice = getNutritionAdvice(data.total, ideal);
+  const historyTip = NUTRITION_TIPS.find(t => t.id === data.nutritionTipId) || null;
 
 
 
@@ -5322,11 +5891,24 @@ function showHistoryDetail(date) {
       <h3>${date} の食事記録</h3>
 
       <ul>
-        ${data.foods.map(f =>
-    `<li>${f.name}</li>`
-  ).join("")}
+        ${data.foods.map((f, index) => `
+          <li class="history-food-quantity-row">
+            <span>${f.name}</span>
+            <div class="today-quantity-controls" aria-label="過去の食事の数量変更">
+              <span class="today-quantity-label">数量</span>
+              <button type="button" class="history-quantity-minus" data-index="${index}" aria-label="数量を減らす" ${(f.quantity || 1) <= 1 ? "disabled" : ""}>−</button>
+              <strong>${f.quantity || 1}</strong>
+              <button type="button" class="history-quantity-plus" data-index="${index}" aria-label="数量を増やす" ${(f.quantity || 1) >= 10 ? "disabled" : ""}>＋</button>
+            </div>
+          </li>
+        `).join("")}
       </ul>
 
+<button type="button" id="addHistoryMealBtn">
+  ✏️ 食事を追加・変更する
+</button>
+
+      <hr>
            <hr>
 
       <div class="history-nutrition-header">
@@ -5368,21 +5950,102 @@ function showHistoryDetail(date) {
     }).join("")}
       </div>
 
-      <div class="advice-box">
-        <h3>📊 栄養コメント</h3>
-        <ul>
-          ${advice.map(a => `<li>${a}</li>`).join("")}
-        </ul>
+      <div class="nutrition-tip-box">
+        <h3>💡 この日の栄養豆知識</h3>
+        ${historyTip ? nutritionTipMarkup(historyTip, true) : '<p>この日の豆知識は記録されていません。</p>'}
       </div>
 
     </div>
     `;
+
+  // カレンダーの過去日付でも数量を直接変更できる。
+  // 保存先は選択中の日付のみ。今日の記録を編集した場合は当日画面も同期する。
+  ["minus", "plus"].forEach(direction => {
+    document.querySelectorAll(`.history-quantity-${direction}`).forEach(button => {
+      button.addEventListener("click", () => {
+        const index = Number(button.dataset.index);
+        const history = JSON.parse(storage.getItem(getUserKey("mealHistory")) || "{}");
+        const record = history[date];
+        if (!record || !record.foods || !record.foods[index]) return;
+        const food = record.foods[index];
+        const current = food.quantity || 1;
+        const next = current + (direction === "plus" ? 1 : -1);
+        if (next < 1 || next > 10) return;
+
+        record.foods[index] = withFoodQuantity(food, next);
+        record.total = calcTotalFood(record.foods);
+        // nutritionTipId など既存の記録情報はそのまま保持する
+        storage.setItem(getUserKey("mealHistory"), JSON.stringify(history));
+
+        if (date === formatCafeteriaDate(new Date())) {
+          loadTodayMealFromHistory();
+          renderTodayPage();
+        }
+        renderCalendar();
+        renderMonthlyNutritionChart();
+        showHistoryDetail(date);
+      });
+    });
+  });
+
+  // 登録済みの日付の食事を追加・変更する
+  document.getElementById("addHistoryMealBtn").onclick = () => {
+
+    // 登録済みの料理を編集用に読み込む
+    selectedFoods = data.foods.map(food => ({ ...food }));
+
+    // 追加対象の日付を保持
+    editingMealDate = date;
+
+    updateHistoryEditButton();
+
+    // メニュー選択モードに変更
+    menuMode = "select";
+
+    // メニュー一覧を再描画
+    renderMenuList();
+
+    // メニュー画面に移動
+    showPage(menuPage, menuTab);
+
+    // 選択中バーを更新
+    updateSelectedBar();
+
+    console.log("追加対象の日付:", editingMealDate);
+  };
 }
 
 document.getElementById("reselectBtn")
   .addEventListener("click", () => {
     document.getElementById("confirmModal").style.display = "none";
   });
+
+
+// 過去の日付の編集を終了する
+const cancelHistoryEditBtn =
+  document.getElementById("cancelHistoryEditBtn");
+
+function updateHistoryEditButton() {
+  cancelHistoryEditBtn.style.display =
+    editingMealDate !== null ? "block" : "none";
+}
+
+cancelHistoryEditBtn.onclick = () => {
+
+  // 編集対象の日付を解除
+  editingMealDate = null;
+  updateHistoryEditButton();
+
+  // 編集中の選択内容を破棄
+  selectedFoods = [];
+
+  // 通常のメニュー選択に戻す
+  menuMode = "select";
+
+  renderMenuList();
+  updateSelectedBar();
+  updateHistoryEditButton();
+};
 
 document.getElementById("confirmRegisterBtn")
   .addEventListener("click", () => {
@@ -5406,11 +6069,11 @@ document.getElementById("confirmRegisterBtn")
 
     const savedFoods = savedHistory[targetDateKey]?.foods || [];
 
-    // 保存済みの料理を優先し、新しい料理を追加する
-    registeredFoods = [
-      ...savedFoods,
-      ...selectedFoods
-    ];
+    // カレンダーから編集中なら選択内容で上書き
+    // 通常登録なら既存の料理に追加
+    registeredFoods = isHistoryEditing
+      ? [...selectedFoods]
+      : [...savedFoods, ...selectedFoods];
 
     registeredTotalFood = {
       name: registeredFoods.map(f => f.name).join(" + "),
@@ -5432,17 +6095,33 @@ document.getElementById("confirmRegisterBtn")
       storage.getItem(getUserKey("mealHistory")) || "{}"
     );
 
-    mealHistory[targetDateKey] = {
-      date: targetDateKey,
-      foods: registeredFoods,
-      total: registeredTotalFood
-    };
+    if (registeredFoods.length === 0) {
+      // 0品なら、その日付の履歴を削除
+      delete mealHistory[targetDateKey];
+    } else {
+      // 1品以上なら通常どおり保存
+      mealHistory[targetDateKey] = {
+        date: targetDateKey,
+        foods: registeredFoods,
+        total: registeredTotalFood,
+        nutritionTipId: savedHistory[targetDateKey]?.nutritionTipId || null
+      };
+    }
 
     storage.setItem(
       getUserKey("mealHistory"),
       JSON.stringify(mealHistory)
     );
 
+    // 通常の食事登録が確定したときだけ豆知識を更新
+    if (!isHistoryEditing && registeredFoods.length > 0) {
+      const tip = advanceNutritionTip();
+      const history = JSON.parse(storage.getItem(getUserKey("mealHistory")) || "{}");
+      if (history[targetDateKey]) {
+        history[targetDateKey].nutritionTipId = tip.id;
+        storage.setItem(getUserKey("mealHistory"), JSON.stringify(history));
+      }
+    }
     // 過去の日付への登録だった場合、今日の食事を復元
     if (isHistoryEditing) {
       loadTodayMealFromHistory();
@@ -5482,6 +6161,9 @@ document.getElementById("confirmRegisterBtn")
       // 編集モードを終了
       editingMealDate = null;
 
+      // 編集終了ボタンを非表示にする
+      updateHistoryEditButton();
+
       setActiveTab(mypageTab);
     } else {
       setActiveTab(todayTab);
@@ -5500,6 +6182,8 @@ document.querySelectorAll("#backToMenuBtn, #backToMenuBtnBottom")
       document.getElementById("detailPage").style.display = "none";
       document.getElementById("selectMenuPage").style.display = "block";
 
+      requestAnimationFrame(updateTabScrollButtons);
+
       window.scrollTo({
         top: 0,
         behavior: "auto"
@@ -5508,98 +6192,95 @@ document.querySelectorAll("#backToMenuBtn, #backToMenuBtnBottom")
     });
   });
 
-document.getElementById("registerBtn")
-  .addEventListener("click", () => {
-
-    if (!selectedFood) return;
-
-    // 13号館：価格・栄養価が未登録なら登録を防止
-    if (
-      activeBuilding === "13" &&
-      (
-        !hasCompleteNutrition(selectedFood) ||
-        typeof selectedFood.price !== "number" ||
-        !Number.isFinite(selectedFood.price) ||
-        selectedFood.price < 0
-      )
-    ) {
-      alert("このメニューは価格または栄養情報を確認中のため、現在は食事登録できません。");
-      return;
-    }
-
-    const alreadySelected = selectedFoods.some(f => f.id === selectedFood.id);
-
-    if (alreadySelected) {
-      return;
-    }
-
-    let foodToAdd = {
-      ...selectedFood,
-      baseId: selectedFood.id,
-      isLarge: false
-    };
-
-    const largeOptionCheck = document.getElementById("largeOptionCheck");
-
-    if (largeOptionCheck.checked) {
-      const largeOption = MENU_DATA.items.find(item =>
-        item.category === selectedFood.category &&
-        item.tags.includes("option")
-      );
-
-      if (largeOption) {
-        foodToAdd = {
-          ...foodToAdd,
-          isLarge: true,
-          name: `${selectedFood.name} 大盛り`,
-          price: selectedFood.price + largeOption.price,
-          energy_kcal: selectedFood.energy_kcal + largeOption.energy_kcal,
-          protein_g: selectedFood.protein_g + largeOption.protein_g,
-          fat_g: selectedFood.fat_g + largeOption.fat_g,
-          carb_g: selectedFood.carb_g + largeOption.carb_g,
-          salt_g: selectedFood.salt_g + largeOption.salt_g
-        };
-      }
-    }
-    const soupOptionCheck = document.getElementById("soupOptionCheck");
-
-    if (soupOptionCheck && soupOptionCheck.checked) {
-      foodToAdd = {
-        ...foodToAdd,
-        isSoupLess: true,
-        name: `${foodToAdd.name}（スープなし）`,
-        salt_g: foodToAdd.salt_g * 0.5
+// 詳細画面のオプションを元データから再計算し、二重加算を防ぐ。
+function makeSelectedFoodFromDetail() {
+  let food = { ...selectedFood, baseId: selectedFood.id, isLarge: false, isSoupLess: false };
+  const largeCheck = document.getElementById("largeOptionCheck");
+  if (largeCheck.checked && document.getElementById("largeOptionArea").style.display !== "none") {
+    const opt = getLargeOptionForFood(selectedFood);
+    if (opt) {
+      food = {
+        ...food, isLarge: true, name: `${selectedFood.name} 大盛り`,
+        price: selectedFood.price + opt.price,
+        energy_kcal: selectedFood.energy_kcal + opt.energy_kcal,
+        protein_g: selectedFood.protein_g + opt.protein_g,
+        fat_g: selectedFood.fat_g + opt.fat_g,
+        carb_g: selectedFood.carb_g + opt.carb_g,
+        salt_g: selectedFood.salt_g + opt.salt_g
       };
     }
+  }
+  const soupCheck = document.getElementById("soupOptionCheck");
+  if (soupCheck.checked && document.getElementById("soupOptionArea").style.display !== "none") {
+    food = { ...food, isSoupLess: true, name: `${food.name}（スープなし）`, salt_g: food.salt_g * 0.5 };
+  }
+  return food;
+}
 
-    selectedFoods.push(foodToAdd);
+function returnToMenuAfterDetailAction() {
+  document.getElementById("detailPage").style.display = "none";
+  document.getElementById("selectMenuPage").style.display = "block";
+  renderMenuList();
+  updateSelectedBar();
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
 
-    document.getElementById("detailPage").style.display = "none";
-    document.getElementById("selectMenuPage").style.display = "block";
+document.getElementById("registerBtn").addEventListener("click", () => {
+  if (!selectedFood) return;
+  const selectedIndex = selectedFoods.findIndex(f =>
+    f.baseId === selectedFood.id || f.id === selectedFood.id
+  );
+  if (selectedIndex === -1 && activeBuilding === "13" && (
+    !hasCompleteNutrition(selectedFood) ||
+    typeof selectedFood.price !== "number" ||
+    !Number.isFinite(selectedFood.price) || selectedFood.price < 0
+  )) {
+    alert("このメニューは価格または栄養情報を確認中のため、現在は食事登録できません。");
+    return;
+  }
+  const updatedFood = makeSelectedFoodFromDetail();
+  if (selectedIndex !== -1) {
+    selectedFoods[selectedIndex] = updatedFood;
+  } else {
+    selectedFoods.push(updatedFood);
+  }
+  returnToMenuAfterDetailAction();
+});
 
-    renderMenuList();
-    updateSelectedBar();
-
-    window.scrollTo({
-      top: 0,
-      behavior: "auto"
-    });
-
-  });
+document.getElementById("removeDetailBtn").addEventListener("click", () => {
+  if (!selectedFood) return;
+  const index = selectedFoods.findIndex(f =>
+    f.baseId === selectedFood.id || f.id === selectedFood.id
+  );
+  if (index === -1) return;
+  selectedFoods.splice(index, 1);
+  returnToMenuAfterDetailAction();
+});
 
 document.getElementById("finishSelectBtn")
   .addEventListener("click", () => {
 
-    if (selectedFoods.length === 0) return;
+    if (selectedFoods.length === 0 && editingMealDate === null) return;
 
     const totalFood = makeTotalFood();
 
     renderConfirmModal();
 
-    if (registeredFoods.length === 0) {
+    if (editingMealDate !== null) {
+
+      // カレンダーから食事を編集している場合
+      document.getElementById("confirmRegisterBtn").textContent = "変更を保存";
+
+    } else if (registeredFoods.length === 0) {
+
+      // 通常の新規登録
       document.getElementById("confirmRegisterBtn").textContent = "この内容で登録";
+
     } else {
+
+      // 通常のメニュー追加
       document.getElementById("confirmRegisterBtn").textContent = "メニューを追加";
+
     }
     document.getElementById("confirmModal").style.display = "flex";
 
@@ -5653,11 +6334,15 @@ todayTab.onclick = () => {
   renderTodayPage();
 };
 // aiTab.onclick = () => showPage(aiPage, aiTab);
+
 menuTab.onclick = () => {
   menuMode = "select";
   renderMenuList();
   showPage(menuPage, menuTab);
   updateSelectedBar();
+
+  // 編集中なら終了ボタンを表示
+  updateHistoryEditButton();
 };
 
 mypageTab.onclick = () => {
