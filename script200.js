@@ -763,12 +763,12 @@ const MENU_13_DATA = {
 
 
     // 200番で追加：週間献立画像に基づく週替わりメニュー。栄養情報は企業確認までnull。
-    {"id": "b13-weekly-teishoku-20261109", "name": "メンチカツ定食", "category": "weekly-teishoku", "category_label": "週替わり定食", "tags": [], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
-    {"id": "b13-weekly-don-20261109", "name": "ソースチキンカツ丼", "category": "weekly-don", "category_label": "週替わり丼", "tags": [], "price": 500, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
-    {"id": "b13-weekly-udon-20261109", "name": "はいからうどん＋ミニソースチキンカツ丼", "category": "weekly-udon", "category_label": "う～どん・プチ丼", "tags": [], "price": 480, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
-    {"id": "b13-weekly-don-20261102", "name": "天ぷら丼", "category": "weekly-don", "category_label": "週替わり丼", "tags": [], "price": 500, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
-    {"id": "b13-weekly-udon-20261102", "name": "はいからうどん＋ミニ天ぷら丼", "category": "weekly-udon", "category_label": "う～どん・プチ丼", "tags": [], "price": 480, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
-    {"id": "b13-weekly-teishoku-20261019", "name": "とんかつ定食", "category": "weekly-teishoku", "category_label": "週替わり定食", "tags": [], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13"},
+    { "id": "b13-weekly-teishoku-20261109", "name": "メンチカツ定食", "category": "weekly-teishoku", "category_label": "週替わり定食", "tags": [], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13" },
+    { "id": "b13-weekly-don-20261109", "name": "ソースチキンカツ丼", "category": "weekly-don", "category_label": "週替わり丼", "tags": [], "price": 500, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13" },
+    { "id": "b13-weekly-udon-20261109", "name": "はいからうどん＋ミニソースチキンカツ丼", "category": "weekly-udon", "category_label": "う～どん・プチ丼", "tags": [], "price": 480, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13" },
+    { "id": "b13-weekly-don-20261102", "name": "天ぷら丼", "category": "weekly-don", "category_label": "週替わり丼", "tags": [], "price": 500, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13" },
+    { "id": "b13-weekly-udon-20261102", "name": "はいからうどん＋ミニ天ぷら丼", "category": "weekly-udon", "category_label": "う～どん・プチ丼", "tags": [], "price": 480, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13" },
+    { "id": "b13-weekly-teishoku-20261019", "name": "とんかつ定食", "category": "weekly-teishoku", "category_label": "週替わり定食", "tags": [], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "building": "13" },
 
   ]
 
@@ -954,25 +954,65 @@ const RADAR_LABELS = ["エネルギー", "たんぱく質", "脂質", "炭水化
 
 function getBasalRate(gender, age) {
   if (gender === "male") {
-    if (age < 30) return 23.7; if (age < 50) return 22.5; if (age < 65) return 21.8; if (age < 75) return 21.6; return
-    21.5;
-  } else {
-    if (age < 30) return 22.1; if (age < 50) return 21.9; if (age < 65) return 20.7; if (age < 75)
-      return 20.7; return 20.7;
+    if (age < 30) return 23.7;
+    if (age < 50) return 22.5;
+    if (age < 65) return 21.8;
+    if (age < 75) return 21.6;
+    return 21.5;
   }
-} function getActivityLevel(age) { if (age < 65) return 1.75; return 1.70; } function
-  getIdealNutrition() {
+  if (age < 30) return 22.1;
+  if (age < 50) return 21.9;
+  return 20.7;
+}
+function getActivityLevel(age) {
+  return age < 65 ? 1.75 : 1.70;
+}
+// 年齢別PFC基準。炭水化物は合計100%となる残余。
+function getPfcRatios(age) {
+  const protein = age < 50 ? 0.165 : age < 65 ? 0.17 : 0.175;
+  const fat = 0.25;
+  return { protein, fat, carb: 1 - protein - fat };
+}
+function getNutritionRanges() {
+  const age = Number(storage.getItem(getUserKey("age"))) || 20;
+  const energy = getIdealNutrition().energy_kcal;
+  const proteinMin = age < 50 ? 0.13 : age < 65 ? 0.14 : 0.15;
+  return {
+    protein_g: [energy * proteinMin / 4, energy * 0.20 / 4],
+    fat_g: [energy * 0.20 / 9, energy * 0.30 / 9],
+    carb_g: [energy * 0.50 / 4, energy * 0.65 / 4]
+  };
+}
+// 栄養判定を全画面で共通化する（PFCは年齢別の目標範囲）
+function getNutritionJudgement(key, actual, ideal = getIdealNutrition()) {
+  const ranges = getNutritionRanges();
+  if (!Number.isFinite(Number(actual))) return "good";
+  if (ranges[key]) {
+    if (actual < ranges[key][0]) return "low";
+    if (actual > ranges[key][1]) return "high";
+    return "good";
+  }
+  if (key === "salt_g") return actual > ideal.salt_g ? "high" : "good";
+  // エネルギーには厚労省が定めた1食の許容幅がないため評価しない。
+  if (key === "energy_kcal") return "neutral";
+  return "good";
+}
+function getIdealNutrition() {
   const gender = storage.getItem(getUserKey("gender")) || "male";
   const age = Number(storage.getItem(getUserKey("age"))) || 20;
   const height = Number(storage.getItem(getUserKey("height"))) || 170;
-  const weight = Number(storage.getItem(getUserKey("weight"))) || 60; const heightM = height / 100; const bmi = weight / (heightM * heightM); const basalRate = getBasalRate(gender, age);
-  const activityLevel = getActivityLevel(age);
-
-  const dailyEnergy = weight * basalRate * activityLevel; const
-    mealEnergy = dailyEnergy * 0.4; return {
-      energy_kcal: mealEnergy, protein_g: mealEnergy * 0.165 / 4, fat_g:
-        mealEnergy * 0.25 / 9, carb_g: mealEnergy * 0.575 / 4, salt_g: gender === "male" ? 3.0 : 2.6
-    };
+  const heightM = height / 100;
+  const standardWeight = 22 * heightM * heightM;
+  const dailyEnergy = standardWeight * getBasalRate(gender, age) * getActivityLevel(age);
+  const mealEnergy = dailyEnergy * 0.30;
+  const pfc = getPfcRatios(age);
+  return {
+    energy_kcal: mealEnergy,
+    protein_g: mealEnergy * pfc.protein / 4,
+    fat_g: mealEnergy * pfc.fat / 9,
+    carb_g: mealEnergy * pfc.carb / 4,
+    salt_g: (gender === "male" ? 7.5 : 6.5) * 0.30
+  };
 }
 function toRadarData(item) {
   const ideal = getIdealNutrition();
@@ -1032,6 +1072,14 @@ const storage = {
       window.localStorage.setItem(key, value);
     } catch (e) {
       this.memory[key] = value;
+    }
+  },
+  removeItem(key) {
+    delete this.memory[key];
+    try {
+      window.localStorage.removeItem(key);
+    } catch (e) {
+      // localStorage が使えない場合もメモリ上のデータは削除済み
     }
   }
 };
@@ -1126,7 +1174,9 @@ function restoreSessionTimeout() {
   /* すでに30分経過している */
   if (elapsedTime >= SESSION_TIMEOUT) {
 
-    sessionLogout();
+    // 期限切れセッションは静かに終了。保存済みプロフィールは維持する。
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("lastActivityTime");
     return;
   }
 
@@ -1225,7 +1275,7 @@ function sendMealDataToSheet() {
     gender: storage.getItem(getUserKey("gender")) || "",
     age: storage.getItem(getUserKey("age")) || "",
     height: storage.getItem(getUserKey("height")) || "",
-    weight: storage.getItem(getUserKey("weight")) || "",
+    weight: "", // 廃止済みの入力項目
     foods: registeredFoods.map(f => f.name).join(" / "),
     totalPrice: registeredTotalFood.price,
     energyKcal: registeredTotalFood.energy_kcal,
@@ -1483,9 +1533,6 @@ document.querySelectorAll(".cafeteria-btn").forEach(btn => {
     if (weeklyInfo) {
       weeklyInfo.style.display =
         activeBuilding === "13" ? "block" : "none";
-
-      weeklyInfo.textContent =
-        "13号館のメニュー（提供状況は要確認）";
     }
 
     renderTabs();
@@ -1771,17 +1818,17 @@ loginSubmitBtn.addEventListener("click", () => {
   const savedGender = storage.getItem(getUserKey("gender"));
   const savedAge = storage.getItem(getUserKey("age"));
   const savedHeight = storage.getItem(getUserKey("height"));
-  const savedWeight = storage.getItem(getUserKey("weight"));
+
 
   const hasAllProfileData =
     participantId &&
     savedGender &&
     savedAge &&
-    savedHeight &&
-    savedWeight;
+    savedHeight;
 
   /* 基本情報が全部ある場合はメニュー画面へ */
   if (hasAllProfileData) {
+    localStorage.setItem("lastProfileUser", inputNickname);
     progressContainer.style.display = "none";
     inputCard.style.display = "none";
 
@@ -1935,19 +1982,6 @@ const heightSelect = document.getElementById("height");
   heightSelect.insertAdjacentHTML("beforeend", options);
 }
 
-const weightSelect = document.getElementById("weight");
-{
-  let options = "";
-  for (let i = 30; i <= 120; i += 5) {
-    const end = i + 4; const value = i + 2; options += ` <option
-              value="${value}">
-              ${i}kg～${end}kg
-              </option>
-              `;
-  }
-  weightSelect.insertAdjacentHTML("beforeend", options);
-}
-
 /* =========================
 ログイン中ユーザーの基本情報を読み込む
 ========================= */
@@ -1962,13 +1996,13 @@ function loadUserProfileIntoForm() {
 
   ageSelect.value = "";
   heightSelect.value = "";
-  weightSelect.value = "";
+
 
   const savedParticipantId = getParticipantId();
   const savedGender = storage.getItem(getUserKey("gender"));
   const savedAge = storage.getItem(getUserKey("age"));
   const savedHeight = storage.getItem(getUserKey("height"));
-  const savedWeight = storage.getItem(getUserKey("weight"));
+
   if (savedParticipantId) {
     studentIdInput.value = savedParticipantId;
   }
@@ -1981,7 +2015,7 @@ function loadUserProfileIntoForm() {
   }
   if (savedAge) { ageSelect.value = savedAge; }
   if (savedHeight) { heightSelect.value = savedHeight; }
-  if (savedWeight) { weightSelect.value = savedWeight; }
+
 
   // 学籍番号の入力をスキップし、性別選択から開始
   currentStep = 1;
@@ -2044,14 +2078,17 @@ nextBtn.addEventListener("click", () => {
   if (currentStep === 1 && !selectedGender) return;
   if (currentStep === 2 && ageSelect.value === "") return;
   if (currentStep === 3 && heightSelect.value === "") return;
-  if (currentStep === 4 && weightSelect.value === "") return;
 
-  if (currentStep === 4) {
+
+  if (currentStep === 3) {
     storage.setItem(getUserKey("participantId"), getParticipantId());
     storage.setItem(getUserKey("gender"), selectedGender);
     storage.setItem(getUserKey("age"), ageSelect.value);
     storage.setItem(getUserKey("height"), heightSelect.value);
-    storage.setItem(getUserKey("weight"), weightSelect.value);
+    storage.removeItem(getUserKey("weight"));
+    // 次回起動用。ログインセッションとは別に最後のプロフィールを覚える。
+    const profileOwner = localStorage.getItem("currentUser");
+    if (profileOwner) localStorage.setItem("lastProfileUser", profileOwner);
 
 
     // 基本情報の編集だった場合はマイページに戻る
@@ -2101,7 +2138,7 @@ nextBtn.addEventListener("click", () => {
   if (currentStep === 1 && selectedGender) { enableButton(); }
   if (currentStep === 2 && ageSelect.value !== "") { enableButton(); }
   if (currentStep === 3 && heightSelect.value !== "") { enableButton(); }
-  if (currentStep === 4 && weightSelect.value !== "") { enableButton(); }
+
 });
 
 /* =========================================================
@@ -2192,38 +2229,11 @@ function getQuickNutritionStatus(actual, ideal, type) {
   }
 
   const ratio = actual / ideal;
-
-  let status = "適量";
-  let className = "good";
-
-  /* =========================
-     塩分だけ別判定
-  ========================= */
-  if (type === "salt") {
-
-    if (ratio > 1.0) {
-      status = "基準超過";
-      className = "high";
-    } else {
-      status = "基準以内";
-      className = "good";
-    }
-
-  } else {
-
-    /* =========================
-       その他の栄養素
-    ========================= */
-    if (ratio < 0.8) {
-      status = "少なめ";
-      className = "low";
-
-    } else if (ratio > 1.2) {
-      status = "多め";
-      className = "high";
-    }
-
-  }
+  const key = ({ protein: "protein_g", fat: "fat_g", carb: "carb_g", salt: "salt_g", energy: "energy_kcal" })[type];
+  const judgement = getNutritionJudgement(key, actual);
+  const className = judgement;
+  const status = type === "energy" ? "目標との差を表示" : type === "salt" ? (judgement === "high" ? "基準超過" : "基準以内") :
+    judgement === "low" ? "少なめ" : judgement === "high" ? "多め" : "目標範囲内";
 
   /*
     ゲージは基準値の160%を右端とする
@@ -2570,10 +2580,8 @@ ${nutritionPending ? `
 
                 <div class="quick-gauge">
 
-                  <div class="quick-gauge-good-zone"></div>
-
                   <div
-                    class="quick-gauge-marker"
+                    class="quick-gauge-marker neutral"
                     style="left:${energyStatus.position}%"
                   ></div>
 
@@ -3226,7 +3234,8 @@ function updateDetailNutritionAndChart() {
   document.getElementById("nutritionGrid").innerHTML =
     NUTRITION_FIELDS.map(f => {
       const diff = displayFood[f.key] - ideal[f.key];
-      const diffClass = diff >= 0 ? "diff-plus" : "diff-minus";
+      const judgement = getNutritionJudgement(f.key, displayFood[f.key], ideal);
+      const diffClass = judgement === "neutral" ? "diff-neutral" : judgement === "good" ? "diff-good" : judgement === "high" ? "diff-plus" : "diff-minus";
       const diffText =
         diff > 0
           ? `↑${diff.toFixed(1)}${f.unit}`
@@ -3235,7 +3244,7 @@ function updateDetailNutritionAndChart() {
             : `±0.0${f.unit}`;
 
       return `
-              <div class="nutrition-item">
+              <div class="nutrition-item is-${judgement}">
                 <div class="n-label">${f.label}</div>
 
                 <div class="nutrition-top">
@@ -3471,28 +3480,15 @@ function calcTotalFood(foodList) {
 
 function getNutritionAdvice(totalFood, ideal) {
   const advice = [];
-
-  if (totalFood.energy_kcal > ideal.energy_kcal + 100) {
-    advice.push("エネルギーが基準より多めです。");
+  const ranges = getNutritionRanges();
+  // エネルギーは差分のみ表示し、多い・少ないの健康判定をしない。
+  for (const [field, label] of [["protein_g", "たんぱく質"], ["fat_g", "脂質"], ["carb_g", "炭水化物"]]) {
+    const [min, max] = ranges[field];
+    if (totalFood[field] < min) advice.push(`${label}が基準範囲より少なめです。`);
+    if (totalFood[field] > max) advice.push(`${label}が基準範囲より多めです。`);
   }
-
-  if (totalFood.energy_kcal < ideal.energy_kcal - 100) { advice.push("エネルギーが基準より少なめです。"); } if
-    (totalFood.protein_g < ideal.protein_g * 0.8) { advice.push("たんぱく質が不足しています。"); } if (totalFood.fat_g >
-      ideal.fat_g * 1.2) {
-    advice.push("脂質を摂りすぎています。");
-  }
-
-  if (totalFood.salt_g > ideal.salt_g) {
-    advice.push("食塩相当量が昼食の基準値を超えています。");
-  }
-  if (totalFood.carb_g > ideal.carb_g * 1.2) {
-    advice.push("炭水化物が多めです。");
-  }
-
-  if (advice.length === 0) {
-    advice.push("全体的に基準に近い食事です。");
-  }
-
+  if (totalFood.salt_g > ideal.salt_g) advice.push("食塩相当量が昼食の基準値を超えています。");
+  if (advice.length === 0) advice.push("たんぱく質・脂質・炭水化物・食塩相当量は設定した目標範囲内です。エネルギーは目標との差を確認してください。");
   return advice;
 }
 
@@ -3536,12 +3532,12 @@ ${selectedFoods.length === 0 ? `
                       `}
 
                       ${(() => {
-                        const baseFood = findBaseMenuById(f.baseId || f.id);
-                        return baseFood && ["udon", "ramen"].includes(baseFood.category) ? `
+      const baseFood = findBaseMenuById(f.baseId || f.id);
+      return baseFood && ["udon", "ramen"].includes(baseFood.category) ? `
                         <button type="button" class="modal-toggle-soup-btn" data-index="${index}" aria-pressed="${Boolean(f.isSoupLess)}">
                           ${f.isSoupLess ? "スープを飲む" : "スープを飲まない"}
                         </button>` : "";
-                      })()}
+    })()}
 
                       <button type="button" class="remove-food-btn" data-index="${index}">
                         削除
@@ -3562,28 +3558,25 @@ ${selectedFoods.length === 0 ? `
 
 <div class="nutrition-grid">
 ${NUTRITION_FIELDS.map(f => {
-    const actual = totalFood[f.key];
-    const target = ideal[f.key];
-    const diff = actual - target;
-    const ratio = target > 0 ? actual / target : 1;
+      const actual = totalFood[f.key];
+      const target = ideal[f.key];
+      const diff = actual - target;
+      const ratio = target > 0 ? actual / target : 1;
 
-    const diffClass =
-      diff > 0 ? "diff-plus" :
-        diff < 0 ? "diff-minus" : "diff-good";
+      const diffClass =
+        diff > 0 ? "diff-plus" :
+          diff < 0 ? "diff-minus" : "diff-good";
 
-    const diffText =
-      diff > 0 ? `↑${diff.toFixed(1)}${f.unit}` :
-        diff < 0 ? `↓${Math.abs(diff).toFixed(1)}${f.unit}` :
-          `±0.0${f.unit}`;
+      const diffText =
+        diff > 0 ? `↑${diff.toFixed(1)}${f.unit}` :
+          diff < 0 ? `↓${Math.abs(diff).toFixed(1)}${f.unit}` :
+            `±0.0${f.unit}`;
 
-    const nutritionState =
-      f.key === "salt_g"
-        ? (ratio > 1 ? "is-high" : "is-good")
-        : ratio < 0.8 ? "is-low"
-          : ratio > 1.2 ? "is-high"
-            : "is-good";
+      const judgement = getNutritionJudgement(f.key, actual, ideal);
+      const nutritionState = `is-${judgement}`;
+      const displayDiffClass = judgement === "neutral" ? "diff-neutral" : judgement === "good" ? "diff-good" : judgement === "high" ? "diff-plus" : "diff-minus";
 
-    return `
+      return `
     <div class="nutrition-item ${nutritionState}">
       <div class="n-label">${f.label}</div>
 
@@ -3592,7 +3585,7 @@ ${NUTRITION_FIELDS.map(f => {
           ${actual.toFixed(1)}
           <span class="n-unit">${f.unit}</span>
         </div>
-        <span class="${diffClass}">${diffText}</span>
+        <span class="${displayDiffClass}">${diffText}</span>
       </div>
 
       <span class="n-standard">
@@ -3600,7 +3593,7 @@ ${NUTRITION_FIELDS.map(f => {
       </span>
     </div>
   `;
-  }).join("")}
+    }).join("")}
                 </div>
                 `;
 
@@ -3763,13 +3756,10 @@ function saveTodayMealToHistory() {
 }
 function getLackingNutrients(totalFood, ideal) {
   const lacking = [];
-
-  if (totalFood.protein_g < ideal.protein_g * 0.8) { lacking.push("たんぱく質"); } if (totalFood.fat_g <
-    ideal.fat_g * 0.7) { lacking.push("脂質"); } if (totalFood.carb_g < ideal.carb_g * 0.8) {
-      lacking.push("炭水化物");
-    } if (totalFood.energy_kcal < ideal.energy_kcal * 0.8) {
-      lacking.push("エネルギー");
-    } return lacking;
+  for (const [key, label] of [["protein_g", "たんぱく質"], ["fat_g", "脂質"], ["carb_g", "炭水化物"], ["energy_kcal", "エネルギー"]]) {
+    if (getNutritionJudgement(key, totalFood[key], ideal) === "low") lacking.push(label);
+  }
+  return lacking;
 }
 function getRecommendFoods(lackingNutrients) {
   // 13号館の追加提案は栄養データ整備まで停止する。
@@ -3809,9 +3799,10 @@ function getRecommendFoods(lackingNutrients) {
       if (!(target > 0)) continue;
       const before = Number(registeredTotalFood[key]) || 0;
       const after = before + Number(food[key]);
+      const ranges = getNutritionRanges();
       const penalty = value => {
-        const ratio = value / target;
-        return Math.max(0, 1 - ratio) + 1.5 * Math.max(0, ratio - 1);
+        const [min, max] = ranges[key] || [target - 100, target + 100];
+        return Math.max(0, (min - value) / target) + 1.5 * Math.max(0, (value - max) / target);
       };
       score += weight * (penalty(before) - penalty(after));
     }
@@ -4184,7 +4175,7 @@ function advanceNutritionTip() {
     }
   }
   const current = remaining.shift();
-  storage.setItem(getUserKey("nutritionTipState"), JSON.stringify({remaining, current}));
+  storage.setItem(getUserKey("nutritionTipState"), JSON.stringify({ remaining, current }));
   return NUTRITION_TIPS.find(t => t.id === current);
 }
 function nutritionTipMarkup(tip, history = false) {
@@ -4675,14 +4666,9 @@ function renderTodayPage() {
       diffText = `±0.0${field.unit}`;
     }
 
-    /* 既存の栄養状態の判定は維持 */
-    if (field.key === "salt_g") {
-      nutritionState = ratio > 1.0 ? "is-high" : "is-good";
-    } else if (ratio < 0.8) {
-      nutritionState = "is-low";
-    } else if (ratio > 1.2) {
-      nutritionState = "is-high";
-    }
+    const judgement = getNutritionJudgement(field.key, actualValue, ideal);
+    nutritionState = `is-${judgement}`;
+    diffClass = judgement === "neutral" ? "diff-neutral" : judgement === "good" ? "diff-good" : judgement === "high" ? "diff-plus" : "diff-minus";
 
     return `
                           <div class="nutrition-item ${nutritionState}">
@@ -4770,7 +4756,7 @@ function renderTodayPage() {
                       <div class="recommend-food-list">
 
                         ${recommendFoods.length > 0
-      ? recommendFoods.map(food => `
+        ? recommendFoods.map(food => `
                         <button type="button" class="recommend-food-btn" data-id="${food.id}">
 
                           <span class="recommend-food-name">
@@ -4789,12 +4775,12 @@ function renderTodayPage() {
 
                         </button>
                         `).join("")
-      : `
+        : `
                         <div class="recommend-empty">
                           現在おすすめできるメニューはありません
                         </div>
                         `
-    }
+      }
 
                       </div>
 
@@ -4931,8 +4917,10 @@ function renderTodayPage() {
       if (!largeOption) return;
 
       const quantity = food.quantity || 1;
-      const updated = { ...food, isLarge: true,
-        name: `${baseFood.name} 大盛り${food.isSoupLess ? "（スープなし）" : ""}` };
+      const updated = {
+        ...food, isLarge: true,
+        name: `${baseFood.name} 大盛り${food.isSoupLess ? "（スープなし）" : ""}`
+      };
       FOOD_NUMERIC_FIELDS.forEach(key => {
         updated[key] = (Number(food[key]) || 0) + (Number(largeOption[key]) || 0) * quantity;
       });
@@ -4959,8 +4947,10 @@ function renderTodayPage() {
       const largeOption = getLargeOptionForFood(baseFood);
       if (!largeOption) return;
       const quantity = food.quantity || 1;
-      const updated = { ...food, isLarge: false,
-        name: `${baseFood.name}${food.isSoupLess ? "（スープなし）" : ""}` };
+      const updated = {
+        ...food, isLarge: false,
+        name: `${baseFood.name}${food.isSoupLess ? "（スープなし）" : ""}`
+      };
       FOOD_NUMERIC_FIELDS.forEach(key => {
         updated[key] = (Number(food[key]) || 0) - (Number(largeOption[key]) || 0) * quantity;
       });
@@ -5430,7 +5420,7 @@ function renderMyPage() {
   const gender = storage.getItem(getUserKey("gender"));
   const age = storage.getItem(getUserKey("age"));
   const height = storage.getItem(getUserKey("height"));
-  const weight = storage.getItem(getUserKey("weight"));
+
 
   document.getElementById("profileCard").innerHTML = `
                   <div class="profile-card">
@@ -5458,10 +5448,7 @@ function renderMyPage() {
     <strong>${height}cm</strong>
   </div>
 
-  <div class="profile-info-item">
-    <span>体重</span>
-    <strong>${weight}kg</strong>
-  </div>
+
 </div>
                     <button type="button" id="editProfileBtn" class="edit-profile-btn">
                       基本情報を変更
@@ -6370,3 +6357,84 @@ if (recommendOverlay && closeRecommendPopup) {
 
 }
 
+
+/* =========================
+   保存済み基本情報からSTART画面へ
+   30分のログイン期限とは独立して判定する
+========================= */
+(function initializeReturnStart() {
+  const startPage = document.getElementById("returnStartPage");
+  const startBtn = document.getElementById("returnStartBtn");
+  const switchBtn = document.getElementById("returnSwitchBtn");
+  if (!startPage || !startBtn || !switchBtn) return;
+
+  const fields = ["gender", "age", "height"];
+  const hasProfile = owner => Boolean(owner) && fields.every(field =>
+    Boolean(storage.getItem(`${owner}_${field}`))
+  );
+
+  // 前回保存したプロフィールを優先。旧バージョンの保存データも引き継ぐ。
+  const users = getUsers();
+  const current = localStorage.getItem("currentUser");
+  const last = localStorage.getItem("lastProfileUser");
+  let owner = [current, last].find(name => name && users[name] && hasProfile(name));
+  if (!owner) {
+    const candidates = Object.keys(users).filter(name => hasProfile(name));
+    if (candidates.length === 1) owner = candidates[0];
+  }
+  // 古い匿名形式のプロフィールも利用可能にする。
+  const anonymous = !owner && fields.every(field => Boolean(storage.getItem(field)));
+  if (!owner && !anonymous) return;
+
+  authChoicePage.style.display = "none";
+  loginPage.style.display = "none";
+  registerPage.style.display = "none";
+  progressContainer.style.display = "none";
+  inputCard.style.display = "none";
+  startPage.style.display = "flex";
+
+  startBtn.addEventListener("click", () => {
+    if (owner) {
+      localStorage.setItem("currentUser", owner);
+      localStorage.setItem("lastProfileUser", owner);
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+    loadUserProfileIntoForm();
+    loadTodayMealFromHistory();
+    startPage.style.display = "none";
+    menuMode = "select";
+    selectedFoods = [];
+    renderMenuList();
+    updateSelectedBar();
+    document.getElementById("selectMenuPage").style.display = "block";
+    document.getElementById("appContainer").classList.add("has-bottom-nav");
+    document.getElementById("bottomNav").style.display = "flex";
+    setActiveTab(menuTab);
+    if (owner) resetSessionTimeout();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  });
+
+  switchBtn.addEventListener("click", () => {
+    // ログアウトや別ユーザーへの切り替えは行わず、保存済み情報を編集する。
+    if (owner) {
+      localStorage.setItem("currentUser", owner);
+      localStorage.setItem("lastProfileUser", owner);
+    } else {
+      localStorage.removeItem("currentUser");
+    }
+    loadUserProfileIntoForm();
+    startPage.style.display = "none";
+    authChoicePage.style.display = "none";
+    loginPage.style.display = "none";
+    registerPage.style.display = "none";
+    document.getElementById("selectMenuPage").style.display = "none";
+    document.getElementById("bottomNav").style.display = "none";
+    document.getElementById("appContainer").classList.remove("has-bottom-nav");
+    progressContainer.style.display = "flex";
+    inputCard.style.display = "flex";
+    // 編集を保存したら既存の処理でマイページに戻る。
+    isEditingProfile = true;
+    window.scrollTo({ top: 0, behavior: "auto" });
+  });
+})();

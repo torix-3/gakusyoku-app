@@ -19,6 +19,18 @@
 
   <div class="container" id="appContainer">
 
+    <!-- 保存済み基本情報がある利用者向けの開始画面 -->
+    <div id="returnStartPage" class="return-start-page" style="display:none;">
+      <div class="return-start-card">
+        <div class="return-start-logo">🍽️</div>
+        <h1>常翔ウェルフェア</h1>
+        <p class="return-start-lead">今日の学食、何にする？</p>
+        <p class="return-start-saved">✓ 基本情報は登録済みです</p>
+        <button type="button" id="returnStartBtn" class="return-start-btn">START　→</button>
+        <button type="button" id="returnSwitchBtn" class="return-switch-btn">基本情報を変更する</button>
+      </div>
+    </div>
+
     <!-- =========================
      新規登録・ログイン選択画面
 ========================= -->
@@ -466,8 +478,8 @@
         </div>
 
         <div id="detailActionRow" class="detail-action-row">
-          <button type="button" class="next-btn enabled" id="registerBtn">選択リストに追加</button>
           <button type="button" class="next-btn enabled" id="removeDetailBtn" style="display:none;">リストから消去</button>
+          <button type="button" class="next-btn enabled" id="registerBtn">選択リストに追加</button>
         </div>
 
         <button type="button" class="back-link" id="backToMenuBtnBottom">
@@ -619,7 +631,6 @@
       <div class="progress-step"></div>
       <div class="progress-step"></div>
       <div class="progress-step"></div>
-      <div class="progress-step"></div>
     </div>
 
     <!-- 入力画面 -->
@@ -653,15 +664,6 @@
           <option value="">選択してください</option>
         </select>
       </div>
-
-      <!-- 体重 (Step 4) -->
-      <div class="question">
-        <label>体重を選択してください</label>
-        <select id="weight">
-          <option value="">選択してください</option>
-        </select>
-      </div>
-
       <!-- 次へボタン -->
       <div class="button-area">
         <button type="button" class="next-btn" id="nextBtn" disabled>次へ</button>
