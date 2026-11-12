@@ -35,6 +35,37 @@ function openEditor(id){
  el('modalTitle').textContent=id?'メニューを編集':'新規メニューを登録';
  const labels={name:'商品名',price:'価格（円）',category:'カテゴリ',energy_kcal:'エネルギー（kcal）',protein_g:'たんぱく質（g）',fat_g:'脂質（g）',carb_g:'炭水化物（g）',salt_g:'食塩相当量（g）'};
  el('formFields').innerHTML=fields.map(k=>`<label>${labels[k]}${k==='category'?`<select name="${k}">${data().categories.filter(c=>building==='2'||c.id!=='daily').map(c=>`<option value="${esc(c.id)}" ${i.category===c.id?'selected':''}>${esc(c.label)}</option>`).join('')}</select>`:`<input name="${k}" ${k==='name'?'type="text" required maxlength="120"':'type="number" step="any" min="0"'} value="${esc(i[k]??'')}">`}</label>`).join('')+`<label class="wide">写真のURL（任意）<input name="image_url" type="url" placeholder="https://.../photo.jpg" value="${esc(i.image_url||'')}"><span class="hint">写真はGoogle Driveに保存します。公開用の料理写真だけを登録してください。</span></label><label class="wide">端末から写真を選ぶ（JPEG / PNG / WebP、最大4MB）<input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp"><button id="uploadPhoto" type="button">写真をアップロード</button><span id="photoStatus" class="hint">アップロード後、写真URLが自動入力されます。</span><img id="photoPreview" class="photo-preview" style="display:none" alt="写真プレビュー"></label><label>表示設定<select name="visible"><option value="false" ${!i.visible?'selected':''}>OFF（非公開）</option><option value="true" ${i.visible?'selected':''}>ON（公開候補）</option></select></label>`;
+
+ // 注文オプション: 既存メニューは従来の動作を引き継ぎ、新規はカテゴリから初期値を提案。
+ const optionItem = i || {};
+ const isExisting = Boolean(id);
+ const baseCategory = i.category;
+ const isSet = Array.isArray(i.tags) && i.tags.includes('set');
+ const isOption = Array.isArray(i.tags) && i.tags.includes('option');
+ const eligible = !isSet && !isOption;
+ const defaultLarge = eligible && ['udon','ramen','curry'].includes(baseCategory);
+ const defaultSoup = eligible && ['udon','ramen'].includes(baseCategory);
+ const largeEnabled = i.option_large_enabled === undefined ? defaultLarge : Boolean(i.option_large_enabled);
+ const soupEnabled = i.option_soup_enabled === undefined ? defaultSoup : Boolean(i.option_soup_enabled);
+ const opts = `
+ <div class="wide" style="border-top:1px solid #ddd;padding-top:14px"><b>注文オプション</b><p class="hint">新しい麺類には初期設定を提案します。料理ごとに変更できます。既存メニューは未設定なら従来の判定を使用します。</p></div>
+ <label class="wide"><span><input type="checkbox" name="option_large_enabled" ${largeEnabled?'checked':''}> 大盛りに対応する</span></label>
+ <label>大盛り追加料金（円）<input type="number" name="option_large_price" min="0" step="1" placeholder="未入力なら従来設定" value="${esc(i.option_large_price??'')}"></label>
+ <label>追加エネルギー（kcal）<input type="number" name="option_large_energy_kcal" min="0" step="any" value="${esc(i.option_large_energy_kcal??'')}"></label>
+ <label>追加たんぱく質（g）<input type="number" name="option_large_protein_g" min="0" step="any" value="${esc(i.option_large_protein_g??'')}"></label>
+ <label>追加脂質（g）<input type="number" name="option_large_fat_g" min="0" step="any" value="${esc(i.option_large_fat_g??'')}"></label>
+ <label>追加炭水化物（g）<input type="number" name="option_large_carb_g" min="0" step="any" value="${esc(i.option_large_carb_g??'')}"></label>
+ <label>追加食塩相当量（g）<input type="number" name="option_large_salt_g" min="0" step="any" value="${esc(i.option_large_salt_g??'')}"></label>
+ <label class="wide"><span><input type="checkbox" name="option_soup_enabled" ${soupEnabled?'checked':''}> スープを飲まない選択に対応する</span></label>
+ <label>スープを飲まない場合の塩分減少率（%）<input type="number" name="option_soup_reduction" min="0" max="100" step="any" value="${esc(i.option_soup_reduction??50)}"></label>
+ <p class="hint wide">大盛りの追加栄養量が未登録の新メニューでは、誤った栄養計算を避けるため学生側に大盛りを表示しません。13号館も実測値を登録してください。</p>`;
+ el('formFields').insertAdjacentHTML('beforeend',opts);
+ const catSelect=el('menuForm').elements.namedItem('category');
+ catSelect.addEventListener('change',()=>{
+   if(isExisting)return; // 既存の設定は勝手に変更しない
+   el('menuForm').elements.namedItem('option_large_enabled').checked=['udon','ramen','curry'].includes(catSelect.value);
+   el('menuForm').elements.namedItem('option_soup_enabled').checked=['udon','ramen'].includes(catSelect.value);
+ });
  el('modal').classList.remove('hidden');
 }
 async function uploadSelectedPhoto(){
@@ -70,6 +101,17 @@ function closeEditor(){el('modal').classList.add('hidden');editingId=null;}
 el('closeModal').onclick=closeEditor;el('cancelModal').onclick=closeEditor;
 el('menuForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.currentTarget);const name=String(fd.get('name')||'').trim();if(!name){alert('商品名を入力してください');return;}
  const id=editingId||'admin-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);const k=key(id);const change={id,name,building,category:String(fd.get('category')),image_url:String(fd.get('image_url')||'').trim(),visible:fd.get('visible')==='true'};
+ const optionNames=['option_large_price','option_large_energy_kcal','option_large_protein_g','option_large_fat_g','option_large_carb_g','option_large_salt_g'];
+ change.option_large_enabled=fd.has('option_large_enabled');
+ change.option_soup_enabled=fd.has('option_soup_enabled');
+ for(const field of optionNames){const v=String(fd.get(field)||'').trim();change[field]=v===''?null:Number(v);}
+ change.option_soup_reduction=Math.min(100,Math.max(0,Number(fd.get('option_soup_reduction')||50)));
+ if(change.option_large_enabled){
+   const all=optionNames.every(f=>change[f]!==null);
+   const old=editingId?rows().find(x=>x.id===editingId):null;
+   const legacy=old && !Object.prototype.hasOwnProperty.call(old,'option_large_enabled');
+   if(!all && !legacy){alert('大盛り対応を有効にする場合、追加料金と5つの追加栄養量をすべて入力してください。');return;}
+ }
  for(const f of fields.filter(x=>!['name','category'].includes(x))){const v=String(fd.get(f)||'').trim();change[f]=v===''?null:Number(v);}
  patches[k]={...(patches[k]||{}),...change,created:editingId?(patches[k]?.created||false):true,deleted:false};
  if(building==='2'&&change.category==='daily'&&change.visible)keepSingleDaily(id);

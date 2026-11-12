@@ -869,15 +869,30 @@ const LARGE_CURRY_OPTION_IDS = {
 };
 function getLargeOptionForFood(food) {
   if (!food || food.tags?.includes("option") || food.tags?.includes("set")) return null;
+  if (food.option_large_enabled === false) return null;
+  const keys=["price","energy_kcal","protein_g","fat_g","carb_g","salt_g"];
+  const customKeys=["option_large_price","option_large_energy_kcal","option_large_protein_g","option_large_fat_g","option_large_carb_g","option_large_salt_g"];
+  if (food.option_large_enabled === true && customKeys.every(k=>food[k]!==null && food[k]!==undefined && Number.isFinite(Number(food[k])))) {
+    return Object.fromEntries(keys.map((k,j)=>[k,Number(food[customKeys[j]])]));
+  }
+  // 新規登録品に2号館の値を無条件流用しない。
+  if (food.adminManaged || String(food.id).startsWith('admin-')) return null;
   if (food.category === "curry") {
     const optionId = LARGE_CURRY_OPTION_IDS[food.id];
     return optionId ? MENU_DATA.items.find(item => item.id === optionId) || null : null;
   }
   if (!["udon", "ramen"].includes(food.category)) return null;
-  return MENU_DATA.items.find(item =>
-    item.category === food.category && item.tags.includes("option")
-  ) || null;
+  return MENU_DATA.items.find(item => item.category === food.category && item.tags.includes("option")) || null;
 }
+function canUseSoupOption(food) {
+  if (!food || food.tags?.includes('option') || food.tags?.includes('set')) return false;
+  return food.option_soup_enabled === undefined ? ["udon","ramen"].includes(food.category) : Boolean(food.option_soup_enabled);
+}
+function soupSaltFactor(food) {
+  const reduction=Number(food?.option_soup_reduction);
+  return 1 - (Number.isFinite(reduction) ? Math.min(100,Math.max(0,reduction)) : 50)/100;
+}
+
 
 const SHARED_MENU_IMAGES = {
   "b13-udon-03": "udon-03",
@@ -1470,7 +1485,7 @@ function applyAdminMenuOverrides() {
     for (const item of dataset.items) {
       const patch = getAdminOverride(building, item.id);
       if (!patch) continue;
-      for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted","image_url"]) {
+      for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted","image_url","option_large_enabled","option_large_price","option_large_energy_kcal","option_large_protein_g","option_large_fat_g","option_large_carb_g","option_large_salt_g","option_soup_enabled","option_soup_reduction"]) {
         if (Object.prototype.hasOwnProperty.call(patch,field)) item[field] = patch[field];
       }
       const cat = dataset.categories.find(c => c.id === item.category);
@@ -3449,7 +3464,7 @@ function getDisplayFood() {
     displayFood = {
       ...displayFood,
       isSoupLess: true,
-      salt_g: displayFood.salt_g * 0.5
+      salt_g: displayFood.salt_g * soupSaltFactor(selectedFood)
     };
   }
   return displayFood;
@@ -3685,22 +3700,21 @@ function showDetail(itemId) {
 
   if (
     menuMode === "select" &&
-    largeOption &&
-    ["udon", "ramen", "curry"].includes(selectedFood.category)
+    largeOption
   ) {
     largeOptionArea.style.display = "block";
     largeOptionText.textContent = `+${largeOption.price}円 / +${largeOption.energy_kcal}kcal${activeBuilding === "13" ? "（2号館の値を仮使用）" : ""}`;
   } else {
     largeOptionArea.style.display = "none";
   }
-  const canSoupMenu = ["udon", "ramen"].includes(selectedFood.category);
+  const canSoupMenu = canUseSoupOption(selectedFood);
 
   soupOptionArea.style.display = canSoupMenu ? "block" : "none";
   soupOptionCheck.checked = Boolean(existingSelectedFood?.isSoupLess);
   document.getElementById("soupOptionText").textContent =
     activeBuilding === "13"
       ? "※塩分約50%減（2号館と同じと仮定した推定値）"
-      : "※塩分を約50%減として計算";
+      : `※塩分を約${Math.round((1-soupSaltFactor(selectedFood))*100)}%減として計算`;
 
   document.getElementById("selectMenuPage").style.display = "none";
   document.getElementById("detailPage").style.display = "block";
@@ -3938,11 +3952,11 @@ ${NUTRITION_FIELDS.map(f => {
         };
       }
     }
-    if (isSoupLess && ["udon", "ramen"].includes(baseFood.category)) {
+    if (isSoupLess && canUseSoupOption(baseFood)) {
       updated = {
         ...updated, isSoupLess: true,
         name: `${updated.name}（スープなし）`,
-        salt_g: updated.salt_g * 0.5
+        salt_g: updated.salt_g * soupSaltFactor(baseFood)
       };
     }
     selectedFoods[index] = updated;
@@ -4601,7 +4615,7 @@ function renderTodayPage() {
 
     const canSoupMenu =
       baseFood &&
-      ["udon", "ramen"].includes(baseFood.category);
+      canUseSoupOption(baseFood);
 
     return `
                         <li class="today-food-item">
@@ -5258,7 +5272,7 @@ function renderTodayPage() {
       FOOD_NUMERIC_FIELDS.forEach(key => {
         updated[key] = (Number(food[key]) || 0) + (Number(largeOption[key]) || 0) * quantity;
       });
-      if (food.isSoupLess) updated.salt_g -= (Number(largeOption.salt_g) || 0) * quantity * 0.5;
+      if (food.isSoupLess) updated.salt_g -= (Number(largeOption.salt_g) || 0) * quantity * soupSaltFactor(baseFood);
       registeredFoods[index] = updated;
 
       registeredTotalFood = calcTotalFood(registeredFoods);
@@ -5288,7 +5302,7 @@ function renderTodayPage() {
       FOOD_NUMERIC_FIELDS.forEach(key => {
         updated[key] = (Number(food[key]) || 0) - (Number(largeOption[key]) || 0) * quantity;
       });
-      if (food.isSoupLess) updated.salt_g += (Number(largeOption.salt_g) || 0) * quantity * 0.5;
+      if (food.isSoupLess) updated.salt_g += (Number(largeOption.salt_g) || 0) * quantity * soupSaltFactor(baseFood);
       registeredFoods[index] = updated;
 
       registeredTotalFood = calcTotalFood(registeredFoods);
@@ -5309,7 +5323,7 @@ function renderTodayPage() {
         name: food.name.includes("（スープなし）")
           ? food.name
           : `${food.name}（スープなし）`,
-        salt_g: food.salt_g * 0.5
+        salt_g: food.salt_g * soupSaltFactor(findBaseMenuById(food.baseId || food.id))
       };
 
       registeredTotalFood = calcTotalFood(registeredFoods);
@@ -5333,7 +5347,7 @@ function renderTodayPage() {
         ...food,
         isSoupLess: false,
         name: `${baseFood.name}${food.isLarge ? " 大盛り" : ""}`,
-        salt_g: food.salt_g * 2
+        salt_g: food.salt_g / Math.max(0.001,soupSaltFactor(baseFood))
       };
 
       registeredTotalFood = calcTotalFood(registeredFoods);
@@ -6560,7 +6574,7 @@ function makeSelectedFoodFromDetail() {
   }
   const soupCheck = document.getElementById("soupOptionCheck");
   if (soupCheck.checked && document.getElementById("soupOptionArea").style.display !== "none") {
-    food = { ...food, isSoupLess: true, name: `${food.name}（スープなし）`, salt_g: food.salt_g * 0.5 };
+    food = { ...food, isSoupLess: true, name: `${food.name}（スープなし）`, salt_g: food.salt_g * soupSaltFactor(findBaseMenuById(food.baseId || food.id)) };
   }
   return food;
 }
