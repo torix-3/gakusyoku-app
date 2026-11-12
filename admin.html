@@ -34,9 +34,38 @@ function openEditor(id){
  editingId=id;const i=id?rows().find(x=>x.id===id):{name:'',price:null,category:data().categories[0].id,energy_kcal:null,protein_g:null,fat_g:null,carb_g:null,salt_g:null,visible:false,image_url:''};
  el('modalTitle').textContent=id?'メニューを編集':'新規メニューを登録';
  const labels={name:'商品名',price:'価格（円）',category:'カテゴリ',energy_kcal:'エネルギー（kcal）',protein_g:'たんぱく質（g）',fat_g:'脂質（g）',carb_g:'炭水化物（g）',salt_g:'食塩相当量（g）'};
- el('formFields').innerHTML=fields.map(k=>`<label>${labels[k]}${k==='category'?`<select name="${k}">${data().categories.filter(c=>building==='2'||c.id!=='daily').map(c=>`<option value="${esc(c.id)}" ${i.category===c.id?'selected':''}>${esc(c.label)}</option>`).join('')}</select>`:`<input name="${k}" ${k==='name'?'type="text" required maxlength="120"':'type="number" step="any" min="0"'} value="${esc(i[k]??'')}">`}</label>`).join('')+`<label class="wide">写真のURL（任意）<input name="image_url" type="url" placeholder="https://.../photo.jpg" value="${esc(i.image_url||'')}"><span class="hint">現段階は画像URLの登録に対応。端末からの写真アップロードは次段階でGAS・Driveに接続します。</span></label><label>表示設定<select name="visible"><option value="false" ${!i.visible?'selected':''}>OFF（非公開）</option><option value="true" ${i.visible?'selected':''}>ON（公開候補）</option></select></label>`;
+ el('formFields').innerHTML=fields.map(k=>`<label>${labels[k]}${k==='category'?`<select name="${k}">${data().categories.filter(c=>building==='2'||c.id!=='daily').map(c=>`<option value="${esc(c.id)}" ${i.category===c.id?'selected':''}>${esc(c.label)}</option>`).join('')}</select>`:`<input name="${k}" ${k==='name'?'type="text" required maxlength="120"':'type="number" step="any" min="0"'} value="${esc(i[k]??'')}">`}</label>`).join('')+`<label class="wide">写真のURL（任意）<input name="image_url" type="url" placeholder="https://.../photo.jpg" value="${esc(i.image_url||'')}"><span class="hint">写真はGoogle Driveに保存します。公開用の料理写真だけを登録してください。</span></label><label class="wide">端末から写真を選ぶ（JPEG / PNG / WebP、最大4MB）<input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp"><button id="uploadPhoto" type="button">写真をアップロード</button><span id="photoStatus" class="hint">アップロード後、写真URLが自動入力されます。</span><img id="photoPreview" class="photo-preview" style="display:none" alt="写真プレビュー"></label><label>表示設定<select name="visible"><option value="false" ${!i.visible?'selected':''}>OFF（非公開）</option><option value="true" ${i.visible?'selected':''}>ON（公開候補）</option></select></label>`;
  el('modal').classList.remove('hidden');
 }
+async function uploadSelectedPhoto(){
+ const file=el('photoFile').files[0], status=el('photoStatus'), button=el('uploadPhoto');
+ if(!file){status.textContent='先に写真を選択してください。';return;}
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>4*1024*1024){status.textContent='JPEG / PNG / WebP、4MB以内の画像を選んでください。';return;}
+ if(!syncUrl){status.textContent='GASの接続先が未設定です。';return;}
+ const adminKey=el('publishKey').value;
+ if(!adminKey){status.textContent='画面上部に管理者用公開キーを入力してください。';return;}
+ button.disabled=true;status.textContent='アップロード中…';
+ try{
+  const base64=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=()=>reject(new Error('画像の読み込みに失敗'));reader.readAsDataURL(file)});
+  const requestId='img_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  await fetch(syncUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'uploadImage',key:adminKey,requestId,fileName:file.name,mimeType:file.type,base64})});
+  let result=null;
+  for(let attempt=0;attempt<7;attempt++){
+   await new Promise(r=>setTimeout(r,1000));
+   const response=await cloudRead('imageStatus',{requestId});
+   if(!response.ok)throw new Error(response.error||'確認失敗');
+   if(response.status==='done'){result=response;break;}
+   if(response.status==='error')throw new Error(response.error||'保存失敗');
+  }
+  if(!result||!result.url)throw new Error('保存結果を確認できません。もう一度押す前にGoogle Driveを確認してください。');
+  el('menuForm').elements.namedItem('image_url').value=result.url;
+  el('photoPreview').src=result.url;el('photoPreview').style.display='block';
+  status.textContent='アップロード完了。最後に「内容を保存」→「全学生に公開」を押してください。';
+ }catch(err){status.textContent='アップロード失敗：'+err.message;}
+ finally{button.disabled=false;}
+}
+el('formFields').addEventListener('click',e=>{if(e.target.id==='uploadPhoto')uploadSelectedPhoto()});
+el('formFields').addEventListener('change',e=>{if(e.target.id==='photoFile'&&e.target.files[0]){const img=el('photoPreview');img.src=URL.createObjectURL(e.target.files[0]);img.style.display='block';}});
 function closeEditor(){el('modal').classList.add('hidden');editingId=null;}
 el('closeModal').onclick=closeEditor;el('cancelModal').onclick=closeEditor;
 el('menuForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.currentTarget);const name=String(fd.get('name')||'').trim();if(!name){alert('商品名を入力してください');return;}
@@ -61,7 +90,7 @@ el('reset').onclick=()=>{if(!confirm(`${building}号館の管理設定をこの�
 const syncUrl = (window.MENU_SYNC_CONFIG && window.MENU_SYNC_CONFIG.url || "").trim();
 const state = el('syncState');
 state.textContent = syncUrl ? '共有サーバーURL設定済み。公開前に「共有設定を取得」してください。' : '未接続：menu-sync-config.js にGASの /exec URLを設定してください。';
-function cloudRead() {
+function cloudRead(action="read", params={}) {
  return new Promise((resolve,reject)=>{
   if(!syncUrl){reject(new Error('GAS URL未設定'));return;}
   const cb='joshoAdmin_'+Math.random().toString(36).slice(2), script=document.createElement('script');
@@ -70,7 +99,7 @@ function cloudRead() {
   const timer=setTimeout(()=>end(new Error('読み込みタイムアウト')),12000);
   window[cb]=data=>end(null,data);
   script.onerror=()=>end(new Error('通信失敗'));
-  script.src=syncUrl+(syncUrl.includes('?')?'&':'?')+'action=read&callback='+cb+'&_='+Date.now();
+  script.src=syncUrl+(syncUrl.includes('?')?'&':'?')+'action='+encodeURIComponent(action)+'&callback='+cb+'&_='+Date.now()+Object.entries(params).map(([k,v])=>'&'+encodeURIComponent(k)+'='+encodeURIComponent(v)).join('');
   document.head.appendChild(script);
  });
 }

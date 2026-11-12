@@ -908,6 +908,7 @@ Object.assign(SHARED_MENU_IMAGES, {
 });
 
 function getMenuImagePath(food) {
+  if (food && /^https:\/\//.test(food.image_url || "")) return food.image_url;
   const sharedId = SHARED_MENU_IMAGES[food.id];
 
   if (sharedId) {
