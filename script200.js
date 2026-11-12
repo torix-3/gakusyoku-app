@@ -1469,7 +1469,7 @@ function applyAdminMenuOverrides() {
     for (const item of dataset.items) {
       const patch = getAdminOverride(building, item.id);
       if (!patch) continue;
-      for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted"]) {
+      for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted","image_url"]) {
         if (Object.prototype.hasOwnProperty.call(patch,field)) item[field] = patch[field];
       }
       const cat = dataset.categories.find(c => c.id === item.category);
