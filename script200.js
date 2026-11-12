@@ -64,7 +64,8 @@ const MENU_DATA = {
     { "id": "curry", "label": "カレー", "emoji": "🍛" },
     { "id": "side", "label": "サイドメニュー", "emoji": "🥗" },
     { "id": "seasonal", "label": "季節限定", "emoji": "🧊" },
-    { "id": "recommended", "label": "おすすめメニュー", "emoji": "✨" }
+    { "id": "recommended", "label": "おすすめメニュー", "emoji": "✨" },
+    { "id": "daily", "label": "日替わりメニュー", "emoji": "🍱" }
   ],
   "items": [
     {
@@ -1002,6 +1003,16 @@ function getMenu13AvailableIds(date) {
   return [...new Set([...dailyIds, ...weeklyIds])];
 }
 
+// 2号館の日替わり仮メニュー（価格・栄養値はテスト用の仮値）。
+// 公開ONにするまでは学生画面に表示されません。
+MENU_DATA.items.push({
+  id: "b2-daily-demo-nikujaga", name: "肉じゃが定食（仮）",
+  category: "daily", category_label: "日替わりメニュー",
+  building: "2", tags: [], price: 550,
+  energy_kcal: 680, protein_g: 25, fat_g: 20, carb_g: 96, salt_g: 3.2,
+  provisionalNutrition: true, adminManaged: true
+});
+
 /* =========================
    2号館 日替わりメニュー
 ========================= */
@@ -1485,6 +1496,7 @@ function loadSharedMenuSettings() {
     applyAdminMenuOverrides();
     if (typeof renderTabs === "function") renderTabs();
     if (typeof renderMenuList === "function") renderMenuList();
+    if (typeof renderDailyMenuCard === "function") renderDailyMenuCard();
   }
   window[callback] = data => finish(null,data);
   tag.onerror = () => finish(new Error("network"));
@@ -1562,13 +1574,11 @@ function renderDailyMenuCard() {
   // 選択中の日付
   const dateText = formatCafeteriaDate(selectedCafeteriaDate);
 
-  // その日に提供される日替わり料理ID
-  const dailyIds = MENU_3_DAILY_SCHEDULE[dateText] || [];
-
-  // 2号館の料理データから検索
-  const dailyFoods = dailyIds
-    .map(id => MENU_DATA.items.find(item => item.id === id))
-    .filter(isB2MenuVisible);
+  // 管理画面で「日替わりメニュー」に分類し、表示ONにした2号館の商品だけ表示。
+  // 現在は提供日データ未登録のため、ONの商品を日付に関係なく仮表示する。
+  const dailyFoods = MENU_DATA.items.filter(item =>
+    item.category === "daily" && isB2MenuVisible(item)
+  );
 
   // 献立未登録の場合
   if (dailyFoods.length === 0) {
