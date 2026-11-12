@@ -5249,3 +5249,9 @@ input[type="text"] {
 .monthly-legend-btn.is-hidden .monthly-legend-mark { background: #a0a6ad; }
 .monthly-legend-eye { font-size: 17px; line-height: 1; }
 .monthly-legend-btn:focus-visible { outline: 3px solid #333; outline-offset: 2px; }
+
+/* 2号館 日替わりカード：写真がある場合は大きく表示 */
+.daily-menu-content:has(.daily-menu-placeholder.has-photo) { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.daily-menu-placeholder.has-photo { width: 100%; height: auto; aspect-ratio: 16 / 9; overflow: hidden; background: #f6f6f6; border-radius: 14px; }
+.daily-menu-placeholder.has-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.daily-menu-content:has(.daily-menu-placeholder.has-photo) .daily-menu-details { width: 100%; }

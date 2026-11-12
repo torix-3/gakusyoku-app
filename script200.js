@@ -1581,8 +1581,27 @@ function renderDailyMenuCard() {
     item.category === "daily" && isB2MenuVisible(item)
   );
 
+  const photoBox = document.getElementById("dailyMenuPhotoBox");
+  const photo = document.getElementById("dailyMenuPhoto");
+  const photoFallback = document.getElementById("dailyMenuPhotoFallback");
+  const setDailyPhoto = (url) => {
+    if (!photo || !photoBox || !photoFallback) return;
+    photo.onload = () => { photo.style.display = "block"; photoFallback.style.display = "none"; photoBox.classList.add("has-photo"); };
+    photo.onerror = () => { photo.style.display = "none"; photoFallback.style.display = "block"; photoBox.classList.remove("has-photo"); };
+    if (url && /^https:\/\//i.test(url)) {
+      photo.style.display = "none";
+      photoFallback.style.display = "block";
+      photoBox.classList.remove("has-photo");
+      photo.src = url;
+    } else {
+      photo.removeAttribute("src");
+      photo.onerror();
+    }
+  };
+
   // 献立未登録の場合
   if (dailyFoods.length === 0) {
+    setDailyPhoto(null);
     name.textContent = "献立情報を準備中";
     description.textContent =
       `${dateText} の日替わりメニューはまだ登録されていません。`;
@@ -1595,6 +1614,7 @@ function renderDailyMenuCard() {
 
   // 登録済みの料理を表示（まずは1品対応）
   const food = dailyFoods[0];
+  setDailyPhoto(food.image_url || null);
 
   name.textContent = food.name;
   description.textContent =
