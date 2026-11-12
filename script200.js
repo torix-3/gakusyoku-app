@@ -2447,7 +2447,7 @@ tabBar.addEventListener("scroll", updateTabScrollButtons);
 window.addEventListener("resize", updateTabScrollButtons);
 
 function renderTabs() {
-  tabBar.innerHTML = getActiveMenuData().categories.map(cat => `
+  tabBar.innerHTML = getActiveMenuData().categories.filter(cat => !(activeBuilding === "2" && cat.id === "daily")).map(cat => `
               <button type="button" class="tab-item${cat.id === activeCategory ? " active" : ""}"
                 data-category="${cat.id}">
                 ${cat.emoji} ${cat.label}
@@ -2562,6 +2562,7 @@ function renderMenuList() {
 
   // 表示する料理を取得
   const items = getActiveMenuData().items.filter(item => {
+    if (activeBuilding === "2" && item.category === "daily") return false;
     if (item.category !== activeCategory) return false;
     if (item.tags.includes("option")) return false;
     if (item.deleted) return false;
