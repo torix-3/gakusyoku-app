@@ -5135,3 +5135,117 @@ input[type="text"] {
 #confirmModal .nutrition-item.is-neutral .n-unit {
   font-size: 9px;
 }
+
+/* 年齢・身長：階層式セレクター */
+.hierarchy-native-select { display: none; }
+.hierarchy-picker { width: 100%; font-size: 16px; }
+.hierarchy-picker button { font-family: inherit; cursor: pointer; }
+.hierarchy-summary { width:100%; min-height:60px; padding:15px 18px; display:flex; align-items:center; justify-content:space-between; background:#fff; color:#333; border:2px solid #e5e5e5; border-radius:17px; font-size:18px; font-weight:700; text-align:left; }
+.hierarchy-summary:focus-visible,.hierarchy-group-button:focus-visible,.hierarchy-choice:focus-visible { outline:3px solid #ff7043; outline-offset:2px; }
+.hierarchy-chevron { color:#ff5722; font-size:23px; font-weight:700; }
+.hierarchy-groups { margin-top:9px; padding:7px; background:#fff; border:1px solid #e8e8e8; border-radius:16px; max-height:290px; overflow-y:auto; }
+.hierarchy-section + .hierarchy-section { border-top:1px solid #f1f1f1; }
+.hierarchy-group-button { width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 13px; background:transparent; border:0; color:#444; font-size:16px; font-weight:700; text-align:left; }
+.hierarchy-choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; padding:4px 8px 12px; }
+.hierarchy-choice { padding:12px 4px; border:1px solid #ededed; border-radius:10px; background:#f7f7f7; color:#444; font-size:14px; font-weight:700; }
+.hierarchy-choice.is-selected { background:#fff0e9; color:#e64a19; border-color:#ff7043; }
+
+/* 基本情報入力のナビゲーション */
+#inputCard .button-area { display:block; width:100%; }
+#inputCard .button-area .next-btn { width:100%; box-sizing:border-box; }
+#profileBackBtn { width:100%; box-sizing:border-box; margin-top:12px; border:1px solid #cbd5e1; background:#fff; color:#334155; border-radius:12px; padding:12px 18px; font-size:15px; cursor:pointer; align-items:center; justify-content:center; white-space:nowrap; }
+#cancelProfileEditBtn { display:block; width:100%; margin-top:12px; padding:12px; border:1px solid #cbd5e1; border-radius:12px; background:transparent; color:#475569; font-size:14px; cursor:pointer; }
+
+/* 基本情報入力：戻る操作の視認性を改善 */
+#profileBackBtn,
+#cancelProfileEditBtn {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  margin-top: 12px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+#profileBackBtn {
+  background: #edf4fb;
+  border: 1.5px solid #a6c4df;
+  color: #315b7d;
+}
+#cancelProfileEditBtn {
+  background: #e9f0f7;
+  border: 1.5px solid #94b3ce;
+  color: #284f71;
+}
+#profileBackBtn:hover,
+#cancelProfileEditBtn:hover {
+  background: #dbeafa;
+  border-color: #6c9ec8;
+  box-shadow: 0 2px 6px rgba(36, 81, 118, .10);
+}
+#profileBackBtn:focus-visible,
+#cancelProfileEditBtn:focus-visible {
+  outline: 3px solid rgba(50, 120, 190, .32);
+  outline-offset: 2px;
+}
+
+/* 基本情報編集時のみ、マイページへの導線をカード左上に配置 */
+#inputCard #cancelProfileEditBtn {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 38px;
+  margin: 0 0 22px 0;
+  padding: 8px 13px;
+  display: none;
+  justify-content: flex-start;
+  border: 1px solid #bfd0df;
+  border-radius: 10px;
+  background: #f1f6fa;
+  color: #315b7d;
+  font-size: 14px;
+  box-shadow: none;
+}
+#inputCard #cancelProfileEditBtn:hover {
+  background: #e4eef7;
+  border-color: #94b3ce;
+}
+
+/* 月別グラフ：押しやすいカスタム凡例 */
+.monthly-chart-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+.monthly-legend-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 10px 15px;
+  border: 1.5px solid;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color .15s, opacity .15s;
+  touch-action: manipulation;
+}
+.monthly-legend-btn.orange { background: #fff0e7; border-color: #ef9a68; color: #a34c18; }
+.monthly-legend-btn.blue { background: #e9f3ff; border-color: #85b2e8; color: #285f9c; }
+.monthly-legend-btn.is-hidden { background: #f3f4f6; border-color: #d3d6da; color: #737b86; }
+.monthly-legend-mark { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.monthly-legend-btn.orange .monthly-legend-mark { background: #ff9800; }
+.monthly-legend-btn.blue .monthly-legend-mark { background: #2196f3; }
+.monthly-legend-btn.is-hidden .monthly-legend-mark { background: #a0a6ad; }
+.monthly-legend-eye { font-size: 17px; line-height: 1; }
+.monthly-legend-btn:focus-visible { outline: 3px solid #333; outline-offset: 2px; }

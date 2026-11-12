@@ -63,7 +63,8 @@ const MENU_DATA = {
     { "id": "don", "label": "丼", "emoji": "🍚" },
     { "id": "curry", "label": "カレー", "emoji": "🍛" },
     { "id": "side", "label": "サイドメニュー", "emoji": "🥗" },
-    { "id": "seasonal", "label": "季節限定", "emoji": "🧊" }
+    { "id": "seasonal", "label": "季節限定", "emoji": "🧊" },
+    { "id": "recommended", "label": "おすすめメニュー", "emoji": "✨" }
   ],
   "items": [
     {
@@ -288,9 +289,73 @@ const MENU_DATA = {
     {
       "id": "seasonal-07", "name": "冷やし担々麺からあげセット", "category": "seasonal", "category_label": "季節限定", "tags": ["set",
         "cold"], "price": 710, "energy_kcal": 1059, "protein_g": 39.7, "fat_g": 35.7, "carb_g": 141.2, "salt_g": 7.7
-    }
+    },
+    {"id": "b2-pending-01", "name": "焼鳥丼", "category": "don", "category_label": "丼", "tags": ["pending_nutrition", "daily_candidate"], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-02", "name": "豚玉丼", "category": "don", "category_label": "丼", "tags": ["pending_nutrition", "daily_candidate"], "price": 490, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-03", "name": "油淋鶏定食", "category": "teishoku", "category_label": "定食", "tags": ["pending_nutrition", "daily_candidate"], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-04", "name": "台湾風まぜそば", "category": "ramen", "category_label": "ラーメン", "tags": ["pending_nutrition", "daily_candidate"], "price": 490, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-05", "name": "鶏マヨ丼", "category": "don", "category_label": "丼", "tags": ["pending_nutrition", "daily_candidate"], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-06", "name": "チキンステーキ", "category": "teishoku", "category_label": "定食", "tags": ["pending_nutrition", "daily_candidate"], "price": 570, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-07", "name": "キムチ丼", "category": "don", "category_label": "丼", "tags": ["pending_nutrition", "daily_candidate"], "price": 570, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-08", "name": "ガパオライス", "category": "don", "category_label": "丼", "tags": ["pending_nutrition", "daily_candidate"], "price": 570, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-09", "name": "ミラノ風ドリア", "category": "teishoku", "category_label": "定食", "tags": ["pending_nutrition", "daily_candidate"], "price": 570, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-10", "name": "コロコロガーリックポテト", "category": "side", "category_label": "サイドメニュー", "tags": ["pending_nutrition", "daily_candidate"], "price": null, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false},
+    {"id": "b2-pending-11", "name": "豚丼", "category": "don", "category_label": "丼", "tags": ["pending_nutrition", "daily_candidate"], "price": 530, "energy_kcal": null, "protein_g": null, "fat_g": null, "carb_g": null, "salt_g": null, "visible": false, "nutritionVerified": false}
   ]
 };
+
+
+// 2号館：献立表で確認できなかった品目は、データを保持して非表示にする。
+// 季節限定は販売期間未確認のため、現時点ではすべて非表示。
+const B2_HIDDEN_MENU_IDS = new Set([
+  "udon-02", "udon-04",
+  "ramen-02", "ramen-04", "ramen-06",
+  "don-02", "don-04", "don-07", "don-08", "don-010",
+  "curry-02",
+  "seasonal-01", "seasonal-02", "seasonal-03", "seasonal-04",
+  "seasonal-05", "seasonal-06", "seasonal-07"
+]);
+function isB2MenuVisible(item) {
+  if (!item || item.deleted) return false;
+  const override = getAdminOverride("2", item.id);
+  // 学生画面は初期状態で全品OFF。管理者が明示的にONにした商品のみ表示。
+  return override?.visible === true;
+}
+
+// 定番以外の料理はデータを残したまま「おすすめメニュー」に分類。
+// 管理者設定が導入されるまでは、販売日が不明な料理は非表示。
+const B2_RECOMMENDED_IDS = new Set([
+  "don-02", "don-04", "don-07", "don-08", "don-09", "don-010",
+  "udon-02", "udon-04", "curry-02",
+  "ramen-02", "ramen-04", "ramen-06",
+  "seasonal-01", "seasonal-02", "seasonal-03", "seasonal-04",
+  "seasonal-05", "seasonal-06", "seasonal-07"
+]);
+MENU_DATA.items.forEach(item => {
+  if (item.category === "ramen" && !item.tags.includes("option")) {
+    item.adminManaged = true;
+    item.visible = false;
+  }
+});
+MENU_DATA.items.forEach(item => {
+  if (B2_RECOMMENDED_IDS.has(item.id) || item.tags.includes("daily_candidate")) {
+    item.originalCategory = item.category;
+    item.category = "recommended";
+    item.category_label = "おすすめメニュー";
+    item.adminManaged = true;
+    item.visible = false;
+  }
+});
+
+// 管理者画面の実装に備え、全品目に共通の編集可能な管理属性を付与。
+// 既存の visible=false は維持し、学生画面の表示条件を変えない。
+MENU_DATA.items.forEach(item => {
+  item.building = "2";
+  item.adminEditable = true;
+  item.adminManaged = true;
+  item.availabilityMode = item.category === "recommended" || item.originalCategory === "ramen"
+    ? "manual" : "standard";
+});
 
 /* =========================
    13号館（ブォナージョ）メニュー
@@ -299,22 +364,28 @@ const MENU_DATA = {
 const MENU_13_DATA = {
   categories: [
     // 日替わり・週替わり
-    { id: "daily-teishoku", label: "日替わり定食", emoji: "🍱" },
-    { id: "weekly-teishoku", label: "週替わり定食", emoji: "🍱" },
-    { id: "weekly-don", label: "週替わり丼", emoji: "🍚" },
-    { id: "weekly-udon", label: "う～どん・プチ丼", emoji: "🍜" },
     { id: "premium", label: "プレミアム", emoji: "✨" },
+    { id: "recommended", label: "おすすめメニュー", emoji: "✨" },
 
     // 常時提供メニュー
     { id: "teishoku", label: "定食", emoji: "🍱" },
     { id: "udon", label: "うどん", emoji: "🍜" },
     { id: "ramen", label: "ラーメン", emoji: "🍜" },
     { id: "don", label: "丼", emoji: "🍚" },
-    { id: "curry", label: "カレー", emoji: "🍛" }
+    { id: "curry", label: "カレー", emoji: "🍛" },
+    { id: "side", label: "サイドメニュー", emoji: "🥣" }
   ],
 
 
   items: [
+
+    // 献立表掲載・栄養未確認の追加メニュー
+
+
+    // 13号館サイド：提供品目は確認済み。価格・栄養値は2号館のデータを暫定使用。
+    { ...MENU_DATA.items.find(item => item.id === "side-04"), id: "b13-side-01", name: "ライスM", building: "13", provisionalNutrition: true },
+    { ...MENU_DATA.items.find(item => item.id === "side-01"), id: "b13-side-02", name: "みそ汁", building: "13", provisionalNutrition: true },
+    { ...MENU_DATA.items.find(item => item.id === "side-03"), id: "b13-side-03", name: "チーズ", building: "13", provisionalNutrition: true },
 
     // =====================================
     // 13号館 常時提供うどん
@@ -784,8 +855,24 @@ function findBaseMenuById(id) {
   return MENU_DATA.items.find(item => item.id === id) ||
     MENU_13_DATA.items.find(item => item.id === id);
 }
+// 大盛り対象は販売条件を確認したメニューに限定する。
+// 大盛券は「追加分」なので、通常の料理の価格・栄養成分に加算する。
+// 13号館は2号館と同じルールを暫定適用する。
+const LARGE_CURRY_OPTION_IDS = {
+  "curry-01": "curry-06",       // 常翔特製カレー
+  "curry-02": "curry-07",       // ハヤシライス
+  "curry-03": "curry-06",       // カツは増やさず、ごはんとルーを増量
+  "curry-04": "curry-06",       // 唐揚げは増やさず、ごはんとルーを増量
+  "b13-curry-01": "curry-06",   // 13号館（暫定）
+  "b13-curry-02": "curry-06"    // 13号館（暫定）
+};
 function getLargeOptionForFood(food) {
-  if (!food || !["udon", "ramen", "curry"].includes(food.category)) return null;
+  if (!food || food.tags?.includes("option") || food.tags?.includes("set")) return null;
+  if (food.category === "curry") {
+    const optionId = LARGE_CURRY_OPTION_IDS[food.id];
+    return optionId ? MENU_DATA.items.find(item => item.id === optionId) || null : null;
+  }
+  if (!["udon", "ramen"].includes(food.category)) return null;
   return MENU_DATA.items.find(item =>
     item.category === food.category && item.tags.includes("option")
   ) || null;
@@ -811,6 +898,13 @@ const SHARED_MENU_IMAGES = {
   "b13-curry-01": "curry-01",
   "b13-curry-02": "curry-03"
 };
+
+// 13号館サイドは2号館と同じ写真を共用する。
+Object.assign(SHARED_MENU_IMAGES, {
+  "b13-side-01": "side-04",
+  "b13-side-02": "side-01",
+  "b13-side-03": "side-03"
+});
 
 function getMenuImagePath(food) {
   const sharedId = SHARED_MENU_IMAGES[food.id];
@@ -916,6 +1010,27 @@ const MENU_3_DAILY_SCHEDULE = {
   // 動作確認用の仮データ（実際の日替わり献立ではありません）
 
 };
+// 13号館：日替わり・週替わりはおすすめメニューとして一括管理する。
+const B13_ROTATING_CATEGORIES = new Set([
+  "daily-teishoku", "weekly-teishoku", "weekly-don", "weekly-udon"
+]);
+MENU_13_DATA.items.forEach(item => {
+  if (B13_ROTATING_CATEGORIES.has(item.category)) {
+    item.originalCategory = item.category;
+    item.category = "recommended";
+    item.category_label = "おすすめメニュー";
+    item.adminManaged = true;
+  }
+});
+
+// 13号館も全メニューを将来の管理画面で編集できる対象にする。
+MENU_13_DATA.items.forEach(item => {
+  item.building = "13";
+  item.adminEditable = true;
+  item.adminManaged = true;
+  if (!item.availabilityMode) item.availabilityMode = item.category === "recommended" ? "manual" : "standard";
+});
+
 /* =========================
    13号館の栄養データ形式を統一
 ========================= */
@@ -1327,6 +1442,56 @@ async function sendMealEvaluationToSheet(evaluationData) {
   }
 }
 
+/* GAS同期: URLは menu-sync-config.js に設定。未設定時は従来の同一ブラウザ試作モード。 */
+const ADMIN_MENU_STORAGE_KEY = "josho_admin_menu_v1";
+const MENU_SYNC_URL = (window.MENU_SYNC_CONFIG && window.MENU_SYNC_CONFIG.url || "").trim();
+let adminMenuOverrides = {};
+if (!MENU_SYNC_URL) {
+  try { adminMenuOverrides = JSON.parse(localStorage.getItem(ADMIN_MENU_STORAGE_KEY) || "{}"); }
+  catch (e) { console.warn("管理者設定を読み込めません", e); }
+}
+function getAdminOverride(building, id) { return adminMenuOverrides[`${building}:${id}`] || null; }
+const BASE_MENU_ITEMS = {"2": MENU_DATA.items.map(i => ({...i})), "13": MENU_13_DATA.items.map(i => ({...i}))};
+function applyAdminMenuOverrides() {
+  for (const [building, dataset] of [["2", MENU_DATA], ["13", MENU_13_DATA]]) {
+    dataset.items = BASE_MENU_ITEMS[building].map(i => ({...i}));
+    for (const item of dataset.items) {
+      const patch = getAdminOverride(building, item.id);
+      if (!patch) continue;
+      for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted"]) {
+        if (Object.prototype.hasOwnProperty.call(patch,field)) item[field] = patch[field];
+      }
+      const cat = dataset.categories.find(c => c.id === item.category);
+      if (cat) item.category_label = cat.label;
+    }
+    for (const [key,patch] of Object.entries(adminMenuOverrides)) {
+      if (!key.startsWith(building+":") || !patch.created || patch.deleted) continue;
+      if (!dataset.items.some(item => item.id === patch.id)) dataset.items.push({...patch, building, tags: [], adminManaged: true});
+    }
+  }
+}
+applyAdminMenuOverrides();
+function loadSharedMenuSettings() {
+  if (!MENU_SYNC_URL) return;
+  const callback = "joshoMenuSync_" + Math.random().toString(36).slice(2);
+  const tag = document.createElement("script");
+  const timeout = setTimeout(() => finish(new Error("timeout")), 12000);
+  let finished = false;
+  function finish(error, data) {
+    if (finished) return;
+    finished = true; clearTimeout(timeout); delete window[callback]; tag.remove();
+    if (error || !data || !data.ok) { console.warn("共有メニューの読み込み失敗。安全のため全商品を非表示にします。",error || data); return; }
+    adminMenuOverrides = data.patches || {};
+    applyAdminMenuOverrides();
+    if (typeof renderTabs === "function") renderTabs();
+    if (typeof renderMenuList === "function") renderMenuList();
+  }
+  window[callback] = data => finish(null,data);
+  tag.onerror = () => finish(new Error("network"));
+  tag.src = MENU_SYNC_URL + (MENU_SYNC_URL.includes("?") ? "&" : "?") + "action=read&callback=" + callback + "&_=" + Date.now();
+  document.head.appendChild(tag);
+}
+window.addEventListener("load", loadSharedMenuSettings);
 /* =========================
 基本設定と要素の取得
 ========================= */
@@ -1403,7 +1568,7 @@ function renderDailyMenuCard() {
   // 2号館の料理データから検索
   const dailyFoods = dailyIds
     .map(id => MENU_DATA.items.find(item => item.id === id))
-    .filter(Boolean);
+    .filter(isB2MenuVisible);
 
   // 献立未登録の場合
   if (dailyFoods.length === 0) {
@@ -1956,31 +2121,83 @@ registerSubmitBtn.addEventListener("click", () => {
 });
 
 /* =========================
-セレクトボックスの選択肢自動生成
+年齢・身長の階層式選択（1歳・1cm単位）
 ========================= */
 const ageSelect = document.getElementById("age");
-{
-  let options = "";
-  for (let i = 18; i <= 80; i += 5) {
-    const end = i + 4; const value = i + 2; options += ` <option value="${value}">
-          ${i}歳～${end}歳
-          </option>
-          `;
+const heightSelect = document.getElementById("height");
+
+function setupHierarchyPicker(select, containerId, minimum, maximum, unit, groupLabel) {
+  const container = document.getElementById(containerId);
+  if (!container || !select) return { sync() {} };
+
+  // 元のselectを維持し、既存の保存・栄養計算ロジックと連携する。
+  for (let n = minimum; n <= maximum; n++) {
+    const option = document.createElement("option");
+    option.value = String(n);
+    option.textContent = `${n}${unit}`;
+    select.appendChild(option);
   }
-  ageSelect.insertAdjacentHTML("beforeend", options);
+
+  let open = false;
+  let expandedGroup = null;
+  const groups = [];
+  for (let n = Math.floor(minimum / 10) * 10; n <= maximum; n += 10) groups.push(n);
+
+  function draw() {
+    container.replaceChildren();
+    const selected = Number(select.value);
+    const summary = document.createElement("button");
+    summary.type = "button";
+    summary.className = "hierarchy-summary";
+    summary.setAttribute("aria-expanded", String(open));
+    summary.innerHTML = `<span>${select.value ? `${selected}${unit}` : "選択してください"}</span><span class="hierarchy-chevron">${open ? "⌃" : "⌄"}</span>`;
+    summary.addEventListener("click", () => { open = !open; expandedGroup = null; draw(); });
+    container.appendChild(summary);
+    if (!open) return;
+
+    const list = document.createElement("div");
+    list.className = "hierarchy-groups";
+    groups.forEach(group => {
+      const first = Math.max(minimum, group);
+      const last = Math.min(maximum, group + 9);
+      const section = document.createElement("div");
+      section.className = "hierarchy-section";
+      const groupButton = document.createElement("button");
+      groupButton.type = "button";
+      groupButton.className = "hierarchy-group-button";
+      groupButton.setAttribute("aria-expanded", String(expandedGroup === group));
+      groupButton.innerHTML = `<span>${group}${groupLabel}${first === last ? `（${first}${unit}）` : ""}</span><span class="hierarchy-chevron">${expandedGroup === group ? "⌄" : "›"}</span>`;
+      groupButton.addEventListener("click", () => { expandedGroup = expandedGroup === group ? null : group; draw(); });
+      section.appendChild(groupButton);
+      if (expandedGroup === group) {
+        const choices = document.createElement("div");
+        choices.className = "hierarchy-choices";
+        for (let n = first; n <= last; n++) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "hierarchy-choice" + (select.value === String(n) ? " is-selected" : "");
+          button.textContent = `${n}${unit}`;
+          button.addEventListener("click", () => {
+            select.value = String(n);
+            open = false;
+            expandedGroup = null;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+            draw();
+          });
+          choices.appendChild(button);
+        }
+        section.appendChild(choices);
+      }
+      list.appendChild(section);
+    });
+    container.appendChild(list);
+  }
+  draw();
+  return { sync() { open = false; expandedGroup = null; draw(); } };
 }
 
-const heightSelect = document.getElementById("height");
-{
-  let options = "";
-  for (let i = 130; i <= 200; i += 5) {
-    const end = i + 4; const value = i + 2; options += ` <option value="${value}">
-            ${i}cm～${end}cm
-            </option>
-            `;
-  }
-  heightSelect.insertAdjacentHTML("beforeend", options);
-}
+const agePicker = setupHierarchyPicker(ageSelect, "ageHierarchy", 18, 80, "歳", "代");
+const heightPicker = setupHierarchyPicker(heightSelect, "heightHierarchy", 130, 200, "cm", "cm台");
 
 /* =========================
 ログイン中ユーザーの基本情報を読み込む
@@ -1996,6 +2213,8 @@ function loadUserProfileIntoForm() {
 
   ageSelect.value = "";
   heightSelect.value = "";
+  agePicker.sync();
+  heightPicker.sync();
 
 
   const savedParticipantId = getParticipantId();
@@ -2015,6 +2234,8 @@ function loadUserProfileIntoForm() {
   }
   if (savedAge) { ageSelect.value = savedAge; }
   if (savedHeight) { heightSelect.value = savedHeight; }
+  agePicker.sync();
+  heightPicker.sync();
 
 
   // 学籍番号の入力をスキップし、性別選択から開始
@@ -2028,6 +2249,7 @@ function loadUserProfileIntoForm() {
     step.classList.toggle("active", index === 0);
   });
 
+  if (typeof syncProfileNavigation === "function") syncProfileNavigation();
   // 性別が選択されている場合のみ次へ進める
   if (selectedGender) {
     enableButton();
@@ -2068,6 +2290,38 @@ function disableButton() {
   nextBtn.classList.remove("enabled");
   nextBtn.disabled = true;
 }
+
+/* 基本情報入力の戻る・編集キャンセル */
+const profileBackBtn = document.getElementById("profileBackBtn");
+const cancelProfileEditBtn = document.getElementById("cancelProfileEditBtn");
+function syncProfileNavigation() {
+  profileBackBtn.style.display = inputCard.style.display === "none" || currentStep <= 1 ? "none" : "inline-flex";
+  cancelProfileEditBtn.style.display = isEditingProfile && inputCard.style.display !== "none" ? "inline-flex" : "none";
+}
+function showProfileStep(step) {
+  currentStep = step;
+  questions.forEach((question, index) => question.classList.toggle("active", index === currentStep));
+  progressSteps.forEach((progress, index) => progress.classList.toggle("active", index < currentStep));
+  const valid = currentStep === 1 ? !!selectedGender : currentStep === 2 ? ageSelect.value !== "" : heightSelect.value !== "";
+  if (valid) enableButton(); else disableButton();
+  syncProfileNavigation();
+}
+profileBackBtn.addEventListener("click", () => {
+  if (currentStep > 1) showProfileStep(currentStep - 1);
+});
+cancelProfileEditBtn.addEventListener("click", () => {
+  if (!isEditingProfile) return;
+  isEditingProfile = false;
+  progressContainer.style.display = "none";
+  inputCard.style.display = "none";
+  document.getElementById("mypagePage").style.display = "block";
+  document.getElementById("bottomNav").style.display = "flex";
+  document.getElementById("appContainer").classList.add("has-bottom-nav");
+  setActiveTab(mypageTab);
+  renderMyPage();
+  syncProfileNavigation();
+  window.scrollTo({top:0,behavior:"auto"});
+});
 
 /* =========================
 ステップ遷移・保存ロジック
@@ -2126,18 +2380,7 @@ nextBtn.addEventListener("click", () => {
     return;
   }
 
-  questions[currentStep].classList.remove("active");
-  currentStep++;
-  questions[currentStep].classList.add("active");
-  progressSteps.forEach((step, index) => {
-    step.classList.toggle("active", index < currentStep - 1);
-  });
-
-  disableButton();
-
-  if (currentStep === 1 && selectedGender) { enableButton(); }
-  if (currentStep === 2 && ageSelect.value !== "") { enableButton(); }
-  if (currentStep === 3 && heightSelect.value !== "") { enableButton(); }
+  showProfileStep(currentStep + 1);
 
 });
 
@@ -2303,16 +2546,27 @@ function renderMenuList() {
     "ramen-set",
     "don",
     "curry",
-    "premium"
+    "premium",
+    "side"
   ];
 
   // 表示する料理を取得
   const items = getActiveMenuData().items.filter(item => {
     if (item.category !== activeCategory) return false;
     if (item.tags.includes("option")) return false;
+    if (item.deleted) return false;
+    const adminOverride = getAdminOverride(activeBuilding, item.id);
+    // 管理者の明示的なONがない商品は、号館や通常/おすすめの区別なく非表示。
+    if (adminOverride?.visible !== true) return false;
 
-    // 2号館は従来どおり
-    if (activeBuilding === "2") return true;
+    // 栄養値未確認の料理はデータに保持し、学生の食事登録対象にはしない。
+    if (["energy_kcal", "protein_g", "fat_g", "carb_g", "salt_g"].some(key => item[key] == null)) return false;
+
+    // 2号館：非表示品目はデータとして残し、画面には出さない。
+    if (activeBuilding === "2") return isB2MenuVisible(item);
+
+    // 管理者の明示的な販売設定は日付別の既定ルールより優先。
+    if (adminOverride && adminOverride.visible === true) return true;
 
     // 13号館の固定メニューは常時表示
     // 13号館：10/26週のラーメン提供内容
@@ -2501,7 +2755,7 @@ function renderMenuList() {
 
                   ` : `
 
-                    ${["udon", "ramen", "curry"].includes(item.category) ? `
+                    ${getLargeOptionForFood(item) ? `
 
                       <button
                         type="button"
@@ -3278,17 +3532,26 @@ function updateDetailNutritionAndChart() {
         {
           label: "基準値",
           data: idealRadarData(),
-          backgroundColor: "rgba(66,165,245,0.55)",
-          borderWidth: 0,
+          backgroundColor: "rgba(66,165,245,0.19)",
+          borderColor: "rgba(33,150,243,0.95)",
+          borderWidth: 1.5,
+          borderDash: [5, 3],
           pointRadius: 0,
-          pointHoverRadius: 0
+          pointHoverRadius: 0,
+          fill: true
         },
         {
           label: displayFood.name,
           data: toRadarData(displayFood),
-          borderColor: "#ff5722",
-          backgroundColor: "rgba(255,87,34,0.3)",
-          borderWidth: 3
+          borderColor: "#f4511e",
+          backgroundColor: "rgba(255,87,34,0.11)",
+          borderWidth: 3,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: "#f4511e",
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 1.5,
+          fill: true
         }
       ]
     },
@@ -3521,15 +3784,17 @@ ${selectedFoods.length === 0 ? `
                     </div>
 
                     <div class="confirm-food-actions">
-                      ${f.isLarge ? `
+                      ${(() => {
+      const baseFood = findBaseMenuById(f.baseId || f.id);
+      if (!getLargeOptionForFood(baseFood)) return "";
+      return f.isLarge ? `
                       <button type="button" class="modal-cancel-large-btn" data-index="${index}">
                         大盛り解除
-                      </button>
-                      ` : `
+                      </button>` : `
                       <button type="button" class="modal-add-large-btn" data-index="${index}">
                         大盛り追加
-                      </button>
-                      `}
+                      </button>`;
+    })()}
 
                       ${(() => {
       const baseFood = findBaseMenuById(f.baseId || f.id);
@@ -3689,17 +3954,26 @@ function renderConfirmRadarChart() {
         {
           label: "基準値",
           data: idealRadarData(),
-          backgroundColor: "rgba(66,165,245,0.55)",
-          borderWidth: 0,
+          backgroundColor: "rgba(66,165,245,0.19)",
+          borderColor: "rgba(33,150,243,0.95)",
+          borderWidth: 1.5,
+          borderDash: [5, 3],
           pointRadius: 0,
-          pointHoverRadius: 0
+          pointHoverRadius: 0,
+          fill: true
         },
         {
           label: "選択合計",
           data: toRadarData(totalFood),
-          borderColor: "#ff5722",
-          backgroundColor: "rgba(255,87,34,0.3)",
-          borderWidth: 3
+          borderColor: "#f4511e",
+          backgroundColor: "rgba(255,87,34,0.11)",
+          borderWidth: 3,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: "#f4511e",
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 1.5,
+          fill: true
         }
       ]
     },
@@ -3762,8 +4036,8 @@ function getLackingNutrients(totalFood, ideal) {
   return lacking;
 }
 function getRecommendFoods(lackingNutrients) {
-  // 13号館の追加提案は栄養データ整備まで停止する。
-  if (!registeredTotalFood || activeBuilding !== "2") return [];
+  // 号館ごとに実際に提供するサイドメニューから候補を選ぶ。
+  if (!registeredTotalFood) return [];
 
   const ideal = getIdealNutrition();
   const selected = registeredFoods;
@@ -3781,10 +4055,12 @@ function getRecommendFoods(lackingNutrients) {
     /唐揚げ|から揚げ|カツ|かつ|とんかつ|天ぷら|天/.test(food.name)
   );
 
-  const candidates = MENU_DATA.items.filter(item =>
+  const candidates = getActiveMenuData().items.filter(item =>
     item.category === "side" &&
+    (activeBuilding !== "2" || isB2MenuVisible(item)) &&
     !(item.tags || []).includes("option") &&
-    !["side-04", "side-07"].includes(item.id) &&
+    // 2号館では従来の候補条件を維持。13号館はライスMも対象。
+    (activeBuilding !== "2" || !["side-04", "side-07"].includes(item.id)) &&
     !registeredNames.has(item.name) &&
     ["energy_kcal", "protein_g", "fat_g", "carb_g", "salt_g"]
       .every(key => Number.isFinite(Number(item[key])))
@@ -3818,16 +4094,16 @@ function getRecommendFoods(lackingNutrients) {
   function pairingScore(food) {
     // 禁止ではなく相性による加減点。麺＋少量のご飯は許容する。
     const id = food.id;
-    const rice = id === "side-04" || id === "side-07";
+    const rice = ["side-04", "side-07", "b13-side-01"].includes(id);
     if (rice) {
       let score = hasRiceMain ? -0.55 : hasNoodleMain ? -0.12 : -0.06;
-      if (id === "side-04") score -= 0.12; // Mサイズは追加量が多い
+      if (id === "side-04" || id === "b13-side-01") score -= 0.12; // Mサイズは追加量が多い
       return score;
     }
     if (id === "side-06") return hasFriedMain ? -0.35 : 0.04;
-    if (id === "side-03") return hasRiceMain ? 0.01 : -0.08;
+    if (id === "side-03" || id === "b13-side-03") return hasRiceMain ? 0.01 : -0.08;
     if (id === "side-05") return 0.10; // 主菜に合わせやすいサラダ
-    if (id === "side-01") return hasNoodleMain ? -0.16 : 0.02; // 麺＋汁物の重複
+    if (id === "side-01" || id === "b13-side-02") return hasNoodleMain ? -0.16 : 0.02; // 麺＋汁物の重複
     if (id === "side-02") return 0.05;
     return 0;
   }
@@ -3905,18 +4181,37 @@ function showRecommendModal(recommendFood, afterFood) {
         {
           label: "基準値",
           data: idealRadarData(),
-          borderWidth: 2,
-          pointRadius: 0
+          backgroundColor: "rgba(66,165,245,0.19)",
+          borderColor: "rgba(33,150,243,0.95)",
+          borderWidth: 1.5,
+          borderDash: [5, 3],
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          fill: true
         },
         {
           label: "現在",
           data: toRadarData(registeredTotalFood),
-          borderWidth: 2
+          backgroundColor: "rgba(120,120,120,0.015)",
+          borderColor: "rgba(95,95,95,0.85)",
+          borderWidth: 1.5,
+          borderDash: [],
+          pointRadius: 2,
+          pointHoverRadius: 3,
+          fill: true
         },
         {
           label: "追加後",
           data: toRadarData(afterFood),
-          borderWidth: 2
+          borderColor: "#f4511e",
+          backgroundColor: "rgba(255,87,34,0.11)",
+          borderWidth: 3,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: "#f4511e",
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 1.5,
+          fill: true
         }
       ]
     },
@@ -4232,7 +4527,7 @@ function renderTodayPage() {
   const ideal = getIdealNutrition();
   const lackingNutrients = getLackingNutrients(totalFood, ideal);
   const recommendFoods = getRecommendFoods(lackingNutrients);
-  const showExtraRecommendations = activeBuilding === "2";
+  const showExtraRecommendations = activeBuilding === "2" || activeBuilding === "13";
 
   todayFood.innerHTML = `
                   <div class="today-card">
@@ -4270,9 +4565,7 @@ function renderTodayPage() {
       ? baseFood.id
       : baseId;
 
-    const canLargeMenu =
-      baseFood &&
-      ["udon", "ramen", "curry"].includes(baseFood.category);
+    const canLargeMenu = Boolean(getLargeOptionForFood(baseFood));
 
     const canSoupMenu =
       baseFood &&
@@ -4829,20 +5122,29 @@ function renderTodayPage() {
         labels: RADAR_LABELS,
         datasets: [
           {
-            label: "基準値",
-            data: idealRadarData(),
-            backgroundColor: "rgba(66,165,245,0.55)",
-            borderWidth: 0,
-            pointRadius: 0,
-            pointHoverRadius: 0
-          },
+          label: "基準値",
+          data: idealRadarData(),
+          backgroundColor: "rgba(66,165,245,0.19)",
+          borderColor: "rgba(33,150,243,0.95)",
+          borderWidth: 1.5,
+          borderDash: [5, 3],
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          fill: true
+        },
           {
-            label: "本日の合計",
-            data: toRadarData(totalFood),
-            borderColor: "#ff5722",
-            backgroundColor: "rgba(255,87,34,0.3)",
-            borderWidth: 3
-          }
+          label: "本日の合計",
+          data: toRadarData(totalFood),
+          borderColor: "#f4511e",
+          backgroundColor: "rgba(255,87,34,0.11)",
+          borderWidth: 3,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointBackgroundColor: "#f4511e",
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 1.5,
+          fill: true
+        }
         ]
       },
       options: {
@@ -5008,9 +5310,9 @@ function renderTodayPage() {
     });
   });
   document.getElementById("openSideMenuBtn")?.addEventListener("click", () => {
-    activeBuilding = "2";
+    // 号館を切り替えず、現在選択中の号館のサイドメニューを開く。
     document.querySelectorAll(".cafeteria-btn").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.building === "2");
+      btn.classList.toggle("active", btn.dataset.building === activeBuilding);
     });
     activeCategory = "side";
     menuMode = "select";
@@ -5025,7 +5327,7 @@ function renderTodayPage() {
     btn.addEventListener("click", () => {
       const foodId = btn.dataset.id;
 
-      const recommendFood = MENU_DATA.items.find(item => item.id === foodId);
+      const recommendFood = getActiveMenuData().items.find(item => item.id === foodId);
       if (!recommendFood) return;
 
       showRecommendPreview(recommendFood);
@@ -5427,11 +5729,6 @@ function renderMyPage() {
 
 <h3>基本情報</h3>
 
-<div class="profile-student">
-  <span>学籍番号</span>
-  <strong>${studentId || "未登録"}</strong>
-</div>
-
 <div class="profile-info-grid">
   <div class="profile-info-item">
     <span>性別</span>
@@ -5475,6 +5772,7 @@ function renderMyPage() {
 
     // 編集中であることを記録
     isEditingProfile = true;
+    syncProfileNavigation();
 
     window.scrollTo({ top: 0, behavior: "auto" });
   };
@@ -5687,6 +5985,38 @@ function getMonthlyNutritionData() {
 ========================= */
 
 let monthlyNutritionChart = null;
+// 凡例の表示状態は、栄養素を切り替えても保持する。
+const monthlySeriesVisible = { actual: true, target: true };
+
+function renderMonthlyChartLegend(nutrient) {
+  const legend = document.getElementById("monthlyChartLegend");
+  if (!legend) return;
+  const options = [
+    { key: "actual", text: nutrient.label, color: "orange" },
+    { key: "target", text: "目標値", color: "blue" }
+  ];
+  legend.innerHTML = options.map(option => {
+    const visible = monthlySeriesVisible[option.key];
+    return `<button type="button" class="monthly-legend-btn ${option.color} ${visible ? "is-visible" : "is-hidden"}"
+      data-series="${option.key}" aria-pressed="${visible}" aria-label="${option.text}の表示を切り替え">
+      <span class="monthly-legend-mark" aria-hidden="true"></span>
+      <span>${option.text}</span>
+      <span class="monthly-legend-eye" aria-hidden="true">${visible ? "◉" : "○"}</span>
+    </button>`;
+  }).join("");
+  legend.querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.series;
+      monthlySeriesVisible[key] = !monthlySeriesVisible[key];
+      if (monthlyNutritionChart) {
+        monthlyNutritionChart.setDatasetVisibility(key === "actual" ? 0 : 1, monthlySeriesVisible[key]);
+        monthlyNutritionChart.update();
+      }
+      renderMonthlyChartLegend(nutrient);
+    });
+  });
+}
+
 
 // 月別グラフで表示する栄養素
 let selectedMonthlyNutrient = "energy_kcal";
@@ -5737,6 +6067,8 @@ function renderMonthlyNutritionChart() {
     item => item.key === selectedMonthlyNutrient
   );
 
+  renderMonthlyChartLegend(nutrient);
+
   // 前のグラフを削除
   if (monthlyNutritionChart) {
     monthlyNutritionChart.destroy();
@@ -5753,6 +6085,7 @@ function renderMonthlyNutritionChart() {
           label: `${nutrient.label}（${nutrient.unit}）`,
           data: nutritionData,
           backgroundColor: "#ff9800",
+          hidden: !monthlySeriesVisible.actual,
           borderRadius: 4
         },
         {
@@ -5760,6 +6093,7 @@ function renderMonthlyNutritionChart() {
           label: "目標値",
           data: labels.map(() => ideal[selectedMonthlyNutrient]),
           borderColor: "#2196f3",
+          hidden: !monthlySeriesVisible.target,
           borderWidth: 2,
           borderDash: [6, 4],
           pointRadius: 0,
@@ -5774,12 +6108,7 @@ function renderMonthlyNutritionChart() {
 
       plugins: {
         legend: {
-          display: true,
-          position: "top",
-          labels: {
-            usePointStyle: true,
-            boxWidth: 12
-          }
+          display: false
         },
 
         tooltip: {
@@ -6435,6 +6764,7 @@ if (recommendOverlay && closeRecommendPopup) {
     inputCard.style.display = "flex";
     // 編集を保存したら既存の処理でマイページに戻る。
     isEditingProfile = true;
+    syncProfileNavigation();
     window.scrollTo({ top: 0, behavior: "auto" });
   });
 })();

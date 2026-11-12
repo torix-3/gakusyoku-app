@@ -535,6 +535,8 @@
 
           <div id="monthlyNutritionControls"></div>
 
+          <div id="monthlyChartLegend" class="monthly-chart-legend" aria-label="グラフの表示切り替え"></div>
+
           <div class="monthly-chart-area">
             <canvas id="monthlyNutritionChart"></canvas>
           </div>
@@ -635,6 +637,8 @@
 
     <!-- 入力画面 -->
     <div class="card" id="inputCard" style="display:none;">
+      <button type="button" id="cancelProfileEditBtn" class="profile-cancel-btn" style="display:none;">← マイページに戻る</button>
+
 
       <!-- 参加者ID（内部管理用・画面には表示しない） -->
       <div class="question" style="display:none;">
@@ -652,25 +656,25 @@
       <!-- 年齢 (Step 2) -->
       <div class="question">
         <label>年齢を選択してください</label>
-        <select id="age">
-          <option value="">選択してください</option>
-        </select>
+        <select id="age" class="hierarchy-native-select" aria-hidden="true" tabindex="-1"><option value="">選択してください</option></select>
+        <div id="ageHierarchy" class="hierarchy-picker"></div>
       </div>
 
       <!-- 身長 (Step 3) -->
       <div class="question">
         <label>身長を選択してください</label>
-        <select id="height">
-          <option value="">選択してください</option>
-        </select>
+        <select id="height" class="hierarchy-native-select" aria-hidden="true" tabindex="-1"><option value="">選択してください</option></select>
+        <div id="heightHierarchy" class="hierarchy-picker"></div>
       </div>
       <!-- 次へボタン -->
       <div class="button-area">
         <button type="button" class="next-btn" id="nextBtn" disabled>次へ</button>
       </div>
+      <button type="button" class="profile-back-btn" id="profileBackBtn" style="display:none;">← 戻る</button>
 
     </div>
 
+    <script src="menu-sync-config.js"></script>
     <script src="script200.js"></script>
 
 </body>
