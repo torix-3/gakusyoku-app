@@ -341,8 +341,8 @@ MENU_DATA.items.forEach(item => {
 MENU_DATA.items.forEach(item => {
   if (B2_RECOMMENDED_IDS.has(item.id) || item.tags.includes("daily_candidate")) {
     item.originalCategory = item.category;
-    item.category = "recommended";
-    item.category_label = "おすすめメニュー";
+    item.category = "daily";
+    item.category_label = "日替わりメニュー";
     item.adminManaged = true;
     item.visible = false;
   }
@@ -367,6 +367,8 @@ const MENU_13_DATA = {
     // 日替わり・週替わり
     { id: "premium", label: "プレミアム", emoji: "✨" },
     { id: "recommended", label: "おすすめメニュー", emoji: "✨" },
+    { id: "weekly", label: "週替わり", emoji: "📅" },
+    { id: "daily", label: "日替わりメニュー", emoji: "🍱" },
 
     // 常時提供メニュー
     { id: "teishoku", label: "定食", emoji: "🍱" },
@@ -1037,13 +1039,22 @@ const MENU_3_DAILY_SCHEDULE = {
   // 動作確認用の仮データ（実際の日替わり献立ではありません）
 
 };
-// 13号館：日替わり・週替わりはおすすめメニューとして一括管理する。
-const B13_ROTATING_CATEGORIES = new Set([
-  "daily-teishoku", "weekly-teishoku", "weekly-don", "weekly-udon"
-]);
+// 13号館：週替わり定食・週替わり丼は「週替わり」に統一。
+// う～どんプチ丼は「うどん」に、日替わり定食は「日替わり」に分類。
 MENU_13_DATA.items.forEach(item => {
-  if (B13_ROTATING_CATEGORIES.has(item.category)) {
-    item.originalCategory = item.category;
+  const oldCategory = item.category;
+  if (oldCategory === "weekly-teishoku" || oldCategory === "weekly-don") {
+    item.originalCategory = oldCategory;
+    item.category = "weekly";
+    item.category_label = "週替わり";
+    item.adminManaged = true;
+  } else if (oldCategory === "weekly-udon") {
+    item.originalCategory = oldCategory;
+    item.category = "udon";
+    item.category_label = "うどん";
+    item.adminManaged = true;
+  } else if (oldCategory === "daily-teishoku") {
+    item.originalCategory = oldCategory;
     item.category = "recommended";
     item.category_label = "おすすめメニュー";
     item.adminManaged = true;
@@ -1488,6 +1499,12 @@ function applyAdminMenuOverrides() {
       for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted","image_url","option_large_enabled","option_large_price","option_large_energy_kcal","option_large_protein_g","option_large_fat_g","option_large_carb_g","option_large_salt_g","option_soup_enabled","option_soup_reduction"]) {
         if (Object.prototype.hasOwnProperty.call(patch,field)) item[field] = patch[field];
       }
+      // 旧分類で保存された13号館の公開データも新分類に移行して表示する。
+      if (building === "13") {
+        if (item.category === "weekly-teishoku" || item.category === "weekly-don") item.category = "weekly";
+        if (item.category === "weekly-udon") item.category = "udon";
+        if (item.category === "daily-teishoku") item.category = "daily";
+      }
       const cat = dataset.categories.find(c => c.id === item.category);
       if (cat) item.category_label = cat.label;
     }
@@ -1582,19 +1599,23 @@ function renderDailyMenuCard() {
 
   if (!card || !name || !description || !button) return;
 
-  // 2号館のみ表示
-  card.style.display = activeBuilding === "2" ? "block" : "none";
-
-  if (activeBuilding !== "2") return;
+  // 2号館・13号館で共通の日替わりカードを表示
+  card.style.display = "block";
 
   // 選択中の日付
   const dateText = formatCafeteriaDate(selectedCafeteriaDate);
 
-  // 管理画面で「日替わりメニュー」に分類し、表示ONにした2号館の商品だけ表示。
-  // 現在は提供日データ未登録のため、ONの商品を日付に関係なく仮表示する。
-  const dailyFoods = MENU_DATA.items.filter(item =>
-    item.category === "daily" && isB2MenuVisible(item)
-  );
+  // 号館別の日替わりメニューを表示。13号館の既存日付指定メニューは
+  // 該当日だけ表示し、新規登録した日替わりは公開ONなら表示する。
+  const dataset = getActiveMenuData();
+  const scheduled13 = MENU_13_SCHEDULE[dateText] || [];
+  const dailyFoods = dataset.items.filter(item => {
+    if (item.category !== "daily" || item.deleted || item.tags?.includes("option")) return false;
+    if (getAdminOverride(activeBuilding, item.id)?.visible !== true) return false;
+    if (activeBuilding === "2") return isB2MenuVisible(item);
+    if (item.id.startsWith("b13-daily-")) return scheduled13.includes(item.id);
+    return true;
+  });
 
   const photoBox = document.getElementById("dailyMenuPhotoBox");
   const photo = document.getElementById("dailyMenuPhoto");
@@ -1632,11 +1653,11 @@ function renderDailyMenuCard() {
   setDailyPhoto(food.image_url || null);
 
   name.textContent = food.name;
-  description.textContent =
-    `${food.energy_kcal}kcal / ${food.price}円`;
+  const nutritionReady = hasCompleteNutrition(food);
+  description.textContent = `${nutritionReady ? food.energy_kcal + "kcal" : "栄養情報を準備中"} / ${food.price == null ? "価格未登録" : food.price + "円"}`;
 
-  button.disabled = false;
-  button.textContent = "この料理を選ぶ";
+  button.disabled = !nutritionReady;
+  button.textContent = nutritionReady ? "この料理を選ぶ" : "栄養情報を準備中";
 
   // 既存の料理詳細画面を開く
   button.onclick = () => {
@@ -2483,7 +2504,7 @@ tabBar.addEventListener("scroll", updateTabScrollButtons);
 window.addEventListener("resize", updateTabScrollButtons);
 
 function renderTabs() {
-  tabBar.innerHTML = getActiveMenuData().categories.filter(cat => !(activeBuilding === "2" && cat.id === "daily")).map(cat => `
+  tabBar.innerHTML = getActiveMenuData().categories.filter(cat => cat.id !== "daily").map(cat => `
               <button type="button" class="tab-item${cat.id === activeCategory ? " active" : ""}"
                 data-category="${cat.id}">
                 ${cat.emoji} ${cat.label}
@@ -2593,12 +2614,13 @@ function renderMenuList() {
     "don",
     "curry",
     "premium",
+    "weekly",
     "side"
   ];
 
   // 表示する料理を取得
   const items = getActiveMenuData().items.filter(item => {
-    if (activeBuilding === "2" && item.category === "daily") return false;
+    if (item.category === "daily") return false;
     if (item.category !== activeCategory) return false;
     if (item.tags.includes("option")) return false;
     if (item.deleted) return false;
