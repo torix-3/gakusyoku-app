@@ -47,8 +47,16 @@ function openEditor(id){
  const defaultSoup = eligible && ['udon','ramen'].includes(baseCategory);
  const largeEnabled = i.option_large_enabled === undefined ? defaultLarge : Boolean(i.option_large_enabled);
  const soupEnabled = i.option_soup_enabled === undefined ? defaultSoup : Boolean(i.option_soup_enabled);
+ const copySource = Array.isArray(i.tags) && i.tags.includes('option') && /大盛/.test(i.name||'');
  const opts = `
- <div class="wide" style="border-top:1px solid #ddd;padding-top:14px"><b>注文オプション</b><p class="hint">新しい麺類には初期設定を提案します。料理ごとに変更できます。既存メニューは未設定なら従来の判定を使用します。</p></div>
+ <div class="wide" style="padding:10px 12px;background:#f1f6ff;border:1px solid #cbdaf5;border-radius:9px;margin:8px 0">
+ <b>大盛りの栄養データを再利用</b>
+ <p class="hint">「＋大盛り」などの追加分をコピーして、別の料理の注文オプションに貼り付けできます。元のメニューは変更されません。</p>
+ ${copySource?'<button type="button" id="copyLargeNutrition">この大盛りの栄養データをコピー</button>':''}
+ ${copySource?'':'<button type="button" id="pasteLargeNutrition">コピーした大盛りデータを注文オプションに貼り付け</button>'}
+ <p id="largeCopyStatus" class="hint" aria-live="polite"></p>
+ </div>
+ <div class="wide style="border-top:1px solid #ddd;padding-top:14px"><b>注文オプション</b><p class="hint">新しい麺類には初期設定を提案します。料理ごとに変更できます。既存メニューは未設定なら従来の判定を使用します。</p></div>
  <label class="wide"><span><input type="checkbox" name="option_large_enabled" ${largeEnabled?'checked':''}> 大盛りに対応する</span></label>
  <label>大盛り追加料金（円）<input type="number" name="option_large_price" min="0" step="1" placeholder="未入力なら従来設定" value="${esc(i.option_large_price??'')}"></label>
  <label>追加エネルギー（kcal）<input type="number" name="option_large_energy_kcal" min="0" step="any" value="${esc(i.option_large_energy_kcal??'')}"></label>
@@ -60,6 +68,7 @@ function openEditor(id){
  <label>スープを飲まない場合の塩分減少率（%）<input type="number" name="option_soup_reduction" min="0" max="100" step="any" value="${esc(i.option_soup_reduction??50)}"></label>
  <p class="hint wide">大盛りの追加栄養量が未登録の新メニューでは、誤った栄養計算を避けるため学生側に大盛りを表示しません。13号館も実測値を登録してください。</p>`;
  el('formFields').insertAdjacentHTML('beforeend',opts);
+ if(copySource){const orderSection=el('formFields').querySelector('[name="option_large_enabled"]');if(orderSection){for(const name of ['option_large_enabled','option_large_price','option_large_energy_kcal','option_large_protein_g','option_large_fat_g','option_large_carb_g','option_large_salt_g','option_soup_enabled','option_soup_reduction']){const input=el('menuForm').elements.namedItem(name);if(input)input.closest('label').style.display='none';}}}
  const catSelect=el('menuForm').elements.namedItem('category');
  catSelect.addEventListener('change',()=>{
    if(isExisting)return; // 既存の設定は勝手に変更しない
@@ -95,17 +104,57 @@ async function uploadSelectedPhoto(){
  }catch(err){status.textContent='アップロード失敗：'+err.message;}
  finally{button.disabled=false;}
 }
-el('formFields').addEventListener('click',e=>{if(e.target.id==='uploadPhoto')uploadSelectedPhoto()});
+// 大盛りの追加栄養量をメニュー間でコピー・貼り付け（ブラウザ内に保持）。
+const LARGE_COPY_KEY='josho_large_nutrition_copy_v1';
+const LARGE_NUTRIENTS=[['energy_kcal','option_large_energy_kcal'],['protein_g','option_large_protein_g'],['fat_g','option_large_fat_g'],['carb_g','option_large_carb_g'],['salt_g','option_large_salt_g']];
+function largeCopyStatus(message){const node=el('largeCopyStatus');if(node)node.textContent=message;}
+function copyLargeNutrition(){
+ const item=rows().find(x=>x.id===editingId);
+ if(!item||!Array.isArray(item.tags)||!item.tags.includes('option')||!/大盛/.test(item.name||'')){largeCopyStatus('大盛りの追加メニューからコピーしてください。');return;}
+ const nutrients={};
+ for(const [source,target] of LARGE_NUTRIENTS){
+   const value=item[source];
+   if(value===null||value===undefined||value===''||!Number.isFinite(Number(value))){largeCopyStatus('栄養データが不足しているためコピーできません。');return;}
+   nutrients[target]=Number(value);
+ }
+ const payload={source:item.name,building,price:item.price==null?null:Number(item.price),nutrients};
+ try{localStorage.setItem(LARGE_COPY_KEY,JSON.stringify(payload));largeCopyStatus('「'+item.name+'」の追加栄養5項目をコピーしました。別の料理の編集画面で貼り付けてください。');}
+ catch(err){largeCopyStatus('コピーに失敗しました：'+err.message);}
+}
+function pasteLargeNutrition(){
+ let payload;
+ try{payload=JSON.parse(localStorage.getItem(LARGE_COPY_KEY)||'null');}catch(e){}
+ if(!payload||!payload.nutrients){largeCopyStatus('先に「＋大盛り」などの編集画面で栄養データをコピーしてください。');return;}
+ if(payload.building!==building){largeCopyStatus('異なる号館のデータです。貼り付ける場合は同じ号館のデータをコピーしてください。');return;}
+ const form=el('menuForm');
+ for(const [,target] of LARGE_NUTRIENTS){
+   const input=form.elements.namedItem(target);
+   const value=payload.nutrients[target];
+   if(!input||!Number.isFinite(Number(value))){largeCopyStatus('コピーした栄養データが不完全です。');return;}
+ }
+ for(const [,target] of LARGE_NUTRIENTS)form.elements.namedItem(target).value=payload.nutrients[target];
+ const priceInput=form.elements.namedItem('option_large_price');
+ if(priceInput&&payload.price!==null&&Number.isFinite(payload.price))priceInput.value=payload.price;
+ form.elements.namedItem('option_large_enabled').checked=true;
+ largeCopyStatus('「'+payload.source+'」の追加栄養5項目'+(payload.price!==null?'と追加料金':'')+'を貼り付けました。「内容を保存」→「変更内容を保存・公開」で反映してください。');
+}
+el('formFields').addEventListener('click',e=>{
+ if(e.target.id==='uploadPhoto')uploadSelectedPhoto();
+ if(e.target.id==='copyLargeNutrition')copyLargeNutrition();
+ if(e.target.id==='pasteLargeNutrition')pasteLargeNutrition();
+});
 el('formFields').addEventListener('change',e=>{if(e.target.id==='photoFile'&&e.target.files[0]){const img=el('photoPreview');img.src=URL.createObjectURL(e.target.files[0]);img.style.display='block';}});
 function closeEditor(){el('modal').classList.add('hidden');editingId=null;}
 el('closeModal').onclick=closeEditor;el('cancelModal').onclick=closeEditor;
 el('menuForm').onsubmit=e=>{e.preventDefault();const fd=new FormData(e.currentTarget);const name=String(fd.get('name')||'').trim();if(!name){alert('商品名を入力してください');return;}
  const id=editingId||'admin-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);const k=key(id);const change={id,name,building,category:String(fd.get('category')),image_url:String(fd.get('image_url')||'').trim(),visible:fd.get('visible')==='true'};
  const optionNames=['option_large_price','option_large_energy_kcal','option_large_protein_g','option_large_fat_g','option_large_carb_g','option_large_salt_g'];
- change.option_large_enabled=fd.has('option_large_enabled');
- change.option_soup_enabled=fd.has('option_soup_enabled');
- for(const field of optionNames){const v=String(fd.get(field)||'').trim();change[field]=v===''?null:Number(v);}
- change.option_soup_reduction=Math.min(100,Math.max(0,Number(fd.get('option_soup_reduction')||50)));
+ const originalItem=editingId?rows().find(x=>x.id===editingId):null;
+ const sourceOption=originalItem&&Array.isArray(originalItem.tags)&&originalItem.tags.includes('option')&&/大盛/.test(originalItem.name||'');
+ change.option_large_enabled=sourceOption?Boolean(originalItem.option_large_enabled):fd.has('option_large_enabled');
+ change.option_soup_enabled=sourceOption?Boolean(originalItem.option_soup_enabled):fd.has('option_soup_enabled');
+ for(const field of optionNames){const v=String(fd.get(field)||'').trim();change[field]=sourceOption?(originalItem[field]??null):(v===''?null:Number(v));}
+ change.option_soup_reduction=sourceOption?(originalItem.option_soup_reduction??50):Math.min(100,Math.max(0,Number(fd.get('option_soup_reduction')||50)));
  if(change.option_large_enabled){
    const all=optionNames.every(f=>change[f]!==null);
    const old=editingId?rows().find(x=>x.id===editingId):null;
