@@ -5255,3 +5255,27 @@ input[type="text"] {
 .daily-menu-placeholder.has-photo { width: 100%; height: auto; aspect-ratio: 16 / 9; overflow: hidden; background: #f6f6f6; border-radius: 14px; }
 .daily-menu-placeholder.has-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .daily-menu-content:has(.daily-menu-placeholder.has-photo) .daily-menu-details { width: 100%; }
+
+/* 共通ホームリンク：既存の画面と下部ナビを邪魔しない */
+.welfare-home-header {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  margin: -16px -16px 18px;
+  padding: calc(14px + env(safe-area-inset-top)) 18px 14px;
+  background: linear-gradient(135deg,#ff7043 0%,#ff5722 55%,#f4511e 100%);
+  box-shadow: 0 4px 14px rgba(244,81,30,.22);
+}
+.welfare-home-button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-align: left;
+  cursor: pointer;
+}
+.welfare-home-button:focus-visible {outline: 2px solid #fff;outline-offset: 5px;border-radius: 3px;}
