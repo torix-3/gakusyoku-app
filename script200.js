@@ -29,13 +29,13 @@ const MENU_DATA = {
   "categories": [
     { "id": "udon", "label": "うどん・そば", "emoji": "🍜" },
     { "id": "ramen", "label": "ラーメン", "emoji": "🍥" },
-    { "id": "teishoku", "label": "定食", "emoji": "🍗" },
-    { "id": "don", "label": "丼", "emoji": "🍚" },
     { "id": "curry", "label": "カレー", "emoji": "🍛" },
-    { "id": "side", "label": "サイドメニュー", "emoji": "🥗" },
-    { "id": "seasonal", "label": "季節限定", "emoji": "🧊" },
+    { "id": "don", "label": "丼", "emoji": "🍚" },
+    { "id": "teishoku", "label": "定食", "emoji": "🍗" },
     { "id": "recommended", "label": "おすすめメニュー", "emoji": "✨" },
-    { "id": "daily", "label": "日替わりメニュー", "emoji": "🍱" }
+    { "id": "seasonal", "label": "季節限定", "emoji": "🧊" },
+    { "id": "daily", "label": "日替わりメニュー", "emoji": "🍱" },
+    { "id": "side", "label": "サイドメニュー", "emoji": "🥗" }
   ],
   "items": [
     {
@@ -334,18 +334,14 @@ MENU_DATA.items.forEach(item => {
 
 const MENU_13_DATA = {
   categories: [
-    // 日替わり・週替わり
-    { id: "premium", label: "プレミアム", emoji: "✨" },
-    { id: "recommended", label: "おすすめメニュー", emoji: "✨" },
-    { id: "weekly", label: "週替わり", emoji: "📅" },
-    { id: "daily", label: "日替わりメニュー", emoji: "🍱" },
-
-    // 常時提供メニュー
-    { id: "teishoku", label: "定食", emoji: "🍱" },
     { id: "udon", label: "うどん", emoji: "🍜" },
     { id: "ramen", label: "ラーメン", emoji: "🍜" },
-    { id: "don", label: "丼", emoji: "🍚" },
     { id: "curry", label: "カレー", emoji: "🍛" },
+    { id: "don", label: "丼", emoji: "🍚" },
+    { id: "teishoku", label: "定食", emoji: "🍱" },
+    { id: "premium", label: "プレミアム", emoji: "✨" },
+    { id: "weekly", label: "週替わり", emoji: "📅" },
+    { id: "daily", label: "日替わり", emoji: "🍱" },
     { id: "side", label: "サイドメニュー", emoji: "🥣" }
   ],
 
@@ -840,21 +836,22 @@ const LARGE_CURRY_OPTION_IDS = {
   "b13-curry-02": "curry-06"    // 13号館（暫定）
 };
 function getLargeOptionForFood(food) {
-  if (!food || food.tags?.includes("option") || food.tags?.includes("set")) return null;
+  if (!food || food.tags?.includes('option') || (food.tags?.includes('set') && food.option_large_enabled !== true)) return null;
   if (food.option_large_enabled === false) return null;
-  const keys=["price","energy_kcal","protein_g","fat_g","carb_g","salt_g"];
-  const customKeys=["option_large_price","option_large_energy_kcal","option_large_protein_g","option_large_fat_g","option_large_carb_g","option_large_salt_g"];
-  if (food.option_large_enabled === true && customKeys.every(k=>food[k]!==null && food[k]!==undefined && Number.isFinite(Number(food[k])))) {
+  const keys=['price','energy_kcal','protein_g','fat_g','carb_g','salt_g'];
+  const customKeys=['option_large_price','option_large_energy_kcal','option_large_protein_g','option_large_fat_g','option_large_carb_g','option_large_salt_g'];
+  // adminで保存済みのコピー値があれば、その値を優先。
+  if (food.option_large_enabled === true && customKeys.every(k=>food[k]!==null && food[k]!==undefined && food[k]!=='' && Number.isFinite(Number(food[k])))) {
     return Object.fromEntries(keys.map((k,j)=>[k,Number(food[customKeys[j]])]));
   }
-  // 新規登録品に2号館の値を無条件流用しない。
-  if (food.adminManaged || String(food.id).startsWith('admin-')) return null;
-  if (food.category === "curry") {
-    const optionId = LARGE_CURRY_OPTION_IDS[food.id];
-    return optionId ? MENU_DATA.items.find(item => item.id === optionId) || null : null;
-  }
-  if (!["udon", "ramen"].includes(food.category)) return null;
-  return MENU_DATA.items.find(item => item.category === food.category && item.tags.includes("option")) || null;
+  // 古い公開データや新規料理でも、カテゴリから元データを自動判定する。
+  // 「なし」を明示した料理だけは対象外。
+  let optionId=food.option_large_enabled===true?({udon:'udon-08',ramen:'ramen-14',curry:'curry-06',hayashi:'curry-07'}[food.option_large_type]||null):null;
+  if (!optionId && food.category==='udon') optionId='udon-08';
+  else if (!optionId && food.category==='ramen') optionId='ramen-14';
+  else if (!optionId && food.category==='curry') optionId=LARGE_CURRY_OPTION_IDS[food.id] || (String(food.name||'').includes('ハヤシ')?'curry-07':'curry-06');
+  if (!optionId) return null;
+  return MENU_DATA.items.find(item=>item.id===optionId && item.tags?.includes('option')) || null;
 }
 function canUseSoupOption(food) {
   if (!food || food.tags?.includes('option') || food.tags?.includes('set')) return false;
@@ -1459,6 +1456,21 @@ if (!MENU_SYNC_URL) {
   catch (e) { console.warn("管理者設定を読み込めません", e); }
 }
 function getAdminOverride(building, id) { return adminMenuOverrides[`${building}:${id}`] || null; }
+function isDateMenuPublished(building,id){
+ const patch=getAdminOverride(building,id);
+ if(patch?.visible!==true)return false;
+ const date=typeof selectedCafeteriaDate!=='undefined' && selectedCafeteriaDate
+  ? formatCafeteriaDate(selectedCafeteriaDate) : formatCafeteriaDate(new Date());
+ const schedules=adminMenuOverrides.__dateSchedules_v1||{};
+ const allowed=schedules[building+':'+date];
+ return !Array.isArray(allowed)||allowed.includes(id);
+}
+function hasDateMenuSchedule(building){
+ const date=typeof selectedCafeteriaDate!=='undefined' && selectedCafeteriaDate
+  ? formatCafeteriaDate(selectedCafeteriaDate) : formatCafeteriaDate(new Date());
+ return Array.isArray((adminMenuOverrides.__dateSchedules_v1||{})[building+':'+date]);
+}
+
 const BASE_MENU_ITEMS = {"2": MENU_DATA.items.map(i => ({...i})), "13": MENU_13_DATA.items.map(i => ({...i}))};
 function applyAdminMenuOverrides() {
   for (const [building, dataset] of [["2", MENU_DATA], ["13", MENU_13_DATA]]) {
@@ -1466,7 +1478,7 @@ function applyAdminMenuOverrides() {
     for (const item of dataset.items) {
       const patch = getAdminOverride(building, item.id);
       if (!patch) continue;
-      for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted","image_url","option_large_enabled","option_large_price","option_large_energy_kcal","option_large_protein_g","option_large_fat_g","option_large_carb_g","option_large_salt_g","option_soup_enabled","option_soup_reduction"]) {
+      for (const field of ["name","price","category","energy_kcal","protein_g","fat_g","carb_g","salt_g","visible","deleted","image_url","option_large_enabled","option_large_type","option_large_price","option_large_energy_kcal","option_large_protein_g","option_large_fat_g","option_large_carb_g","option_large_salt_g","option_soup_enabled","option_soup_reduction"]) {
         if (Object.prototype.hasOwnProperty.call(patch,field)) item[field] = patch[field];
       }
       // 旧分類で保存された13号館の公開データも新分類に移行して表示する。
@@ -1485,26 +1497,42 @@ function applyAdminMenuOverrides() {
   }
 }
 applyAdminMenuOverrides();
+// GAS の公開メニューを再取得。起動時とヘッダー操作で同じ処理を使う。
+let sharedMenuRefreshPromise = null;
 function loadSharedMenuSettings() {
-  if (!MENU_SYNC_URL) return;
-  const callback = "joshoMenuSync_" + Math.random().toString(36).slice(2);
-  const tag = document.createElement("script");
-  const timeout = setTimeout(() => finish(new Error("timeout")), 12000);
-  let finished = false;
-  function finish(error, data) {
-    if (finished) return;
-    finished = true; clearTimeout(timeout); delete window[callback]; tag.remove();
-    if (error || !data || !data.ok) { console.warn("共有メニューの読み込み失敗。安全のため全商品を非表示にします。",error || data); return; }
-    adminMenuOverrides = data.patches || {};
-    applyAdminMenuOverrides();
-    if (typeof renderTabs === "function") renderTabs();
-    if (typeof renderMenuList === "function") renderMenuList();
-    if (typeof renderDailyMenuCard === "function") renderDailyMenuCard();
-  }
-  window[callback] = data => finish(null,data);
-  tag.onerror = () => finish(new Error("network"));
-  tag.src = MENU_SYNC_URL + (MENU_SYNC_URL.includes("?") ? "&" : "?") + "action=read&callback=" + callback + "&_=" + Date.now();
-  document.head.appendChild(tag);
+  if (!MENU_SYNC_URL) return Promise.resolve({ok:false,reason:'unconfigured'});
+  if (sharedMenuRefreshPromise) return sharedMenuRefreshPromise;
+  sharedMenuRefreshPromise = new Promise(resolve => {
+    const callback = "joshoMenuSync_" + Math.random().toString(36).slice(2);
+    const tag = document.createElement("script");
+    let finished = false;
+    let timeout;
+    function finish(error, data) {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timeout);
+      delete window[callback];
+      tag.remove();
+      if (error || !data || data.ok !== true || !data.patches || typeof data.patches !== 'object' || Array.isArray(data.patches)) {
+        console.warn('共有メニューの更新に失敗しました。現在のメニューを維持します。',error || data);
+        resolve({ok:false,reason:'network'});
+        return;
+      }
+      adminMenuOverrides = data.patches;
+      applyAdminMenuOverrides();
+      if (typeof renderTabs === 'function') renderTabs();
+      if (typeof renderMenuList === 'function') renderMenuList();
+      if (typeof renderDailyMenuCard === 'function') renderDailyMenuCard();
+      resolve({ok:true});
+    }
+    window[callback] = data => finish(null,data);
+    tag.onerror = () => finish(new Error('network'));
+    timeout = setTimeout(() => finish(new Error('timeout')), 12000);
+    tag.src = MENU_SYNC_URL + (MENU_SYNC_URL.includes('?') ? '&' : '?') +
+      'action=read&callback=' + encodeURIComponent(callback) + '&_=' + Date.now();
+    document.head.appendChild(tag);
+  }).finally(() => { sharedMenuRefreshPromise = null; });
+  return sharedMenuRefreshPromise;
 }
 window.addEventListener("load", loadSharedMenuSettings);
 /* =========================
@@ -1514,7 +1542,7 @@ window.addEventListener("load", loadSharedMenuSettings);
 let currentStep = 1;
 let isEditingProfile = false;
 let selectedFood = null;
-let activeCategory = MENU_DATA.categories[0].id;
+let activeCategory = "all";
 
 /* =========================
    学食切り替え機能
@@ -1581,9 +1609,9 @@ function renderDailyMenuCard() {
   const scheduled13 = MENU_13_SCHEDULE[dateText] || [];
   const dailyFoods = dataset.items.filter(item => {
     if (item.category !== "daily" || item.deleted || item.tags?.includes("option")) return false;
-    if (getAdminOverride(activeBuilding, item.id)?.visible !== true) return false;
+    if (!isDateMenuPublished(activeBuilding,item.id)) return false;
     if (activeBuilding === "2") return isB2MenuVisible(item);
-    if (item.id.startsWith("b13-daily-")) return scheduled13.includes(item.id);
+    if (item.id.startsWith("b13-daily-")) return hasDateMenuSchedule(activeBuilding) || scheduled13.includes(item.id);
     return true;
   });
 
@@ -1686,7 +1714,7 @@ function renderCafeteriaDateSelector() {
     }
 
     if (
-      formatCafeteriaDate(date) === formatCafeteriaDate(today)
+      formatCafeteriaDate(date) === formatCafeteriaDate(new Date())
     ) {
       button.classList.add("today");
     }
@@ -1728,7 +1756,7 @@ document.querySelectorAll(".cafeteria-btn").forEach(btn => {
       b.classList.toggle("active", b === btn);
     });
 
-    activeCategory = getActiveMenuData().categories[0].id;
+    activeCategory = "all";
 
     const weeklyInfo = document.getElementById("weeklyMenuInfo");
 
@@ -1738,6 +1766,12 @@ document.querySelectorAll(".cafeteria-btn").forEach(btn => {
     }
 
     renderTabs();
+    // 号館を切り替えたら横スクロールも先頭（「すべて」）へ戻す
+    tabBar.scrollLeft = 0;
+    requestAnimationFrame(() => {
+      tabBar.scrollLeft = 0;
+      updateTabScrollButtons();
+    });
     renderMenuList();
     renderCafeteriaDateSelector();
   });
@@ -2036,7 +2070,9 @@ loginSubmitBtn.addEventListener("click", () => {
 
     menuMode = "select";
     selectedFoods = [];
-
+    // ログイン直後は「すべて」を選択する（履歴復元時は変更しない）
+    activeCategory = "all";
+    renderTabs();
     renderMenuList();
     updateSelectedBar();
 
@@ -2402,6 +2438,8 @@ nextBtn.addEventListener("click", () => {
 
     menuMode = "select";
     selectedFoods = [];
+    activeCategory = "all";
+    renderTabs();
     renderMenuList();
     updateSelectedBar();
 
@@ -2474,7 +2512,11 @@ tabBar.addEventListener("scroll", updateTabScrollButtons);
 window.addEventListener("resize", updateTabScrollButtons);
 
 function renderTabs() {
-  tabBar.innerHTML = getActiveMenuData().categories.filter(cat => cat.id !== "daily").map(cat => `
+  const categories = [
+    { id: "all", emoji: "🍽️", label: "すべて" },
+    ...getActiveMenuData().categories
+  ];
+  tabBar.innerHTML = categories.map(cat => `
               <button type="button" class="tab-item${cat.id === activeCategory ? " active" : ""}"
                 data-category="${cat.id}">
                 ${cat.emoji} ${cat.label}
@@ -2591,12 +2633,12 @@ function renderMenuList() {
   // 表示する料理を取得
   const items = getActiveMenuData().items.filter(item => {
     if (item.category === "daily") return false;
-    if (item.category !== activeCategory) return false;
+    if (activeCategory !== "all" && item.category !== activeCategory) return false;
     if (item.tags.includes("option")) return false;
     if (item.deleted) return false;
     const adminOverride = getAdminOverride(activeBuilding, item.id);
     // 管理者の明示的なONがない商品は、号館や通常/おすすめの区別なく非表示。
-    if (adminOverride?.visible !== true) return false;
+    if (!isDateMenuPublished(activeBuilding,item.id)) return false;
 
     // 栄養値未確認の料理はデータに保持し、学生の食事登録対象にはしない。
     if (["energy_kcal", "protein_g", "fat_g", "carb_g", "salt_g"].some(key => item[key] == null)) return false;
@@ -2605,6 +2647,7 @@ function renderMenuList() {
     if (activeBuilding === "2") return isB2MenuVisible(item);
 
     // 管理者の明示的な販売設定は日付別の既定ルールより優先。
+    if (hasDateMenuSchedule(activeBuilding)) return true;
     if (adminOverride && adminOverride.visible === true) return true;
 
     // 13号館の固定メニューは常時表示
@@ -2648,7 +2691,15 @@ function renderMenuList() {
   }
 
 
-  menuList.innerHTML = uniqueItems.map(item => {
+  // 「すべて」でもカテゴリタブと同じ順序に揃える
+  const categoryOrder = getActiveMenuData().categories.map(cat => cat.id);
+  const orderedItems = [...uniqueItems].sort((a,b) => {
+    const categoryOf = item => activeBuilding === "13" && item.category === "daily-teishoku" ? "daily" : item.category;
+    const ai = categoryOrder.indexOf(categoryOf(a));
+    const bi = categoryOrder.indexOf(categoryOf(b));
+    return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+  });
+  menuList.innerHTML = orderedItems.map(item => {
 
     // 13号館：栄養価が未登録か確認
     const nutritionPending =
@@ -6772,6 +6823,8 @@ if (recommendOverlay && closeRecommendPopup) {
     startPage.style.display = "none";
     menuMode = "select";
     selectedFoods = [];
+    activeCategory = "all";
+    renderTabs();
     renderMenuList();
     updateSelectedBar();
     document.getElementById("selectMenuPage").style.display = "block";
@@ -6805,4 +6858,220 @@ if (recommendOverlay && closeRecommendPopup) {
     syncProfileNavigation();
     window.scrollTo({ top: 0, behavior: "auto" });
   });
+})();
+
+
+
+/* =========================================================
+   画面・操作履歴 v4
+   クリック前後の状態を比較し、実際に変わった操作だけ履歴へ。
+   戻る操作は popstate で保存状態を復元する。
+========================================================= */
+(function initNavigationV4() {
+  const KEY = 'joshoNavigationV4';
+  const screens = ['returnStartPage','authChoicePage','registerPage','loginPage',
+    'selectMenuPage','detailPage','todayPage','mypagePage'];
+  const $ = id => document.getElementById(id);
+  const visible = id => { const e=$(id); return !!e && getComputedStyle(e).display!=='none' && e.getClientRects().length>0; };
+  const owner = () => localStorage.getItem('currentUser') || localStorage.getItem('lastProfileUser') || '';
+  let locked=true, previous=null, timer=null, before=null;
+  function take() {
+    const page = visible('inputCard') ? 'profileInput' : screens.find(visible);
+    if (!page) return null;
+    return {
+      page, owner:owner(), building:activeBuilding, category:activeCategory,
+      itemId:page==='detailPage' ? selectedFood?.id : null,
+      date: selectedCafeteriaDate instanceof Date ? selectedCafeteriaDate.toISOString().slice(0,10) : null,
+      calendarYear, calendarMonth, selectedCalendarDate,
+      profileStep:currentStep, editingProfile:isEditingProfile,
+      modal:visible('confirmModal'), scroll:window.scrollY
+    };
+  }
+  function identity(s) { if(!s) return ''; const {scroll,...rest}=s; return JSON.stringify(rest); }
+  function save(s) { if(s) try { sessionStorage.setItem(KEY,JSON.stringify(s)); } catch(_){} }
+  function update() {
+    if(locked) return;
+    const next=take(); if(!next) return;
+    if(identity(next)===identity(previous)) {save(next);return;}
+    history.pushState({joshoNav4:next},''); previous=next; save(next);
+  }
+  function schedule() { clearTimeout(timer);timer=setTimeout(update,30); }
+  function restore(s) {
+    if(!s || !s.page || s.owner!==owner()) return false;
+    locked=true; clearTimeout(timer);
+    try {
+      if(['2','13'].includes(s.building)) activeBuilding=s.building;
+      if(s.date && /^\d{4}-\d{2}-\d{2}$/.test(s.date)) { selectedCafeteriaDate=new Date(s.date+'T12:00:00'); cafeteriaWeekStart=getMonday(selectedCafeteriaDate); }
+      if(Number.isInteger(s.calendarYear)) calendarYear=s.calendarYear;
+      if(Number.isInteger(s.calendarMonth)) calendarMonth=s.calendarMonth;
+      selectedCalendarDate=s.selectedCalendarDate||null;
+      isEditingProfile=!!s.editingProfile;
+      const data=getActiveMenuData();
+      if(s.category === "all" || data.categories.some(c=>c.id===s.category)) activeCategory=s.category;
+      document.querySelectorAll('.cafeteria-btn').forEach(b=>b.classList.toggle('active',b.dataset.building===activeBuilding));
+      renderTabs(); renderMenuList(); renderCafeteriaDateSelector();
+      screens.forEach(id=>{if($(id)) $(id).style.display='none';});
+      if($('inputCard')) $('inputCard').style.display='none';
+      if($('progressContainer')) $('progressContainer').style.display='none';
+      if(document.querySelector('.progress-container')) document.querySelector('.progress-container').style.display='none';
+      if($('confirmModal')) $('confirmModal').style.display='none';
+      const main=['selectMenuPage','detailPage','todayPage','mypagePage'].includes(s.page);
+      if($('bottomNav')) $('bottomNav').style.display=main?'flex':'none';
+      $('appContainer')?.classList.toggle('has-bottom-nav',main);
+      if(s.page==='profileInput') {
+        loadUserProfileIntoForm();
+        if($('inputCard')) $('inputCard').style.display='flex';
+        if(document.querySelector('.progress-container')) document.querySelector('.progress-container').style.display='flex';
+        showProfileStep(Math.max(0,Math.min(3,s.profileStep||0)));
+      } else if(s.page==='detailPage' && s.itemId && data.items.some(i=>i.id===s.itemId)) {
+        showDetail(s.itemId); setActiveTab(menuTab);
+      } else if(s.page==='todayPage') {
+        loadTodayMealFromHistory();showPage(todayPage,todayTab);renderTodayPage();
+      } else if(s.page==='mypagePage') {
+        showPage(mypagePage,mypageTab);renderMyPage();
+      } else if(main) {
+        showPage(menuPage,menuTab);updateSelectedBar();
+      } else if($(s.page)) {
+        $(s.page).style.display='flex';
+      }
+      if(s.modal && selectedFoods.length) {
+        renderConfirmModal();if($('confirmModal')) $('confirmModal').style.display='flex';
+        if(typeof renderConfirmRadarChart==='function') renderConfirmRadarChart();
+      }
+      previous=s;save(s);
+      requestAnimationFrame(()=>window.scrollTo(0,Math.max(0,s.scroll||0)));
+      return true;
+    } catch(e) {console.error('画面履歴の復元に失敗',e);return false;}
+    finally {setTimeout(()=>{locked=false;},120);}
+  }
+  // イベント前の状態を保存。後から同一操作の結果を一回だけ記録する。
+  document.addEventListener('click',e=>{
+    if(locked || !e.target.closest('button,a,[role="button"],.menu-card,.calendar-day')) return;
+    before=take();
+    // 初期エントリをクリック前の状態に固定して、1回目の戻る先を保証
+    if(before && identity(before)!==identity(previous)) {
+      history.replaceState({...(history.state||{}),joshoNav4:before},'');previous=before;save(before);
+    }
+  },true);
+  document.addEventListener('click',e=>{
+    if(locked || !e.target.closest('button,a,[role="button"],.menu-card,.calendar-day')) return;
+    schedule();
+  });
+  document.addEventListener('change',()=>schedule());
+  window.addEventListener('popstate',e=>{
+    if(e.state?.joshoNav4) restore(e.state.joshoNav4);
+  });
+  window.addEventListener('pagehide',()=>{if(!locked) save(take());});
+  // 起動時のログイン判定や START 表示が完了してから画面を復元
+  let saved=null;try {saved=JSON.parse(sessionStorage.getItem(KEY)||'null');}catch(_){}
+  setTimeout(()=>{
+    // 初回表示・再読み込み時は必ず当日を選択する。
+    // 前日に保存された日付が sessionStorage に残っていても引き継がない。
+    // ブラウザの戻る・進む操作では従来どおり日付履歴を復元する。
+    if(saved) {
+      const currentDate = new Date();
+      saved.date = formatCafeteriaDate(currentDate);
+    }
+    if(saved && restore(saved)) {
+      history.replaceState({...(history.state||{}),joshoNav4:saved},'');
+    } else {
+      previous=take();
+      if(previous) {history.replaceState({...(history.state||{}),joshoNav4:previous},'');save(previous);}
+    }
+    setTimeout(()=>{locked=false;},180);
+  },500);
+})();
+
+
+/* 共通ヘッダー：ホームロゴからメニュー一覧へ */
+(function setupWelfareHomeHeader() {
+  const header = document.getElementById('welfareHomeHeader');
+  const button = document.getElementById('welfareHomeButton');
+  const bottom = document.getElementById('bottomNav');
+  if (!header || !button || !bottom) return;
+  function sync() {
+    // START経由では currentUser が空でも lastProfileUser が使われる。
+    // ログイン状態ではなく、実際にアプリ画面が開いているかで判定する。
+    const appScreens = ['selectMenuPage', 'detailPage', 'todayPage', 'mypagePage'];
+    const appVisible = appScreens.some(id => {
+      const page = document.getElementById(id);
+      return page && getComputedStyle(page).display !== 'none' && page.getClientRects().length > 0;
+    });
+    const editingProfile = typeof isEditingProfile !== 'undefined' && isEditingProfile;
+    const profileCard = document.getElementById('inputCard');
+    const profileVisible = editingProfile && profileCard &&
+      getComputedStyle(profileCard).display !== 'none' && profileCard.getClientRects().length > 0;
+    header.style.display = appVisible || profileVisible ? 'block' : 'none';
+  }
+  button.addEventListener('click', () => {
+    // 基本情報編集は通常のタブ画面とは独立しているため、
+    // メニューを開く前に編集画面と進捗表示を必ず閉じる。
+    if (typeof isEditingProfile !== 'undefined') isEditingProfile = false;
+    const input = document.getElementById('inputCard');
+    if (input) input.style.display = 'none';
+    const progress = document.getElementById('progressContainer');
+    if (progress) progress.style.display = 'none';
+    document.querySelectorAll('.progress-container').forEach(node => {
+      node.style.display = 'none';
+    });
+    const nav = document.getElementById('bottomNav');
+    if (nav) nav.style.display = 'flex';
+    document.getElementById('appContainer')?.classList.add('has-bottom-nav');
+    if (typeof syncProfileNavigation === 'function') syncProfileNavigation();
+
+    // ホームロゴは「2号館・すべて・今日」に表示状態をリセットする。
+    // 登録済みの食事・ユーザープロフィール・履歴は変更しない。
+    activeBuilding = '2';
+    activeCategory = 'all';
+    const homeToday = new Date();
+    selectedCafeteriaDate = new Date(homeToday.getFullYear(), homeToday.getMonth(), homeToday.getDate());
+    cafeteriaWeekStart = getMonday(selectedCafeteriaDate);
+    document.querySelectorAll('.cafeteria-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.building === '2');
+    });
+    const weeklyInfo = document.getElementById('weeklyMenuInfo');
+    if (weeklyInfo) weeklyInfo.style.display = 'none';
+    renderTabs();
+    renderCafeteriaDateSelector();
+    renderMenuList();
+
+    // 既存のメニュータブを利用し、履歴には1操作として記録する。
+    document.getElementById('menuTab')?.click();
+    window.scrollTo({top:0,behavior:'auto'});
+
+    // ページ全体を再読み込みせず、管理者が公開した最新データだけ取得する。
+    // 更新失敗時は現在表示中のメニューを維持する。
+    let status = document.getElementById('welfareMenuRefreshStatus');
+    if (!status) {
+      status = document.createElement('div');
+      status.id = 'welfareMenuRefreshStatus';
+      status.setAttribute('role','status');
+      status.setAttribute('aria-live','polite');
+      status.style.cssText = 'position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff;color:#333;border:1px solid #ddd;border-radius:10px;padding:9px 14px;box-shadow:0 3px 12px #0002;font-size:14px;max-width:90vw;text-align:center;pointer-events:none';
+      document.body.appendChild(status);
+    }
+    if (!MENU_SYNC_URL) {
+      status.textContent = 'メニュー同期の設定がありません';
+      clearTimeout(status.hideTimer);
+      status.hideTimer = setTimeout(() => { status.style.display='none'; }, 3000);
+      status.style.display='block';
+      return;
+    }
+    status.textContent = '最新のメニューを取得しています…';
+    status.style.display = 'block';
+    clearTimeout(status.hideTimer);
+    loadSharedMenuSettings().then(result => {
+      status.textContent = result.ok
+        ? '最新のメニューに更新しました！'
+        : '更新できませんでした。現在のメニューを表示しています';
+      status.hideTimer = setTimeout(() => { status.style.display='none'; }, 3000);
+    });
+  });
+  const observer = new MutationObserver(sync);
+  ['bottomNav','selectMenuPage','detailPage','todayPage','mypagePage','inputCard'].forEach(id => {
+    const node = document.getElementById(id);
+    if (node) observer.observe(node, {attributes:true,attributeFilter:['style','class']});
+  });
+  window.addEventListener('pageshow', sync);
+  sync();
 })();
